@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "zh": "除了期待天空一直不會下雨，你還可以學會在雨天跳舞。",
+    "en": "Instead of wishing for the sky to never rain, you can learn to dance in the rain.",
+    "category": "category1",
+    "contextId": 1
+  },
+  {
+    "id": 2,
+    "zh": "人生所有的點都是連結在一起的。",
+    "en": "Every point in life is connected.",
+    "category": "category1",
+    "contextId": 2
+  },
+  {
+    "id": 3,
+    "zh": "向前看，過去讓它過去。",
+    "en": "Look forward — let bygones be bygones.",
+    "category": "category2",
+    "contextId": 3
+  },
+  {
+    "id": 4,
+    "zh": "每件事情發生都有它的原因。",
+    "en": "Everything that happens has its own meaning.",
+    "category": "category2",
+    "contextId": 4
+  },
+  {
+    "id": 5,
+    "zh": "時間是人際關係的衡量標準之一。",
+    "en": "Time is one of the standards by which relationships are measured.",
+    "category": "category3",
+    "contextId": 5
+  }
+]

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脈絡 - The King of Chicken Soup</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#f2f2f2] overflow-hidden">
+    <div class="w-screen h-screen flex items-center justify-center px-8">
+        <div class="max-w-4xl">
+            <!-- 標題 -->
+            <h2 id="context-title" class="text-3xl md:text-4xl font-bold text-black mb-8 text-center">
+                關於這句話
+            </h2>
+
+            <!-- 內容容器 -->
+            <div id="context-content" class="text-lg md:text-xl text-black leading-relaxed">
+                <!-- 動態載入內容：文字、影片或音訊 -->
+                <p class="text-center">
+                    這是脈絡內容的範例文字。當 NFC 感應時，這裡會顯示對應雞湯文背後的故事、影片或其他相關資訊。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/nfc.js"></script>
+    <script src="js/context.js"></script>
+</body>
+</html>
