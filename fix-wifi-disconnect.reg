@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+
+; 停用 Windows 自動斷開無網路的 WiFi
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet]
+"EnableActiveProbing"=dword:00000000

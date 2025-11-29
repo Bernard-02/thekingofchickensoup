@@ -12,8 +12,30 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-[#f2f2f2] overflow-hidden">
-    <div class="w-screen h-screen flex items-center justify-center">
-        <h1 class="text-4xl md:text-6xl text-black text-center">這個人超會寫雞湯。</h1>
+    <div class="w-screen h-screen flex flex-col items-center justify-center px-8">
+        <!-- 主標題 -->
+        <h1 class="text-5xl md:text-7xl text-black font-medium">
+            這個人超會寫雞湯。
+        </h1>
+
+        <!-- Logo -->
+        <img src="Logo/雞湯Logo.png" alt="The King of Chicken Soup" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 h-8 md:h-10">
+
+        <!-- WebSocket 狀態指示器（隱藏但保留功能） -->
+        <div class="fixed bottom-4 right-4 flex items-center space-x-2 opacity-0 hover:opacity-100 transition-opacity">
+            <div id="ws-status" class="w-3 h-3 rounded-full bg-red-500"></div>
+            <span id="ws-status-text" class="text-sm text-black opacity-50">未連線</span>
+        </div>
     </div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/nfc.js"></script>
+    <script>
+        // 初始化 WebSocket 連線
+        document.addEventListener('DOMContentLoaded', () => {
+            nfcManager.connect();
+        });
+    </script>
 </body>
 </html>

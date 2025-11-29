@@ -88,5 +88,9 @@ class ContextPage {
 const contextPage = new ContextPage();
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 初始化 WebSocket 連線
+    nfcManager.connect();
+
+    // 初始化頁面
     contextPage.init();
 });

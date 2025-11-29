@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(pio run:*)",
+      "Bash(platformio run:*)",
+      "Bash(cat:*)",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []

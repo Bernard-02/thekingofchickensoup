@@ -1,37 +1,182 @@
 [
   {
-    "id": 1,
-    "zh": "除了期待天空一直不會下雨，你還可以學會在雨天跳舞。",
-    "en": "Instead of wishing for the sky to never rain, you can learn to dance in the rain.",
-    "category": "category1",
-    "contextId": 1
+    "id": "001",
+    "number": 1,
+    "category": "人生哲理",
+    "textCN": "除了期待天空一直不會下雨，你還可以學會在雨天跳舞。",
+    "textEN": "Instead of wishing for the sky to never rain, you can learn to dance in the rain.",
+    "nfcUID": "",
+    "contextId": "001"
   },
   {
-    "id": 2,
-    "zh": "人生所有的點都是連結在一起的。",
-    "en": "Every point in life is connected.",
-    "category": "category1",
-    "contextId": 2
+    "id": "002",
+    "number": 2,
+    "category": "人生哲理",
+    "textCN": "人生所有的點都是連結在一起的。",
+    "textEN": "Every point in life is connected.",
+    "nfcUID": "",
+    "contextId": "002"
   },
   {
-    "id": 3,
-    "zh": "向前看，過去讓它過去。",
-    "en": "Look forward — let bygones be bygones.",
-    "category": "category2",
-    "contextId": 3
+    "id": "003",
+    "number": 3,
+    "category": "人生哲理",
+    "textCN": "向前看，過去讓它過去。",
+    "textEN": "Look forward — let bygones be bygones.",
+    "nfcUID": "",
+    "contextId": "003"
   },
   {
-    "id": 4,
-    "zh": "每件事情發生都有它的原因。",
-    "en": "Everything that happens has its own meaning.",
-    "category": "category2",
-    "contextId": 4
+    "id": "004",
+    "number": 4,
+    "category": "人生哲理",
+    "textCN": "每件事情發生都有它的原因。",
+    "textEN": "Everything that happens has its own meaning.",
+    "nfcUID": "",
+    "contextId": "004"
   },
   {
-    "id": 5,
-    "zh": "時間是人際關係的衡量標準之一。",
-    "en": "Time is one of the standards by which relationships are measured.",
-    "category": "category3",
-    "contextId": 5
+    "id": "005",
+    "number": 5,
+    "category": "人際關係",
+    "textCN": "時間是人際關係的衡量標準之一。",
+    "textEN": "Time is one of the standards by which relationships are measured.",
+    "nfcUID": "",
+    "contextId": "005"
+  },
+  {
+    "id": "006",
+    "number": 6,
+    "category": "人生哲理",
+    "textCN": "生命有限，可以偶爾浪費，但不要完全浪費。",
+    "textEN": "Life is limited — you may waste a little of it sometimes, but don't waste it entirely.",
+    "nfcUID": "",
+    "contextId": "006"
+  },
+  {
+    "id": "007",
+    "number": 7,
+    "category": "人際關係",
+    "textCN": "相遇即是一種緣分，珍惜出現在你生命裡的人。",
+    "textEN": "Every encounter is a kind of fate — cherish the people who appear in your life.",
+    "nfcUID": "",
+    "contextId": "007"
+  },
+  {
+    "id": "008",
+    "number": 8,
+    "category": "人生哲理",
+    "textCN": "人生也許就該像蘇軾一樣，也無風雨也無晴。",
+    "textEN": "Perhaps life, like Su Shi wrote, is neither stormy nor sunny.",
+    "nfcUID": "",
+    "contextId": "008"
+  },
+  {
+    "id": "009",
+    "number": 9,
+    "category": "人際關係",
+    "textCN": "破鏡無法重圓，對待與他人的關係請小心輕放。",
+    "textEN": "A broken mirror can't be mended — handle your relationships with care.",
+    "nfcUID": "",
+    "contextId": "009"
+  },
+  {
+    "id": "010",
+    "number": 10,
+    "category": "人生哲理",
+    "textCN": "你最該認識且了解的人，是你自己。",
+    "textEN": "The person you should know and understand the most is yourself.",
+    "nfcUID": "",
+    "contextId": "010"
+  },
+  {
+    "id": "011",
+    "number": 11,
+    "category": "人生哲理",
+    "textCN": "自己選擇的路，不一定要跪著走，也可以站起來走，或者換個舒服的方式走。",
+    "textEN": "The path you chose doesn't have to be walked on your knees — you can stand and walk, or choose a more comfortable way to walk it.",
+    "nfcUID": "",
+    "contextId": "011"
+  },
+  {
+    "id": "012",
+    "number": 12,
+    "category": "人生哲理",
+    "textCN": "人生是拿來體驗的，不一定要拿來完美。",
+    "textEN": "Life is meant to be experienced — it doesn't need to be perfect.",
+    "nfcUID": "",
+    "contextId": "012"
+  },
+  {
+    "id": "013",
+    "number": 13,
+    "category": "人生哲理",
+    "textCN": "我們應該要做好接受任何結果的準備。",
+    "textEN": "We should be prepared to accept any outcome.",
+    "nfcUID": "",
+    "contextId": "013"
+  },
+  {
+    "id": "014",
+    "number": 14,
+    "category": "人生哲理",
+    "textCN": "想活成怎樣的自己，只有你自己能夠決定。",
+    "textEN": "Only you can decide what kind of person you want to become.",
+    "nfcUID": "",
+    "contextId": "014"
+  },
+  {
+    "id": "015",
+    "number": 15,
+    "category": "人生哲理",
+    "textCN": "覺得很煩躁的時候，可以去看大自然。當感覺自己渺小的時候，就會感到心曠神怡。",
+    "textEN": "When you feel irritated, go look at nature. When you feel your own smallness, you'll feel a refreshing sense of relief.",
+    "nfcUID": "",
+    "contextId": "015"
+  },
+  {
+    "id": "016",
+    "number": 16,
+    "category": "人際關係",
+    "textCN": "別人在背後說你壞話，有可能你是個萬人迷，也有可能是因為你走在他們前面。",
+    "textEN": "If people talk badly about you behind your back, it might mean you're charming — or that you're ahead of them.",
+    "nfcUID": "",
+    "contextId": "016"
+  },
+  {
+    "id": "017",
+    "number": 17,
+    "category": "處世態度",
+    "textCN": "想要的東西就自己去爭取，你不再是個嗷嗷待哺的小孩了。",
+    "textEN": "Go after the things you want — you're no longer a child waiting to be fed.",
+    "nfcUID": "",
+    "contextId": "017"
+  },
+  {
+    "id": "018",
+    "number": 18,
+    "category": "人生哲理",
+    "textCN": "這世界上有兩種事：不關我的事及不關你的事。",
+    "textEN": "In this world, there are two kinds of matters: those that don't concern me, and those that don't concern you.",
+    "nfcUID": "",
+    "contextId": "018"
+  },
+  {
+    "id": "019",
+    "number": 19,
+    "category": "人際關係",
+    "textCN": "人生像是一班列車，每個階段上車的人都不一樣：有的可以陪你到終點站，有的則會在幾站就下車了，所以珍惜在車上的時間吧。",
+    "textEN": "Life is like a train — the people who get on at each phase are different. Some will stay with you until the final stop, and some will get off after just a few stations. So cherish the time shared on the train.",
+    "nfcUID": "",
+    "contextId": "019"
+  },
+  {
+    "id": "020",
+    "number": 20,
+    "category": "人生哲理",
+    "textCN": "先愛自己，才能愛別人。",
+    "textEN": "Love yourself first — only then can you love others.",
+    "nfcUID": "",
+    "contextId": "020"
   }
 ]

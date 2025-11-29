@@ -201,9 +201,9 @@ class App {
 }
 
 // 全域應用程式實例
-const app = new App();
+window.app = new App();
 
 // DOM 載入完成後初始化
 document.addEventListener('DOMContentLoaded', () => {
-    app.init();
+    window.app.init();
 });

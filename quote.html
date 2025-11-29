@@ -12,17 +12,39 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-[#f2f2f2] overflow-hidden">
-    <div class="w-screen h-screen flex items-center justify-center px-8">
-        <div class="max-w-4xl text-center">
+    <!-- 過渡動畫 -->
+    <div id="loading-screen" class="w-screen h-screen flex flex-col items-center justify-center">
+        <div class="text-center">
+            <div class="mb-8">
+                <!-- 簡單的旋轉動畫 -->
+                <div class="inline-block w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p class="text-2xl md:text-3xl text-black">準備雞湯中...</p>
+        </div>
+    </div>
+
+    <!-- 雞湯內容 -->
+    <div id="quote-content" class="w-screen h-screen flex flex-col items-center justify-center px-8 py-16 opacity-0 hidden">
+        <div class="max-w-3xl w-full text-center">
+            <!-- 編號 -->
+            <p id="quote-number" class="text-3xl text-black mb-8 font-medium">
+                #1
+            </p>
+
             <!-- 中文雞湯文 -->
-            <p id="quote-zh" class="text-3xl md:text-5xl text-black leading-relaxed mb-6">
+            <p id="quote-zh" class="text-4xl text-black leading-[1.25] px-4 font-bold mb-2" style="text-wrap: balance;">
                 除了期待天空一直不會下雨，你還可以學會在雨天跳舞。
             </p>
+
             <!-- 英文翻譯 -->
-            <p id="quote-en" class="text-xl md:text-2xl text-black opacity-70 leading-relaxed">
+            <p id="quote-en" class="text-4xl text-black tracking-tighter leading-[2.2rem] px-4 font-normal" style="text-wrap: balance;">
                 Instead of wishing for the sky to never rain, you can learn to dance in the rain.
             </p>
+
         </div>
+
+        <!-- Logo -->
+        <img src="Logo/雞湯Logo.png" alt="The King of Chicken Soup" class="absolute bottom-8 left-1/2 transform -translate-x-1/2 h-8 md:h-10">
     </div>
 
     <!-- JavaScript -->

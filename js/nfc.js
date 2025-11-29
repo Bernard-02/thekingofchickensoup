@@ -66,6 +66,25 @@ class NFCManager {
             log(`收到訊息: ${JSON.stringify(message)}`, 'info');
 
             switch (message.type) {
+                case 'connected':
+                    log('ESP8266 連線確認', 'info');
+                    break;
+                case 'category_selected':
+                    // 處理分類選擇
+                    this.handleCategorySelected(message);
+                    break;
+                case 'show_context':
+                    // 處理顯示脈絡
+                    this.handleShowContext(message);
+                    break;
+                case 'save_quote':
+                    // 處理儲存雞湯
+                    this.handleSaveQuote(message);
+                    break;
+                case 'page_change':
+                    // 舊版頁面切換（保留向下相容）
+                    this.handlePageChange(message);
+                    break;
                 case 'nfc_read':
                     this.handleNFCRead(message.data);
                     break;
@@ -89,6 +108,97 @@ class NFCManager {
         }
     }
 
+    // 處理分類選擇
+    async handleCategorySelected(message) {
+        const { uid, category } = message;
+        log(`分類選擇! UID: ${uid}, 分類: ${category}`, 'info');
+
+        try {
+            // 載入雞湯資料
+            const response = await fetch('data/quotes.json');
+            const quotes = await response.json();
+
+            // 篩選該分類的雞湯
+            const categoryQuotes = quotes.filter(q => q.category === category);
+
+            if (categoryQuotes.length === 0) {
+                log(`分類 ${category} 沒有雞湯文`, 'warn');
+                return;
+            }
+
+            // 隨機選擇一句
+            const randomQuote = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
+            log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
+
+            // 儲存到 localStorage，供 quote.html 使用
+            localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
+            localStorage.setItem('selectedCategory', category);
+
+            // 跳轉到 quote.html（會顯示過渡動畫）
+            window.location.href = 'quote.html';
+
+        } catch (error) {
+            log(`載入雞湯失敗: ${error}`, 'error');
+        }
+    }
+
+    // 處理顯示脈絡
+    handleShowContext(message) {
+        const { quoteId } = message;
+        log(`顯示脈絡! Quote ID: ${quoteId}`, 'info');
+
+        // 儲存 quoteId 到 localStorage
+        localStorage.setItem('contextQuoteId', quoteId);
+
+        // 跳轉到 context.html
+        window.location.href = 'context.html';
+    }
+
+    // 處理儲存雞湯
+    handleSaveQuote(message) {
+        log('儲存雞湯功能觸發', 'info');
+
+        // 取得當前雞湯
+        const currentQuote = localStorage.getItem('currentQuote');
+
+        if (currentQuote) {
+            const quote = JSON.parse(currentQuote);
+            log(`準備儲存雞湯 #${quote.number} 到 NFC`, 'info');
+
+            // TODO: 實作寫入 NFC 功能
+            // 這部分之後會實作
+            alert(`雞湯 #${quote.number} 已準備儲存到 NFC！\n\n${quote.textCN}`);
+        } else {
+            log('沒有雞湯可以儲存', 'warn');
+        }
+    }
+
+    // 處理頁面切換 (舊版，保留向下相容)
+    handlePageChange(message) {
+        const { uid, page } = message;
+        log(`NFC 偵測到! UID: ${uid}, 切換到頁面: ${page}`, 'info');
+
+        // 根據頁面名稱切換到對應的 HTML 頁面
+        const pageMap = {
+            'quote': 'quote.html',
+            'context': 'context.html',
+            'home': 'index.html'
+        };
+
+        const targetPage = pageMap[page];
+        if (targetPage) {
+            log(`正在跳轉到: ${targetPage}`, 'info');
+            window.location.href = targetPage;
+        } else {
+            log(`未知的頁面: ${page}`, 'warn');
+        }
+
+        // 觸發回調
+        if (this.onReadCallback) {
+            this.onReadCallback({ uid, page });
+        }
+    }
+
     // 處理 NFC 讀取
     handleNFCRead(data) {
         log(`NFC 讀取: UID=${data.uid}`, 'info');
@@ -99,8 +209,16 @@ class NFCManager {
             resultDiv.innerHTML = `
                 <p class="font-semibold">偵測到 NFC 標籤！</p>
                 <p class="mt-2">UID: ${data.uid}</p>
+                ${data.page ? `<p class="mt-2">頁面: ${data.page}</p>` : ''}
                 ${data.content ? `<p class="mt-2">內容: ${data.content}</p>` : ''}
             `;
+        }
+
+        // 如果有頁面資訊,自動切換頁面
+        if (data.page && window.app) {
+            const pageId = data.page + '-page';
+            log(`自動切換到頁面: ${pageId}`, 'info');
+            window.app.showPage(pageId);
         }
 
         // 觸發回調

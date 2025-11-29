@@ -3,8 +3,8 @@
 const CONFIG = {
     // WebSocket 設定
     websocket: {
-        // ESP8266 的 IP 位址（需要根據實際情況修改）
-        url: 'ws://192.168.4.1:81', // 預設為 ESP8266 AP 模式的 IP
+        // ESP8266 的 IP 位址（Station 模式 - 連接到 Louisa Router）
+        url: 'ws://192.168.50.177:81',
         reconnectInterval: 3000, // 重連間隔（毫秒）
         heartbeatInterval: 30000 // 心跳間隔（毫秒）
     },
