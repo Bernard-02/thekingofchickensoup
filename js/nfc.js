@@ -69,8 +69,12 @@ class NFCManager {
                 case 'connected':
                     log('ESP8266 連線確認', 'info');
                     break;
+                case 'random_quote':
+                    // 處理隨機抽雞湯
+                    this.handleRandomQuote();
+                    break;
                 case 'category_selected':
-                    // 處理分類選擇
+                    // 處理分類選擇（保留向下相容）
                     this.handleCategorySelected(message);
                     break;
                 case 'show_context':
@@ -108,7 +112,36 @@ class NFCManager {
         }
     }
 
-    // 處理分類選擇
+    // 處理隨機抽雞湯（新版簡化邏輯）
+    async handleRandomQuote() {
+        log('收到隨機抽雞湯指令', 'info');
+
+        try {
+            // 載入雞湯資料
+            const response = await fetch('data/quotes.json');
+            const quotes = await response.json();
+
+            if (quotes.length === 0) {
+                log('沒有雞湯資料', 'warn');
+                return;
+            }
+
+            // 從全部 200 句中隨機選擇一句
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
+
+            // 儲存到 localStorage，供 quote.html 使用
+            localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
+
+            // 跳轉到 quote.html
+            window.location.href = 'quote.html';
+
+        } catch (error) {
+            log(`載入雞湯失敗: ${error}`, 'error');
+        }
+    }
+
+    // 處理分類選擇（保留向下相容）
     async handleCategorySelected(message) {
         const { uid, category } = message;
         log(`分類選擇! UID: ${uid}, 分類: ${category}`, 'info');
@@ -154,7 +187,7 @@ class NFCManager {
         window.location.href = 'context.html';
     }
 
-    // 處理儲存雞湯
+    // 處理儲存雞湯（此函數現在由 ESP8266 主動觸發寫入，這裡保留用於 UI 回饋）
     handleSaveQuote(message) {
         log('儲存雞湯功能觸發', 'info');
 
@@ -164,12 +197,30 @@ class NFCManager {
         if (currentQuote) {
             const quote = JSON.parse(currentQuote);
             log(`準備儲存雞湯 #${quote.number} 到 NFC`, 'info');
-
-            // TODO: 實作寫入 NFC 功能
-            // 這部分之後會實作
-            alert(`雞湯 #${quote.number} 已準備儲存到 NFC！\n\n${quote.textCN}`);
+            // 注意：實際寫入是由 ESP8266 處理，這裡只是顯示提示
         } else {
             log('沒有雞湯可以儲存', 'warn');
+        }
+    }
+
+    // 發送當前顯示的雞湯編號給 ESP8266
+    updateCurrentQuote(quoteNumber) {
+        if (!this.isConnected || !this.ws) {
+            log('未連線，無法更新當前雞湯編號', 'warn');
+            return false;
+        }
+
+        try {
+            const message = JSON.stringify({
+                type: 'update_current_quote',
+                quoteNumber: quoteNumber
+            });
+            this.ws.send(message);
+            log(`已發送當前雞湯編號: ${quoteNumber}`, 'sent');
+            return true;
+        } catch (error) {
+            log(`發送雞湯編號失敗: ${error}`, 'error');
+            return false;
         }
     }
 
@@ -245,11 +296,26 @@ class NFCManager {
 
     // 處理 NFC 寫入成功
     handleNFCWriteSuccess(data) {
-        log('NFC 寫入成功', 'info');
+        const { quoteNumber, url } = data;
+        log(`NFC 寫入成功！雞湯 #${quoteNumber}`, 'info');
+
+        // 顯示成功提示（可以用更好的 UI，這裡先用 alert）
+        const currentQuote = localStorage.getItem('currentQuote');
+        if (currentQuote) {
+            const quote = JSON.parse(currentQuote);
+
+            // 驗證寫入的編號與當前顯示的一致
+            if (quote.number === quoteNumber) {
+                // 創建成功提示 overlay
+                this.showWriteSuccessOverlay(quote, url);
+            } else {
+                log(`警告：寫入的編號 (${quoteNumber}) 與當前顯示的 (${quote.number}) 不一致`, 'warn');
+            }
+        }
 
         const resultDiv = document.getElementById('nfc-write-result');
         if (resultDiv) {
-            resultDiv.innerHTML = '<p class="text-green-600">✓ 寫入成功！</p>';
+            resultDiv.innerHTML = `<p class="text-green-600">✓ 雞湯 #${quoteNumber} 已儲存到 NFC！</p>`;
         }
 
         if (this.onWriteCallback) {
@@ -257,18 +323,103 @@ class NFCManager {
         }
     }
 
+    // 顯示寫入成功的 overlay
+    showWriteSuccessOverlay(quote, url) {
+        // 創建 overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'write-success-overlay';
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50';
+        overlay.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 mx-4 max-w-md text-center transform scale-0 transition-transform duration-300">
+                <div class="text-6xl mb-4">✓</div>
+                <h2 class="text-2xl font-bold mb-2">儲存成功！</h2>
+                <p class="text-lg text-gray-600 mb-4">雞湯 #${quote.number} 已寫入 NFC 卡片</p>
+                <p class="text-sm text-gray-400 mb-6 break-all">${url}</p>
+                <p class="text-base text-gray-500">用手機掃描這張卡片<br>即可隨時查看這句雞湯</p>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // 動畫效果
+        setTimeout(() => {
+            overlay.querySelector('div').classList.remove('scale-0');
+            overlay.querySelector('div').classList.add('scale-100');
+        }, 50);
+
+        // 3 秒後自動關閉
+        setTimeout(() => {
+            overlay.querySelector('div').classList.remove('scale-100');
+            overlay.querySelector('div').classList.add('scale-0');
+            setTimeout(() => overlay.remove(), 300);
+        }, 3000);
+
+        // 點擊關閉
+        overlay.addEventListener('click', () => {
+            overlay.querySelector('div').classList.remove('scale-100');
+            overlay.querySelector('div').classList.add('scale-0');
+            setTimeout(() => overlay.remove(), 300);
+        });
+    }
+
     // 處理 NFC 寫入錯誤
     handleNFCWriteError(data) {
-        log(`NFC 寫入失敗: ${data.error}`, 'error');
+        const { quoteNumber, error } = data;
+        log(`NFC 寫入失敗: ${error}`, 'error');
+
+        // 錯誤訊息對應
+        const errorMessages = {
+            'no_quote_displayed': '目前沒有顯示任何雞湯，請先選擇一個分類',
+            'write_failed': '寫入失敗，請確認 NFC 卡片放置正確',
+            'card_removed': 'NFC 卡片已移除，請重新放置卡片'
+        };
+
+        const message = errorMessages[error] || `發生錯誤：${error}`;
+
+        // 顯示錯誤提示
+        this.showWriteErrorOverlay(message);
 
         const resultDiv = document.getElementById('nfc-write-result');
         if (resultDiv) {
-            resultDiv.innerHTML = `<p class="text-red-600">✗ 寫入失敗: ${data.error}</p>`;
+            resultDiv.innerHTML = `<p class="text-red-600">✗ ${message}</p>`;
         }
 
         if (this.onWriteCallback) {
             this.onWriteCallback(false, data);
         }
+    }
+
+    // 顯示寫入失敗的 overlay
+    showWriteErrorOverlay(message) {
+        const overlay = document.createElement('div');
+        overlay.id = 'write-error-overlay';
+        overlay.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50';
+        overlay.innerHTML = `
+            <div class="bg-white rounded-2xl p-8 mx-4 max-w-md text-center transform scale-0 transition-transform duration-300">
+                <div class="text-6xl mb-4 text-red-500">✗</div>
+                <h2 class="text-2xl font-bold mb-2 text-red-600">儲存失敗</h2>
+                <p class="text-lg text-gray-600">${message}</p>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        setTimeout(() => {
+            overlay.querySelector('div').classList.remove('scale-0');
+            overlay.querySelector('div').classList.add('scale-100');
+        }, 50);
+
+        setTimeout(() => {
+            overlay.querySelector('div').classList.remove('scale-100');
+            overlay.querySelector('div').classList.add('scale-0');
+            setTimeout(() => overlay.remove(), 300);
+        }, 2500);
+
+        overlay.addEventListener('click', () => {
+            overlay.querySelector('div').classList.remove('scale-100');
+            overlay.querySelector('div').classList.add('scale-0');
+            setTimeout(() => overlay.remove(), 300);
+        });
     }
 
     // 發送訊息

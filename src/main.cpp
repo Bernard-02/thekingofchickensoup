@@ -15,8 +15,8 @@ const char* ap_ssid = "ChickenSoup-NFC";
 const char* ap_password = "nfc12345";
 
 // ===== Station 模式設定（Router WiFi）=====
-const char* sta_ssid = "Louisa";
-const char* sta_password = "85098222";
+const char* sta_ssid = "Sccd_Professor";
+const char* sta_password = "sccdgogogo";
 
 // ===== WebSocket 設定 =====
 #define WS_PORT 81
@@ -30,26 +30,13 @@ NfcAdapter nfc(pn532spi);
 
 // ===== NFC 卡片類型定義 =====
 enum NFCType {
-  NFC_CATEGORY,  // 分類卡片（3張）
-  NFC_QUOTE,     // 雞湯文卡片（200張）
-  NFC_BLANK,     // 空白卡片（可寫入）
-  NFC_UNKNOWN    // 未知卡片
+  NFC_TRIGGER,   // 觸發卡片（抽雞湯）
+  NFC_OTHER      // 其他卡片（儲存用）
 };
 
-// 分類卡片對應
-struct CategoryMapping {
-  String uid;       // NFC 卡片的 UID
-  String category;  // 分類名稱
-};
-
-// 定義 3 張分類 NFC
-CategoryMapping categoryMappings[] = {
-  {"04:83:D5:22:BF:2A:81", "人生哲理"},
-  {"04:82:D5:22:BF:2A:81", "人際關係"},
-  {"04:8D:D5:22:BF:2A:81", "處世態度"}
-};
-
-const int categoryCount = sizeof(categoryMappings) / sizeof(categoryMappings[0]);
+// ===== 觸發卡片設定 =====
+// 只有這張卡片會觸發隨機抽雞湯
+const String TRIGGER_NFC_UID = "04:83:D5:22:BF:2A:81";  // 人生哲理卡片
 
 // 儲存上次讀取的 UID，避免重複觸發
 String lastUID = "";
@@ -59,14 +46,21 @@ bool clientConnected = false;
 unsigned long lastTriggerTime = 0;  // 上次觸發的時間戳
 const unsigned long TRIGGER_COOLDOWN = 2000;  // 冷卻時間（毫秒），建議 2-5 秒
 
+// ===== 當前狀態追蹤 =====
+int currentQuoteNumber = -1;  // 當前顯示的雞湯編號（由前端更新）
+bool waitingForBlankNFC = false;  // 是否等待空白 NFC 卡片進行寫入
+
+// ===== 網站 URL 設定 =====
+const char* QUOTE_BASE_URL = "https://thekingofchickensoup.framer.website/quotes/quote";
+
 // ===== 函數宣告 =====
 void setupWiFi();
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
 String getUIDString(byte* uid, byte uidLength);
 NFCType detectNFCType(String uid);
-String getCategoryForUID(String uid);
-void sendCategorySelection(String uid, String category);
-void sendQuoteDisplay(String quoteId);
+void sendRandomQuote();
+bool writeURLToNFC(int quoteNumber);
+void sendWriteResult(bool success, int quoteNumber, String errorMsg = "");
 
 // ===== 設定 =====
 void setup() {
@@ -203,9 +197,26 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       break;
     }
 
-    case WStype_TEXT:
+    case WStype_TEXT: {
       Serial.printf("[%u] 收到訊息: %s\n", num, payload);
+
+      // 解析 JSON 訊息
+      String msg = String((char*)payload);
+
+      // 處理前端發送的當前雞湯編號更新
+      // 格式: {"type":"update_current_quote","quoteNumber":1}
+      if (msg.indexOf("\"type\":\"update_current_quote\"") >= 0) {
+        int numStart = msg.indexOf("\"quoteNumber\":") + 14;
+        int numEnd = msg.indexOf("}", numStart);
+        if (numStart > 13 && numEnd > numStart) {
+          String numStr = msg.substring(numStart, numEnd);
+          numStr.trim();
+          currentQuoteNumber = numStr.toInt();
+          Serial.printf("已更新當前雞湯編號: %d\n", currentQuoteNumber);
+        }
+      }
       break;
+    }
   }
 }
 
@@ -242,22 +253,17 @@ void loop() {
     bool shouldProcess = false;
     unsigned long currentTime = millis();
 
-    if (nfcType == NFC_CATEGORY) {
-      // 分類卡片特殊邏輯：
+    if (nfcType == NFC_TRIGGER) {
+      // 觸發卡片邏輯：
       // 1. 如果是新卡片（UID 不同），直接觸發
-      // 2. 如果是同一張卡片，需要滿足兩個條件：
-      //    a) 卡片曾經移除過（lastUID 被清空）
-      //    b) 距離上次觸發超過冷卻時間
+      // 2. 如果是同一張卡片，需要卡片移除後重新放置且超過冷卻時間
 
       if (currentUID != lastUID) {
-        // 新卡片，直接觸發
         shouldProcess = true;
       } else if (lastUID == "") {
-        // 卡片移除後重新放置
         if (currentTime - lastTriggerTime >= TRIGGER_COOLDOWN) {
           shouldProcess = true;
         } else {
-          // 冷卻時間未到
           unsigned long remainingTime = (TRIGGER_COOLDOWN - (currentTime - lastTriggerTime)) / 1000;
           Serial.print("冷卻中，請等待 ");
           Serial.print(remainingTime + 1);
@@ -273,7 +279,7 @@ void loop() {
 
     if (shouldProcess) {
       lastUID = currentUID;
-      lastTriggerTime = currentTime;  // 記錄觸發時間
+      lastTriggerTime = currentTime;
 
       Serial.println("=================================");
       Serial.println("NFC Tag Detected!");
@@ -281,67 +287,48 @@ void loop() {
       Serial.print("UID: ");
       Serial.println(currentUID);
 
-      switch(nfcType) {
-        case NFC_CATEGORY: {
-          // 分類卡片 - 發送分類選擇訊息
-          String category = getCategoryForUID(currentUID);
-          Serial.print("Type: Category - ");
-          Serial.println(category);
-          Serial.println("=================================\n");
+      if (nfcType == NFC_TRIGGER) {
+        // 觸發卡片 - 隨機抽一句雞湯
+        Serial.println("Type: Trigger Card (隨機抽雞湯)");
+        Serial.println("=================================\n");
 
-          // 總是嘗試發送 WebSocket 訊息（即使沒有連線也發送，因為可能正在重連）
-          sendCategorySelection(currentUID, category);
+        sendRandomQuote();
 
-          // 如果沒有連線，也印出備用訊息
-          if (!clientConnected) {
-            Serial.println(">>> 注意：WebSocket 未連線，但已嘗試發送 <<<");
-          }
-          break;
+        if (!clientConnected) {
+          Serial.println(">>> 注意：WebSocket 未連線，但已嘗試發送 <<<");
         }
+      } else {
+        // 其他卡片 - 目前只顯示 UID（測試模式）
+        Serial.println("Type: Other Card");
+        Serial.println(">>> 測試模式：只顯示 UID，不執行寫入 <<<");
+        Serial.println("=================================\n");
 
-        case NFC_QUOTE: {
-          // 雞湯文卡片 - 顯示脈絡頁面
-          Serial.println("Type: Quote Card");
-          Serial.println("=================================\n");
-
-          // 總是嘗試發送
-          sendQuoteDisplay(currentUID);
-
-          if (!clientConnected) {
-            Serial.println(">>> 注意：WebSocket 未連線，但已嘗試發送 <<<");
-          }
-          break;
-        }
-
-        case NFC_BLANK: {
-          // 空白卡片 - 儲存當前雞湯
-          Serial.println("Type: Blank Card (Save)");
-          Serial.println("=================================\n");
-
-          // 總是嘗試發送
-          webSocket.broadcastTXT("{\"type\":\"save_quote\"}");
-
-          if (!clientConnected) {
-            Serial.println(">>> 注意：WebSocket 未連線，但已嘗試發送 <<<");
-          }
-          break;
-        }
-
-        default:
-          Serial.println("Type: Unknown");
-          Serial.println("=================================\n");
-          break;
+        // TODO: 之後可以改回儲存功能
+        // if (currentQuoteNumber <= 0) {
+        //   Serial.println("錯誤：沒有當前顯示的雞湯，無法寫入");
+        //   sendWriteResult(false, 0, "no_quote_displayed");
+        // } else {
+        //   Serial.printf("準備寫入雞湯 #%d 的 URL...\n", currentQuoteNumber);
+        //   bool writeSuccess = writeURLToNFC(currentQuoteNumber);
+        //   if (writeSuccess) {
+        //     Serial.printf("成功！雞湯 #%d 的 URL 已寫入 NFC\n", currentQuoteNumber);
+        //     sendWriteResult(true, currentQuoteNumber);
+        //   } else {
+        //     Serial.println("寫入失敗");
+        //     sendWriteResult(false, currentQuoteNumber, "write_failed");
+        //   }
+        // }
       }
     }
 
-    delay(200);  // 減少延遲，提高切換速度
+    delay(200);
   } else {
     // 沒有偵測到標籤時，清空 lastUID
     if (lastUID != "") {
       Serial.println("Tag removed.\n");
       lastUID = "";
     }
-    delay(50);  // 大幅縮短延遲，快速檢測新卡片
+    delay(50);
   }
 }
 
@@ -361,48 +348,78 @@ String getUIDString(byte* uid, byte uidLength) {
 
 // 偵測 NFC 卡片類型
 NFCType detectNFCType(String uid) {
-  // 檢查是否為分類卡片
-  for (int i = 0; i < categoryCount; i++) {
-    if (uid == categoryMappings[i].uid) {
-      return NFC_CATEGORY;
-    }
+  // 檢查是否為觸發卡片
+  if (uid == TRIGGER_NFC_UID) {
+    return NFC_TRIGGER;
   }
-
-  // TODO: 檢查是否為雞湯文卡片（200張）
-  // 這部分之後會從 quotes.json 讀取
-
-  // TODO: 檢查是否為空白卡片
-  // 目前暫時所有未知卡片都視為空白卡片
-
-  return NFC_UNKNOWN;
+  // 其他所有卡片都是儲存用
+  return NFC_OTHER;
 }
 
-// 根據 UID 查找分類
-String getCategoryForUID(String uid) {
-  for (int i = 0; i < categoryCount; i++) {
-    if (uid == categoryMappings[i].uid) {
-      return categoryMappings[i].category;
-    }
-  }
-  return "未知分類";
-}
-
-// 透過 WebSocket 發送分類選擇訊息
-void sendCategorySelection(String uid, String category) {
-  // 建立 JSON 訊息
-  // 格式: {"type":"category_selected","uid":"04:83:D5:22:BF:2A:81","category":"人生哲理"}
-  String message = "{\"type\":\"category_selected\",\"uid\":\"" + uid + "\",\"category\":\"" + category + "\"}";
+// 透過 WebSocket 發送隨機抽雞湯訊息
+void sendRandomQuote() {
+  // 發送訊息給前端，讓前端從 200 句中隨機抽一句
+  // 格式: {"type":"random_quote"}
+  String message = "{\"type\":\"random_quote\"}";
 
   webSocket.broadcastTXT(message);
-  Serial.println("已發送分類選擇: " + message);
+  Serial.println("已發送隨機抽雞湯指令");
 }
 
-// 透過 WebSocket 發送雞湯顯示訊息
-void sendQuoteDisplay(String quoteId) {
-  // 建立 JSON 訊息
-  // 格式: {"type":"show_context","quoteId":"001"}
-  String message = "{\"type\":\"show_context\",\"quoteId\":\"" + quoteId + "\"}";
+// 寫入 URL 到 NFC 卡片
+bool writeURLToNFC(int quoteNumber) {
+  // 組合完整 URL
+  // 例如: https://thekingofchickensoup.framer.website/quotes/quote1
+  String url = String(QUOTE_BASE_URL) + String(quoteNumber);
+
+  Serial.print("準備寫入 URL: ");
+  Serial.println(url);
+
+  // 確認卡片還在讀取範圍內
+  if (!nfc.tagPresent()) {
+    Serial.println("錯誤：NFC 卡片已移除");
+    return false;
+  }
+
+  // 讀取 NFC 標籤
+  NfcTag tag = nfc.read();
+
+  // 建立 NDEF 訊息
+  NdefMessage message = NdefMessage();
+
+  // 添加 URI record
+  // URI record type 會自動處理 https:// 前綴
+  message.addUriRecord(url.c_str());
+
+  // 寫入 NFC
+  bool success = nfc.write(message);
+
+  if (success) {
+    Serial.println("NDEF URL 寫入成功！");
+  } else {
+    Serial.println("NDEF URL 寫入失敗");
+  }
+
+  return success;
+}
+
+// 發送寫入結果到前端
+void sendWriteResult(bool success, int quoteNumber, String errorMsg) {
+  String message;
+
+  if (success) {
+    // 成功訊息
+    // 格式: {"type":"nfc_write_success","quoteNumber":1,"url":"https://..."}
+    String url = String(QUOTE_BASE_URL) + String(quoteNumber);
+    message = "{\"type\":\"nfc_write_success\",\"quoteNumber\":" + String(quoteNumber) +
+              ",\"url\":\"" + url + "\"}";
+  } else {
+    // 失敗訊息
+    // 格式: {"type":"nfc_write_error","quoteNumber":1,"error":"write_failed"}
+    message = "{\"type\":\"nfc_write_error\",\"quoteNumber\":" + String(quoteNumber) +
+              ",\"error\":\"" + errorMsg + "\"}";
+  }
 
   webSocket.broadcastTXT(message);
-  Serial.println("已發送脈絡顯示: " + message);
+  Serial.println("已發送寫入結果: " + message);
 }
