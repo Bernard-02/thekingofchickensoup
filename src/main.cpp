@@ -15,8 +15,8 @@ const char* ap_ssid = "ChickenSoup-NFC";
 const char* ap_password = "nfc12345";
 
 // ===== Station 模式設定（Router WiFi）=====
-const char* sta_ssid = "Sccd_Professor";
-const char* sta_password = "sccdgogogo";
+const char* sta_ssid = "BERNARD-LAPTOP";
+const char* sta_password = "550V1!5t";
 
 // ===== WebSocket 設定 =====
 #define WS_PORT 81

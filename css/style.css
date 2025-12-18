@@ -60,12 +60,102 @@ body {
 }
 
 /* p5.js 畫布容器 */
-#p5-canvas-container {
+#p5-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    z-index: 1;
+}
+
+/* 首頁視圖 */
+#home-view {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background-color: #f2f2f2;
+}
+
+/* 首頁 Logo */
+#home-view #logo {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 32px;
+    z-index: 10;
+}
+
+@media (min-width: 768px) {
+    #home-view #logo {
+        height: 40px;
+    }
+}
+
+/* 視圖容器 */
+.view-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    transition: opacity 0.5s ease;
+}
+
+.view-container.hidden {
+    display: none;
+}
+
+/* 雞湯頁視圖 */
+#quote-view {
+    background-color: #f2f2f2;
+    z-index: 20;
+}
+
+/* 雞湯文字樣式 */
+#quote-zh-text {
+    text-wrap: balance;
+    line-height: 1.2;
+}
+
+#quote-en-text {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+}
+
+/* WebSocket 狀態指示器 */
+#ws-status-container {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    z-index: 100;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+}
+
+#ws-status-container:hover {
+    opacity: 1;
+}
+
+#ws-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #ef4444;
+    transition: background-color 0.3s ease;
+}
+
+#ws-status.connected {
+    background-color: #10b981;
+}
+
+#ws-status-text {
+    font-size: 14px;
+    color: #000000;
 }
 
 /* 狀態指示燈 */

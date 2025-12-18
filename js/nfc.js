@@ -130,11 +130,14 @@ class NFCManager {
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
             log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
 
-            // 儲存到 localStorage，供 quote.html 使用
-            localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
-
-            // 跳轉到 quote.html
-            window.location.href = 'quote.html';
+            // 使用 appState 切換到雞湯頁（如果存在）
+            if (window.appState) {
+                await appState.switchTo('quote', randomQuote);
+            } else {
+                // 降級方案：使用舊的多頁面方式
+                localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
+                window.location.href = 'quote.html';
+            }
 
         } catch (error) {
             log(`載入雞湯失敗: ${error}`, 'error');

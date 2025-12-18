@@ -5,37 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The King of Chicken Soup</title>
 
+    <!-- Google Fonts - Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- p5.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-[#f2f2f2] overflow-hidden">
-    <div class="w-screen h-screen flex flex-col items-center justify-center px-8">
-        <!-- 主標題 -->
-        <h1 class="text-5xl md:text-7xl text-black font-medium">
-            這個人超會寫雞湯。
-        </h1>
+<body>
+    <!-- 首頁 View: p5.js Canvas -->
+    <div id="home-view" class="view-container">
+        <div id="p5-canvas"></div>
 
         <!-- Logo -->
-        <img src="Logo/雞湯Logo.png" alt="The King of Chicken Soup" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 h-8 md:h-10">
+        <img id="logo" src="Logo/雞湯Logo.png" alt="The King of Chicken Soup">
+    </div>
 
-        <!-- WebSocket 狀態指示器（隱藏但保留功能） -->
-        <div class="fixed bottom-4 right-4 flex items-center space-x-2 opacity-0 hover:opacity-100 transition-opacity">
-            <div id="ws-status" class="w-3 h-3 rounded-full bg-red-500"></div>
-            <span id="ws-status-text" class="text-sm text-black opacity-50">未連線</span>
+    <!-- 雞湯頁 View -->
+    <div id="quote-view" class="view-container hidden">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <!-- 雞湯編號 -->
+            <div class="text-center mb-8">
+                <p id="quote-number-text" class="text-3xl md:text-4xl font-normal">#1</p>
+            </div>
+
+            <!-- 雞湯文字 (中文) -->
+            <div class="max-w-2xl mx-auto text-center mb-4">
+                <p id="quote-zh-text" class="text-3xl md:text-5xl font-bold">
+                    載入中...
+                </p>
+            </div>
+
+            <!-- 雞湯文字 (英文) -->
+            <div class="max-w-2xl mx-auto text-center">
+                <p id="quote-en-text" class="text-3xl md:text-4xl font-normal">
+                    Loading...
+                </p>
+            </div>
         </div>
+    </div>
+
+    <!-- WebSocket 狀態指示器 -->
+    <div id="ws-status-container">
+        <div id="ws-status"></div>
+        <span id="ws-status-text">未連線</span>
+    </div>
+
+    <!-- 測試按鈕（開發用） -->
+    <div style="position: fixed; top: 16px; left: 16px; z-index: 200; display: flex; gap: 8px; flex-wrap: wrap; max-width: 400px;">
+        <button onclick="testSwitchToQuote()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            測試：切換到雞湯頁
+        </button>
+        <button onclick="testSwitchToHome()" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+            返回首頁
+        </button>
     </div>
 
     <!-- JavaScript -->
     <script src="js/config.js"></script>
+    <script src="js/app-state.js"></script>
     <script src="js/nfc.js"></script>
+    <script src="js/sketch.js"></script>
+
     <script>
         // 初始化 WebSocket 連線
         document.addEventListener('DOMContentLoaded', () => {
+            // 初始化狀態管理器
+            if (window.appState) {
+                appState.init();
+            }
+
+            // 初始化 WebSocket 連線
             nfcManager.connect();
         });
+
+        // 測試函數：模擬 NFC 切換到雞湯頁
+        async function testSwitchToQuote() {
+            console.log('測試：手動切換到雞湯頁');
+
+            try {
+                // 載入雞湯資料
+                const response = await fetch('data/quotes.json');
+                const quotes = await response.json();
+
+                if (quotes.length === 0) {
+                    console.error('沒有雞湯資料');
+                    return;
+                }
+
+                // 隨機選一句
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                console.log('選中的雞湯:', randomQuote);
+
+                // 切換到雞湯頁
+                if (!window.appState) {
+                    console.error('❌ appState 不存在');
+                    return;
+                }
+
+                await appState.switchTo('quote', randomQuote);
+                console.log('✅ 切換成功');
+            } catch (error) {
+                console.error('測試失敗:', error);
+            }
+        }
+
+        // 測試函數：返回首頁
+        async function testSwitchToHome() {
+            console.log('測試：返回首頁');
+
+            if (window.appState) {
+                await appState.switchTo('home');
+                console.log('✅ 返回首頁成功');
+            } else {
+                console.error('appState 未初始化');
+            }
+        }
     </script>
 </body>
 </html>
