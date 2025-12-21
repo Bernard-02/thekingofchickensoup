@@ -94,6 +94,11 @@ class AppStateManager {
             if (state === 'quote' && this.currentQuote) {
                 // 雞湯頁：顯示雞湯文
                 this.displayQuote(this.currentQuote);
+            } else if (state === 'home') {
+                // 返回首頁：重置文字輪播
+                if (typeof resetTextRotation === 'function') {
+                    resetTextRotation();
+                }
             }
 
             // 淡入動畫

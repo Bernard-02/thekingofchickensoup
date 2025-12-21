@@ -70,8 +70,8 @@ class NFCManager {
                     log('ESP8266 連線確認', 'info');
                     break;
                 case 'random_quote':
-                    // 處理隨機抽雞湯
-                    this.handleRandomQuote();
+                    // 處理隨機抽雞湯（傳遞訊息資料以取得 UID）
+                    this.handleRandomQuote(message);
                     break;
                 case 'category_selected':
                     // 處理分類選擇（保留向下相容）
@@ -112,21 +112,25 @@ class NFCManager {
         }
     }
 
-    // 處理隨機抽雞湯（新版簡化邏輯）
-    async handleRandomQuote() {
-        log('收到隨機抽雞湯指令', 'info');
+    // 處理隨機抽雞湯（唯一抽籤卡專用，只從前 50 句選擇）
+    async handleRandomQuote(message = {}) {
+        log('收到隨機抽雞湯指令（唯一抽籤卡）', 'info');
 
         try {
             // 載入雞湯資料
             const response = await fetch('data/quotes.json');
-            const quotes = await response.json();
+            let quotes = await response.json();
 
             if (quotes.length === 0) {
                 log('沒有雞湯資料', 'warn');
                 return;
             }
 
-            // 從全部 200 句中隨機選擇一句
+            // 只從前 50 句中選擇（唯一抽籤卡專用）
+            quotes = quotes.filter(q => q.number <= 50);
+            log(`從前 50 句中隨機選擇（共 ${quotes.length} 句）`, 'info');
+
+            // 隨機選擇一句
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
             log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
 

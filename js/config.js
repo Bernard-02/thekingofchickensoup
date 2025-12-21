@@ -4,7 +4,7 @@ const CONFIG = {
     // WebSocket 設定
     websocket: {
         // ESP8266 的 IP 位址（連接到 BERNARD-LAPTOP）
-        url: 'ws://192.168.137.231:81',
+        url: 'ws://192.168.137.65:81',
         reconnectInterval: 3000, // 重連間隔（毫秒）
         heartbeatInterval: 30000 // 心跳間隔（毫秒）
     },

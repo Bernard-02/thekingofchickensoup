@@ -446,7 +446,7 @@
     "category": "人際關係",
     "textCN": "如果你身邊有沒事也會想起你的朋友，請你好好珍惜這樣的人。",
     "textEN": "If you have friends who think of you even when nothing is happening, treasure them well.",
-    "nfcUID": "",
+    "nfcUID": "04:56:6C:97:CC:2A:81",
     "contextId": "050"
   },
   {
@@ -898,5 +898,905 @@
     "textEN": "You can't control what others say, but you can choose what to listen to.",
     "nfcUID": "",
     "contextId": "100"
+  },
+  {
+    "id": "101",
+    "number": 101,
+    "category": "人際關係",
+    "textCN": "如果被火燙傷，下次就知道不會碰火，這道理對一段人際關係也一樣。",
+    "textEN": "If you get burned by fire once, you'll know not to touch it again — the same goes for relationships.",
+    "nfcUID": "",
+    "contextId": "101"
+  },
+  {
+    "id": "102",
+    "number": 102,
+    "category": "人生哲理",
+    "textCN": "希望我們都可以成為我們想成為的大人。",
+    "textEN": "I hope we can all become the kind of adults we once wanted to be.",
+    "nfcUID": "",
+    "contextId": "102"
+  },
+  {
+    "id": "103",
+    "number": 103,
+    "category": "處世態度",
+    "textCN": "路不轉人轉，要麼硬是開一條路，要麼換別條路走，總會有方法的。",
+    "textEN": "When the road doesn't turn, you can — either carve a new path or take another route. There's always a way.",
+    "nfcUID": "",
+    "contextId": "103"
+  },
+  {
+    "id": "104",
+    "number": 104,
+    "category": "人生哲理",
+    "textCN": "每個人身上都有標籤，或多或少。",
+    "textEN": "Everyone carries labels, more or less.",
+    "nfcUID": "",
+    "contextId": "104"
+  },
+  {
+    "id": "105",
+    "number": 105,
+    "category": "人際關係",
+    "textCN": "友情是需要花時間維繫的。長時間不聯絡，再熟絡的朋友都會變得生疏。",
+    "textEN": "Friendship takes effort to maintain. Even the closest friends can grow distant without contact.",
+    "nfcUID": "",
+    "contextId": "105"
+  },
+  {
+    "id": "106",
+    "number": 106,
+    "category": "人生哲理",
+    "textCN": "你所有過往的經驗都會以別的方式回到你身上。",
+    "textEN": "Every experience you've had will return to you in some form.",
+    "nfcUID": "",
+    "contextId": "106"
+  },
+  {
+    "id": "107",
+    "number": 107,
+    "category": "處世態度",
+    "textCN": "做不出選擇的時候可以試試看刪去法，你一定知道你不喜歡的東西有哪些。",
+    "textEN": "When you can't make a choice, try using elimination — you always know what you don't like.",
+    "nfcUID": "",
+    "contextId": "107"
+  },
+  {
+    "id": "108",
+    "number": 108,
+    "category": "人生哲理",
+    "textCN": "有的人只適合當朋友，不適合一起共事。",
+    "textEN": "Some people are meant to be friends, but not colleagues.",
+    "nfcUID": "",
+    "contextId": "108"
+  },
+  {
+    "id": "109",
+    "number": 109,
+    "category": "人生哲理",
+    "textCN": "錢其實是可以買到幸福的。好吃的一餐、好喝的飲料、好看的電影，都可以帶來幸福感。",
+    "textEN": "Money can buy happiness — a good meal, a nice drink, a great movie can all bring joy.",
+    "nfcUID": "",
+    "contextId": "109"
+  },
+  {
+    "id": "110",
+    "number": 110,
+    "category": "處世態度",
+    "textCN": "被稱讚的時候除了說聲謝謝以外，也可以用讚美來回覆對方。",
+    "textEN": "When someone compliments you, besides saying thank you, you can return the kindness with a compliment of your own.",
+    "nfcUID": "",
+    "contextId": "110"
+  },
+  {
+    "id": "111",
+    "number": 111,
+    "category": "人生哲理",
+    "textCN": "積點口德，因果報應這東西是很玄的。",
+    "textEN": "Watch your words — karma is mysterious in its own way.",
+    "nfcUID": "",
+    "contextId": "111"
+  },
+  {
+    "id": "112",
+    "number": 112,
+    "category": "人際關係",
+    "textCN": "在對的關係階段裡做那個階段該做的事，不要越界。",
+    "textEN": "Do what's appropriate for the stage of the relationship you're in; don't overstep the line.",
+    "nfcUID": "",
+    "contextId": "112"
+  },
+  {
+    "id": "113",
+    "number": 113,
+    "category": "處世態度",
+    "textCN": "努力之後給自己充足的休息跟犒賞吧，那是為了走更長遠的路。",
+    "textEN": "After working hard, give yourself enough rest and reward — it's so you can go farther.",
+    "nfcUID": "",
+    "contextId": "113"
+  },
+  {
+    "id": "114",
+    "number": 114,
+    "category": "人生哲理",
+    "textCN": "讓人感動流淚的電影，往往不是因為拍的有多好，剪的有多精湛，而是我們從電影裡看到了自己——我們是在看自己的故事。",
+    "textEN": "Movies that move us to tears aren't necessarily well-made or perfectly edited; it's because we see ourselves in them — we're really watching our own story.",
+    "nfcUID": "",
+    "contextId": "114"
+  },
+  {
+    "id": "115",
+    "number": 115,
+    "category": "處世態度",
+    "textCN": "天外有天，人外有人。拿捏自信的程度，別太多，也別太少。",
+    "textEN": "There's always someone better out there. Keep your confidence in check — not too much, not too little.",
+    "nfcUID": "",
+    "contextId": "115"
+  },
+  {
+    "id": "116",
+    "number": 116,
+    "category": "人生哲理",
+    "textCN": "獲得能量或療癒的方法千百種，找到適合自己的方法很重要，你不一定要學別人的。",
+    "textEN": "There are countless ways to recharge or heal. What matters most is finding the one that works for you — you don't have to copy others.",
+    "nfcUID": "",
+    "contextId": "116"
+  },
+  {
+    "id": "117",
+    "number": 117,
+    "category": "處世態度",
+    "textCN": "沒那麽大的頭還是不要戴那麽大的帽子，因為這樣會看不到前方的路。",
+    "textEN": "Don't wear a hat too big for your head — you'll just block your view of the road ahead.",
+    "nfcUID": "",
+    "contextId": "117"
+  },
+  {
+    "id": "118",
+    "number": 118,
+    "category": "人生哲理",
+    "textCN": "現實哪有那麽浮誇，我們又不是在演偶像劇。",
+    "textEN": "Reality isn't that dramatic; we're not living in a TV drama.",
+    "nfcUID": "",
+    "contextId": "118"
+  },
+  {
+    "id": "119",
+    "number": 119,
+    "category": "處世態度",
+    "textCN": "大數據下的結果僅供參考。",
+    "textEN": "Results from big data are for reference only.",
+    "nfcUID": "",
+    "contextId": "119"
+  },
+  {
+    "id": "120",
+    "number": 120,
+    "category": "人生哲理",
+    "textCN": "人生不就是會起起落落落落落的嗎？",
+    "textEN": "Isn't life just full of ups and downs… and more downs?",
+    "nfcUID": "",
+    "contextId": "120"
+  },
+  {
+    "id": "121",
+    "number": 121,
+    "category": "人際關係",
+    "textCN": "對傾聽的人來說，安撫好他的情緒，再給建議，他比較能聽得進去。對傾訴的人來說，感謝他願意花時間聽你吐苦水，稍微說教也請忍耐一下。",
+    "textEN": "For someone who's listening, soothe their emotions first — they'll take your advice better. For someone who's venting, be grateful they're willing to hear you out — and try to tolerate a bit of lecturing.",
+    "nfcUID": "",
+    "contextId": "121"
+  },
+  {
+    "id": "122",
+    "number": 122,
+    "category": "處世態度",
+    "textCN": "練習可以使你更趨近於完美。",
+    "textEN": "Practice brings you closer to perfection.",
+    "nfcUID": "",
+    "contextId": "122"
+  },
+  {
+    "id": "123",
+    "number": 123,
+    "category": "人際關係",
+    "textCN": "因為把你放在心上，所以記得你、在乎你、關心你。",
+    "textEN": "Because you hold someone in your heart, you remember them, care about them, and think about them.",
+    "nfcUID": "",
+    "contextId": "123"
+  },
+  {
+    "id": "124",
+    "number": 124,
+    "category": "處世態度",
+    "textCN": "學會看人臉色、讀空氣，這些技能還挺有用的。",
+    "textEN": "Learning to read expressions and \"read the room\" is actually a pretty useful skill.",
+    "nfcUID": "",
+    "contextId": "124"
+  },
+  {
+    "id": "125",
+    "number": 125,
+    "category": "人生哲理",
+    "textCN": "我們真的很難理解某個人的痛楚或處境。",
+    "textEN": "It's truly hard for us to fully understand another person's pain or situation.",
+    "nfcUID": "",
+    "contextId": "125"
+  },
+  {
+    "id": "126",
+    "number": 126,
+    "category": "處世態度",
+    "textCN": "打鐵需要趁熱，有些事情熱度過了就沒意思了。",
+    "textEN": "Strike while the iron is hot — once the momentum fades, the meaning fades too.",
+    "nfcUID": "",
+    "contextId": "126"
+  },
+  {
+    "id": "127",
+    "number": 127,
+    "category": "處世態度",
+    "textCN": "不要把快樂建立在別人的痛苦之上，除非他犯下了什麽滔天大罪。",
+    "textEN": "Don't build your happiness on someone else's suffering, unless they've done something truly unforgivable.",
+    "nfcUID": "",
+    "contextId": "127"
+  },
+  {
+    "id": "128",
+    "number": 128,
+    "category": "處世態度",
+    "textCN": "慢就會穩，穩就會快。",
+    "textEN": "Slow makes steady, and steady makes fast.",
+    "nfcUID": "",
+    "contextId": "128"
+  },
+  {
+    "id": "129",
+    "number": 129,
+    "category": "人生哲理",
+    "textCN": "小時候的快樂很簡單，長大後的簡單是快樂。",
+    "textEN": "Joy was simple when we were kids; when we grow up, simplicity becomes joy.",
+    "nfcUID": "",
+    "contextId": "129"
+  },
+  {
+    "id": "130",
+    "number": 130,
+    "category": "處世態度",
+    "textCN": "別只是一味地努力，我們可以聰明地努力。",
+    "textEN": "Don't just work hard — work smart.",
+    "nfcUID": "",
+    "contextId": "130"
+  },
+  {
+    "id": "131",
+    "number": 131,
+    "category": "處世態度",
+    "textCN": "光說沒用，行動是真。畫了大餅又不實現，久而久之會讓人覺得印象很差，至於有沒有本事又是一回事。",
+    "textEN": "Talking means nothing; actions are what matter. Big promises without results only hurt your credibility. Whether you're capable is a separate issue.",
+    "nfcUID": "",
+    "contextId": "131"
+  },
+  {
+    "id": "132",
+    "number": 132,
+    "category": "人生哲理",
+    "textCN": "每個人都有他們各自的課題需要面對。",
+    "textEN": "Everyone has their own lessons to deal with.",
+    "nfcUID": "",
+    "contextId": "132"
+  },
+  {
+    "id": "133",
+    "number": 133,
+    "category": "處世態度",
+    "textCN": "讀書很好啊，但更好的是你有學以致用。",
+    "textEN": "Studying is good, but applying what you learn is even better.",
+    "nfcUID": "",
+    "contextId": "133"
+  },
+  {
+    "id": "134",
+    "number": 134,
+    "category": "人生哲理",
+    "textCN": "知道什麽東西對自己來說是需要，什麽是想要。資源有限，要好好分配。",
+    "textEN": "Know what you need and what you simply want. Resources are limited—use them wisely.",
+    "nfcUID": "",
+    "contextId": "134"
+  },
+  {
+    "id": "135",
+    "number": 135,
+    "category": "處世態度",
+    "textCN": "你行你上。那麽會打嘴砲，可以考慮當個辯論選手。",
+    "textEN": "If you think you can do better, go ahead. If you're that good at talking, maybe join a debate team.",
+    "nfcUID": "",
+    "contextId": "135"
+  },
+  {
+    "id": "136",
+    "number": 136,
+    "category": "人際關係",
+    "textCN": "沒有人生來就適合彼此。兩個人相處是需要磨合的，把彼此的棱角磨成適合的樣子。",
+    "textEN": "No one is naturally a perfect match. Relationships take adjustment—smoothing each other's edges until they fit.",
+    "nfcUID": "",
+    "contextId": "136"
+  },
+  {
+    "id": "137",
+    "number": 137,
+    "category": "處世態度",
+    "textCN": "多觀察和認識自己跟你身邊的人，取他們的長處來補自己的短處。",
+    "textEN": "Observe yourself and the people around you. Learn from their strengths to fill your gaps.",
+    "nfcUID": "",
+    "contextId": "137"
+  },
+  {
+    "id": "138",
+    "number": 138,
+    "category": "處世態度",
+    "textCN": "培養自己的媒體識讀能力，不要網路上的人說什麽就信什麽。",
+    "textEN": "Build your media literacy. Don't believe everything you see online.",
+    "nfcUID": "",
+    "contextId": "138"
+  },
+  {
+    "id": "139",
+    "number": 139,
+    "category": "人生哲理",
+    "textCN": "很多時候我們都會知道其實以後的自己會覺得現在的難關沒什麽，但就是想好好沉浸在當下的感受上啊。",
+    "textEN": "We often know our future self will look back and think today's struggles weren't a big deal, but sometimes you just want to feel your feelings fully.",
+    "nfcUID": "",
+    "contextId": "139"
+  },
+  {
+    "id": "140",
+    "number": 140,
+    "category": "處世態度",
+    "textCN": "在還沒學會走之前，先學會爬，而不是學怎麽飛。",
+    "textEN": "Learn to crawl before you walk, not before you try to fly.",
+    "nfcUID": "",
+    "contextId": "140"
+  },
+  {
+    "id": "141",
+    "number": 141,
+    "category": "人際關係",
+    "textCN": "將心比心，你怎麽對待別人，別人就怎麽對待你。",
+    "textEN": "Treat others the way you want to be treated; people usually reflect what you give.",
+    "nfcUID": "",
+    "contextId": "141"
+  },
+  {
+    "id": "142",
+    "number": 142,
+    "category": "人生哲理",
+    "textCN": "無論再怎麽難過，肚子餓了還是要吃，感覺累了還是要睡——生活還是要過。",
+    "textEN": "No matter how sad you are, you still need to eat when you're hungry and sleep when you're tired—life goes on.",
+    "nfcUID": "",
+    "contextId": "142"
+  },
+  {
+    "id": "143",
+    "number": 143,
+    "category": "處世態度",
+    "textCN": "面對自己的問題，然後改善它，別太自我感覺良好，你又不是阿Q。",
+    "textEN": "Face your problems and fix them. Don't get too self-satisfied; you're not Ah Q.",
+    "nfcUID": "",
+    "contextId": "143"
+  },
+  {
+    "id": "144",
+    "number": 144,
+    "category": "人生哲理",
+    "textCN": "人都喜歡看美的事物，這世上有誰不是外貌協會？花點時間整理自己的外在形象也沒什麼，但別太超過了。",
+    "textEN": "Everyone likes beautiful things—who isn't superficial to some degree? It's fine to tidy up your appearance, just don't overdo it.",
+    "nfcUID": "",
+    "contextId": "144"
+  },
+  {
+    "id": "145",
+    "number": 145,
+    "category": "處世態度",
+    "textCN": "一回生，二回熟，多做幾次就會游刃有餘了，所以不要害怕第一次做的不好。",
+    "textEN": "Everything feels strange the first time, but it gets easier the more you do it. Don't fear doing something poorly at the beginning.",
+    "nfcUID": "",
+    "contextId": "145"
+  },
+  {
+    "id": "146",
+    "number": 146,
+    "category": "人生哲理",
+    "textCN": "對你想過的生活有點想像吧！若不符合理想生活的方向，自然就會想要調整了。",
+    "textEN": "Imagine the life you want. When reality doesn't match that direction, you'll naturally want to adjust.",
+    "nfcUID": "",
+    "contextId": "146"
+  },
+  {
+    "id": "147",
+    "number": 147,
+    "category": "人際關係",
+    "textCN": "有時候兩個人對於彼此的關係其實不在同一個水平上，那也是很正常的，別太在意對方沒有把我們看得像我們看他那般重要。",
+    "textEN": "Sometimes two people simply see the relationship on different levels—and that's normal. Don't take it too personally if they don't value you the way you value them.",
+    "nfcUID": "",
+    "contextId": "147"
+  },
+  {
+    "id": "148",
+    "number": 148,
+    "category": "處世態度",
+    "textCN": "有些事情沒試過就不會知道，只會停留在我們的想像，除了犯法的事情。",
+    "textEN": "Never try, never know—unless it's illegal.",
+    "nfcUID": "",
+    "contextId": "148"
+  },
+  {
+    "id": "149",
+    "number": 149,
+    "category": "人生哲理",
+    "textCN": "生活不止需要吃飯睡覺，有時候還需要詩和遠方。",
+    "textEN": "Life isn't just about eating and sleeping; sometimes you need poetry and the distant horizon.",
+    "nfcUID": "",
+    "contextId": "149"
+  },
+  {
+    "id": "150",
+    "number": 150,
+    "category": "人際關係",
+    "textCN": "不要將你對別人的氣出在另外一個不相關的人上，很莫名其妙也很令人受傷。",
+    "textEN": "Don't take your anger at one person out on someone else. It's unfair, confusing, and hurtful.",
+    "nfcUID": "",
+    "contextId": "150"
+  },
+  {
+    "id": "151",
+    "number": 151,
+    "category": "處世態度",
+    "textCN": "做你該做的事，你的節奏不要輕易地被外界打亂。",
+    "textEN": "Do what you need to do, and don't let the outside world throw off your rhythm.",
+    "nfcUID": "",
+    "contextId": "151"
+  },
+  {
+    "id": "152",
+    "number": 152,
+    "category": "人生哲理",
+    "textCN": "當你正在對未來籌備及規劃時，記得活在當下也同樣重要。",
+    "textEN": "While planning and preparing for the future, don't forget that living in the present matters just as much.",
+    "nfcUID": "",
+    "contextId": "152"
+  },
+  {
+    "id": "153",
+    "number": 153,
+    "category": "處世態度",
+    "textCN": "將一個大目標拆分成好幾個小目標，逐個擊破，這樣才不會覺得目標遙不可及。",
+    "textEN": "Break a big goal into smaller ones and tackle them one by one — that's how it stops feeling out of reach.",
+    "nfcUID": "",
+    "contextId": "153"
+  },
+  {
+    "id": "154",
+    "number": 154,
+    "category": "處世態度",
+    "textCN": "為自己的言論負責，講了就不要怕承認。",
+    "textEN": "Stand by your words. If you said it, don't be afraid to own it.",
+    "nfcUID": "",
+    "contextId": "154"
+  },
+  {
+    "id": "155",
+    "number": 155,
+    "category": "人際關係",
+    "textCN": "如果可以，多跟別人面對面交流，感受平時用社群平台所得不到的東西。",
+    "textEN": "Whenever you can, talk to people face-to-face. You'll feel things you can't get from social media.",
+    "nfcUID": "",
+    "contextId": "155"
+  },
+  {
+    "id": "156",
+    "number": 156,
+    "category": "處世態度",
+    "textCN": "學習應該是自發性且永無止境的。",
+    "textEN": "Learning should be self-driven — and never-ending.",
+    "nfcUID": "",
+    "contextId": "156"
+  },
+  {
+    "id": "157",
+    "number": 157,
+    "category": "處世態度",
+    "textCN": "您就大人有大量，別跟他們一般計較。",
+    "textEN": "Be the bigger person; don't bother stooping to their level.",
+    "nfcUID": "",
+    "contextId": "157"
+  },
+  {
+    "id": "158",
+    "number": 158,
+    "category": "人生哲理",
+    "textCN": "及時止損何嘗不是一種解決方法呢？",
+    "textEN": "Sometimes cutting your losses is one of the ways to deal with it.",
+    "nfcUID": "",
+    "contextId": "158"
+  },
+  {
+    "id": "159",
+    "number": 159,
+    "category": "處世態度",
+    "textCN": "有時候可以學學周敦頤——出淤泥而不染，你不一定要同流合污。",
+    "textEN": "Take a page from Zhou Dunyi — stay clean even in the mud; you don't have to follow the crowd.",
+    "nfcUID": "",
+    "contextId": "159"
+  },
+  {
+    "id": "160",
+    "number": 160,
+    "category": "人生哲理",
+    "textCN": "你是永遠叫不醒裝睡的人的。",
+    "textEN": "You can never wake up someone who's pretending to sleep.",
+    "nfcUID": "",
+    "contextId": "160"
+  },
+  {
+    "id": "161",
+    "number": 161,
+    "category": "處世態度",
+    "textCN": "做個懂得感恩，飲水思源的人，不要覺得別人的付出是理所當然的。",
+    "textEN": "Be someone who knows how to be grateful. Never assume other people's efforts are owed to you.",
+    "nfcUID": "",
+    "contextId": "161"
+  },
+  {
+    "id": "162",
+    "number": 162,
+    "category": "人生哲理",
+    "textCN": "滿分十分的話，三分天注定，六分靠打拼，還有一分要靠運氣。",
+    "textEN": "If life were scored out of ten, three would be fate, six would be hard work, and the last one would be luck.",
+    "nfcUID": "",
+    "contextId": "162"
+  },
+  {
+    "id": "163",
+    "number": 163,
+    "category": "處世態度",
+    "textCN": "希望你在沒人看見的時候也能持續地發光發熱。",
+    "textEN": "I hope you can keep shining even when no one's watching.",
+    "nfcUID": "",
+    "contextId": "163"
+  },
+  {
+    "id": "164",
+    "number": 164,
+    "category": "人際關係",
+    "textCN": "對你好是因為我很好，而不是我被大家評價是個好人。",
+    "textEN": "I'm good to you because I am a good person—not because people label me as one.",
+    "nfcUID": "",
+    "contextId": "164"
+  },
+  {
+    "id": "165",
+    "number": 165,
+    "category": "處世態度",
+    "textCN": "別想太多，有的時候心思不那麽細膩也行。",
+    "textEN": "Don't overthink everything. It's okay if your mind isn't always so delicate and precise.",
+    "nfcUID": "",
+    "contextId": "165"
+  },
+  {
+    "id": "166",
+    "number": 166,
+    "category": "人際關係",
+    "textCN": "在家靠父母，出外靠朋友。人脈很重要，多擴展你的交友圈。",
+    "textEN": "At home you rely on your parents; once you step outside, you rely on your friends. Connections matter, so keep expanding your circle.",
+    "nfcUID": "",
+    "contextId": "166"
+  },
+  {
+    "id": "167",
+    "number": 167,
+    "category": "處世態度",
+    "textCN": "分享即是關懷。",
+    "textEN": "Sharing is caring.",
+    "nfcUID": "",
+    "contextId": "167"
+  },
+  {
+    "id": "168",
+    "number": 168,
+    "category": "人生哲理",
+    "textCN": "沒有消息也可以是一種好消息。",
+    "textEN": "No news is good news — sometimes silence simply means nothing's wrong.",
+    "nfcUID": "",
+    "contextId": "168"
+  },
+  {
+    "id": "169",
+    "number": 169,
+    "category": "處世態度",
+    "textCN": "人不可貌相，一個人的內心跟表面搞不好天差地遠，也不要輕易去批判某些你沒有深入了解的事情。",
+    "textEN": "Don't judge a book by its cover — someone's surface may look nothing like who they truly are, so avoid jumping to conclusions about things you barely know.",
+    "nfcUID": "",
+    "contextId": "169"
+  },
+  {
+    "id": "170",
+    "number": 170,
+    "category": "人生哲理",
+    "textCN": "有想做的事情就去做吧，不要留有遺憾。有時候感到遺憾是因為沒做，而不是做了卻不滿意。",
+    "textEN": "If there's something you want to do, go for it. Regret often comes from not trying, not from trying and falling short.",
+    "nfcUID": "",
+    "contextId": "170"
+  },
+  {
+    "id": "171",
+    "number": 171,
+    "category": "處世態度",
+    "textCN": "跌倒了可以躺著休息一下，躺夠了就站起來。",
+    "textEN": "If you fall, it's okay to lie down and rest for a bit. Once you've rested enough, stand back up.",
+    "nfcUID": "",
+    "contextId": "171"
+  },
+  {
+    "id": "172",
+    "number": 172,
+    "category": "人生哲理",
+    "textCN": "也許只有真正離開家，才會真的懂得家的美好。在外奔波也記得多回家看看。",
+    "textEN": "Maybe you only truly understand the beauty of home once you've left it. Even while chasing life outside, remember to go home when you can.",
+    "nfcUID": "",
+    "contextId": "172"
+  },
+  {
+    "id": "173",
+    "number": 173,
+    "category": "處世態度",
+    "textCN": "哎呀不需要那麽勵志啦，盧廣仲的《勵志論》都沒那麽勵志。",
+    "textEN": "Come on, it doesn't need to be that inspirational — even Crowd Lu's \"C'MON\" isn't that inspiring.",
+    "nfcUID": "",
+    "contextId": "173"
+  },
+  {
+    "id": "174",
+    "number": 174,
+    "category": "人生哲理",
+    "textCN": "自己就是最好的投資，這一點準沒錯的。",
+    "textEN": "Investing in yourself is always the best investment. That part never fails.",
+    "nfcUID": "",
+    "contextId": "174"
+  },
+  {
+    "id": "175",
+    "number": 175,
+    "category": "處世態度",
+    "textCN": "做個打不死的小强，在接下來的日子也要披荊斬棘。",
+    "textEN": "Be a little cockroach that refuses to die — keep pushing forward and cutting through the brambles ahead.",
+    "nfcUID": "",
+    "contextId": "175"
+  },
+  {
+    "id": "176",
+    "number": 176,
+    "category": "人生哲理",
+    "textCN": "多讀一點書，多吸取一點知識，只為了讓自己可以有選擇。",
+    "textEN": "Read more and absorb more knowledge, if only to give yourself more choices in life.",
+    "nfcUID": "",
+    "contextId": "176"
+  },
+  {
+    "id": "177",
+    "number": 177,
+    "category": "處世態度",
+    "textCN": "設一個你可以達成的目標。不要設一個根本無法達成的，然後沒實現就覺得很糟，那不是自討苦吃嗎？",
+    "textEN": "Set a goal you can actually reach. Don't pick an impossible one and then feel terrible when you can't achieve it — that's just asking for trouble.",
+    "nfcUID": "",
+    "contextId": "177"
+  },
+  {
+    "id": "178",
+    "number": 178,
+    "category": "人生哲理",
+    "textCN": "有時候身在廬山不知廬山的真面目，還需要旁人多加提點才會恍然大悟。",
+    "textEN": "Sometimes you can't see the full picture from where you're standing. You need someone else to point things out before everything suddenly makes sense.",
+    "nfcUID": "",
+    "contextId": "178"
+  },
+  {
+    "id": "179",
+    "number": 179,
+    "category": "處世態度",
+    "textCN": "有的事情是沒辦法一個人幹完的，所以培養團隊合作的能力吧，不要排斥跟別人合作。",
+    "textEN": "Some things just can't be done alone. Build your ability to work with others, and don't shy away from collaboration.",
+    "nfcUID": "",
+    "contextId": "179"
+  },
+  {
+    "id": "180",
+    "number": 180,
+    "category": "人生哲理",
+    "textCN": "健康最重要，活著才能做更多想做的事、體驗想體驗的人生。",
+    "textEN": "Health comes first. Only when you're alive and well can you do what you want, and experience the life you hope to live.",
+    "nfcUID": "",
+    "contextId": "180"
+  },
+  {
+    "id": "181",
+    "number": 181,
+    "category": "處世態度",
+    "textCN": "當身邊的人遇到困難的時候，選擇給予他們幫助而不是落井下石，畢竟也無冤無仇啊。",
+    "textEN": "When people around you are struggling, choose to help rather than kick them when they're down—you've got no feud with them anyway.",
+    "nfcUID": "",
+    "contextId": "181"
+  },
+  {
+    "id": "182",
+    "number": 182,
+    "category": "人生哲理",
+    "textCN": "每個人的綻放期都不一樣，你不一定會比別人慢，時間到了自然會盛開。",
+    "textEN": "Everyone blooms at their own pace. You're not necessarily behind; when the time is right, you'll flourish too.",
+    "nfcUID": "",
+    "contextId": "182"
+  },
+  {
+    "id": "183",
+    "number": 183,
+    "category": "處世態度",
+    "textCN": "你的言行舉止基本上就決定了你是個怎樣的人。",
+    "textEN": "Your words and actions basically define the kind of person you are.",
+    "nfcUID": "",
+    "contextId": "183"
+  },
+  {
+    "id": "184",
+    "number": 184,
+    "category": "人生哲理",
+    "textCN": "在面對自己的問題時，需要將自己脫離出來，站在更高的角度看整件事情。",
+    "textEN": "When facing your own problems, try stepping outside yourself and look at the whole situation from a higher perspective.",
+    "nfcUID": "",
+    "contextId": "184"
+  },
+  {
+    "id": "185",
+    "number": 185,
+    "category": "處世態度",
+    "textCN": "機會是留給有準備的人。保持個準備好的狀態，機會來了也請認出它、爭取它。",
+    "textEN": "Opportunity favors the prepared. Stay ready, and when a chance comes, recognize it and go for it.",
+    "nfcUID": "",
+    "contextId": "185"
+  },
+  {
+    "id": "186",
+    "number": 186,
+    "category": "人際關係",
+    "textCN": "天涯何處無芳草，何必單戀一隻花。這又不是只有一個選擇，放過對方，也放過自己。",
+    "textEN": "There are plenty of flowers in the world—no need to obsess over just one. Let them go, and free yourself too.",
+    "nfcUID": "",
+    "contextId": "186"
+  },
+  {
+    "id": "187",
+    "number": 187,
+    "category": "處世態度",
+    "textCN": "有輸入才會有產出。想要言之有物，還得多看多讀多聽，豐富自己的資料庫。",
+    "textEN": "Output depends on input. If you want something meaningful to say, you need to read, listen, and absorb more to enrich your inner library.",
+    "nfcUID": "",
+    "contextId": "187"
+  },
+  {
+    "id": "188",
+    "number": 188,
+    "category": "人生哲理",
+    "textCN": "無心插柳柳成蔭，有時候不經意做的事情往往都會有意想不到的結果發生。",
+    "textEN": "Sometimes unexpected results come from things you did without intention—serendipity happens.",
+    "nfcUID": "",
+    "contextId": "188"
+  },
+  {
+    "id": "189",
+    "number": 189,
+    "category": "人際關係",
+    "textCN": "創建一個共贏的局面，帶來的價值絕對大於彼此之間爭個你死我活。",
+    "textEN": "Creating a win–win situation brings far more value than fighting to the bitter end.",
+    "nfcUID": "",
+    "contextId": "189"
+  },
+  {
+    "id": "190",
+    "number": 190,
+    "category": "處世態度",
+    "textCN": "對自己的專業領域還是要謙虛，即便你有好幾把刷子，也不要覺得自己已經到達了巔峰。",
+    "textEN": "Stay humble in your own field. Even if you're good, don't assume you've already reached the peak.",
+    "nfcUID": "",
+    "contextId": "190"
+  },
+  {
+    "id": "191",
+    "number": 191,
+    "category": "人生哲理",
+    "textCN": "一切都是最好的安排。",
+    "textEN": "Everything happens for the best.",
+    "nfcUID": "",
+    "contextId": "191"
+  },
+  {
+    "id": "192",
+    "number": 192,
+    "category": "處世態度",
+    "textCN": "一般情況下，沒有人有義務服侍我們，又不是王子或公主。",
+    "textEN": "In most situations, no one is obligated to serve us—we're not princes or princesses.",
+    "nfcUID": "",
+    "contextId": "192"
+  },
+  {
+    "id": "193",
+    "number": 193,
+    "category": "人際關係",
+    "textCN": "兩個人的關係應該是要互相且平等的。",
+    "textEN": "A relationship should be mutual and equal.",
+    "nfcUID": "",
+    "contextId": "193"
+  },
+  {
+    "id": "194",
+    "number": 194,
+    "category": "人生哲理",
+    "textCN": "塞翁失馬焉知非福，有時候壞事發生也伴隨一些意想不到的好事。",
+    "textEN": "A setback may turn out to be a blessing in disguise; bad things sometimes come with unexpected good.",
+    "nfcUID": "",
+    "contextId": "194"
+  },
+  {
+    "id": "195",
+    "number": 195,
+    "category": "處世態度",
+    "textCN": "找個你欣賞的人當作榜樣，向他學習吧！",
+    "textEN": "Find someone you admire, take them as a role model, and learn from them.",
+    "nfcUID": "",
+    "contextId": "195"
+  },
+  {
+    "id": "196",
+    "number": 196,
+    "category": "人生哲理",
+    "textCN": "有時候不知道很多事情也可以是一種幸福。",
+    "textEN": "Sometimes, not knowing too much can also be a kind of happiness.",
+    "nfcUID": "",
+    "contextId": "196"
+  },
+  {
+    "id": "197",
+    "number": 197,
+    "category": "人際關係",
+    "textCN": "朋友獲得了自己比較想要的職位，應該替他感到高興。何必為了那一點名利去破壞兩人之間的友情？",
+    "textEN": "If a friend gets the position they really wanted, be happy for them—why ruin a friendship over a bit of fame or gain?",
+    "nfcUID": "",
+    "contextId": "197"
+  },
+  {
+    "id": "198",
+    "number": 198,
+    "category": "人生哲理",
+    "textCN": "否極泰來，相信在最低谷的時候，就是轉機的開始。",
+    "textEN": "After hitting rock bottom, things can only go up; the lowest point may be the beginning of a turning point.",
+    "nfcUID": "",
+    "contextId": "198"
+  },
+  {
+    "id": "199",
+    "number": 199,
+    "category": "處世態度",
+    "textCN": "兩個人之間有那麽多話題可以聊，我們沒有必要說他人的是非。",
+    "textEN": "There are so many things two people can talk about—there's no need to gossip about others.",
+    "nfcUID": "",
+    "contextId": "199"
+  },
+  {
+    "id": "200",
+    "number": 200,
+    "category": "人生哲理",
+    "textCN": "當一個人完全被遺忘的時候，他才算是真正的死亡。",
+    "textEN": "A person truly dies only when they are completely forgotten.",
+    "nfcUID": "",
+    "contextId": "200"
   }
 ]
