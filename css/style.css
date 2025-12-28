@@ -199,13 +199,15 @@ h1, h2, h3, p, button {
 
 /* 問題頁面樣式 */
 #question1-view h2,
-#question2-view h2 {
+#question2-view h2,
+#waiting-nfc-view h2 {
     font-size: 2rem; /* 32px */
 }
 
 @media (min-width: 768px) {
     #question1-view h2,
-    #question2-view h2 {
+    #question2-view h2,
+    #waiting-nfc-view h2 {
         font-size: 2.5rem; /* 40px */
     }
 }
@@ -231,6 +233,10 @@ h1, h2, h3, p, button {
 /* 步驟卡片 */
 .step-card {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* 對齊頂部 */
     text-align: center;
     padding: 2rem 1.5rem;
     background: transparent;
@@ -241,6 +247,20 @@ h1, h2, h3, p, button {
     .step-card {
         max-width: 200px;
     }
+}
+
+/* 步驟數字 */
+.step-number {
+    font-size: 1.5rem; /* 24px */
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: #000;
+}
+
+/* 步驟文字 */
+.step-text {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.4;
 }
 
 /* 問題1選項容器 */
@@ -339,7 +359,7 @@ button {
 
 .experience-btn {
     position: fixed;
-    bottom: 160px;
+    bottom: 200px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -347,7 +367,7 @@ button {
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
@@ -364,7 +384,7 @@ button {
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
@@ -387,7 +407,14 @@ button {
     font-weight: 400;
     color: #000;
     text-align: left;
-    display: block;
+    display: flex;
+    align-items: center;
+}
+
+/* 選項前的圓圈數字 */
+.option-number {
+    margin-right: 0.5rem;
+    font-size: 18px;
 }
 
 .option-btn:hover {
@@ -411,7 +438,7 @@ button {
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
@@ -449,12 +476,12 @@ button {
 
 .yes-no-btn.selected {
     background: #000; /* 選中時黑色背景 */
-    color: #f2f2f2; /* 只有選中時白色文字 */
+    color: #000; /* 選中時文字保持黑色（被覆蓋） */
 }
 
 .yes-no-btn.selected:hover {
     background: #000;
-    color: #f2f2f2; /* 選中時 hover 仍保持白色文字 */
+    color: #000; /* 選中時 hover 仍保持黑色文字（被覆蓋） */
 }
 
 /* 日誌容器 */

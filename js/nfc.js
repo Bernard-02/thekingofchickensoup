@@ -116,6 +116,13 @@ class NFCManager {
     async handleRandomQuote(message = {}) {
         log('收到隨機抽雞湯指令（唯一抽籤卡）', 'info');
 
+        // 檢查當前是否在 waiting-nfc-view 頁面
+        const waitingView = document.getElementById('waiting-nfc-view');
+        if (!waitingView || !waitingView.classList.contains('active')) {
+            log('NFC 掃描無效：必須在等待 NFC 頁面才能掃描', 'warn');
+            return;
+        }
+
         try {
             // 載入雞湯資料
             const response = await fetch('data/quotes.json');

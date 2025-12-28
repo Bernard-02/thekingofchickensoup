@@ -18,7 +18,7 @@
             <h1 class="font-bold">這個人超會寫雞湯</h1>
             <h2 class="en">The King of Chicken Soup</h2>
         </div>
-        <button class="experience-btn" onclick="goToGuide()">開始體驗</button>
+        <button class="experience-btn" onclick="goToGuide()">開始</button>
     </div>
 
     <!-- 使用提示 -->
@@ -28,16 +28,19 @@
                 <h2 class="font-bold">操作提示</h2>
                 <div class="guide-steps">
                     <div class="step-card">
-                        <p class="text-lg">回答兩個問題</p>
+                        <div class="step-number">①</div>
+                        <p class="step-text">回答兩個問題</p>
                     </div>
                     <div class="step-card">
-                        <p class="text-lg">放上NFC卡片抽取雞湯</p>
+                        <div class="step-number">②</div>
+                        <p class="step-text">放上NFC卡片抽取雞湯</p>
                     </div>
                     <div class="step-card">
-                        <p class="text-lg">找對應編號罐子查看脈絡</p>
+                        <div class="step-number">③</div>
+                        <p class="step-text">找對應編號罐子查看脈絡</p>
                     </div>
                 </div>
-                <button class="primary-btn" onclick="goToQuestion1()">開始</button>
+                <button class="primary-btn" onclick="goToQuestion1()">ok，我已了解</button>
             </div>
         </div>
     </div>
@@ -48,11 +51,11 @@
             <div class="max-w-2xl mx-auto text-center">
                 <h2 class="font-medium mb-12">嗨，其實也沒什麼大道理，<br>只是想問你最近過得好嗎？</h2>
                 <div id="q1-options">
-                    <button class="option-btn" data-value="confused">總覺得哪裡怪怪的，不太確定現在的方向。</button>
-                    <button class="option-btn" data-value="relationships">感覺「人」比我想像中複雜了一點。</button>
-                    <button class="option-btn" data-value="tired">有點疲憊，想喘口氣。</button>
-                    <button class="option-btn" data-value="motivated">可能需要點新的想法。</button>
-                    <button class="option-btn" data-value="random">就那樣吧，日子還算滋潤。</button>
+                    <button class="option-btn" data-value="confused"><span class="option-number">①</span>總覺得哪裡怪怪的，不太確定現在的方向。</button>
+                    <button class="option-btn" data-value="relationships"><span class="option-number">②</span>感覺「人」比我想像中複雜了一點。</button>
+                    <button class="option-btn" data-value="tired"><span class="option-number">③</span>有點疲憊，想喘口氣。</button>
+                    <button class="option-btn" data-value="motivated"><span class="option-number">④</span>可能需要點新的想法。</button>
+                    <button class="option-btn" data-value="random"><span class="option-number">⑤</span>就那樣吧，日子還算滋潤。</button>
                 </div>
                 <button id="confirm-q1" class="confirm-btn">確定</button>
             </div>
@@ -65,8 +68,8 @@
             <div class="max-w-2xl mx-auto text-center">
                 <h2 class="font-medium mb-12">你喜歡你目前的生活嗎？</h2>
                 <div class="flex justify-center">
-                    <button class="yes-no-btn" data-value="yes">是</button>
-                    <button class="yes-no-btn" data-value="no">否</button>
+                    <button class="yes-no-btn" data-value="yes">當然，愛死了</button>
+                    <button class="yes-no-btn" data-value="no">我其實是在生存</button>
                 </div>
             </div>
         </div>
@@ -75,9 +78,9 @@
     <!-- 等待NFC -->
     <div id="waiting-nfc-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="max-w-md mx-auto text-center">
-                <h2 class="text-2xl md:text-3xl font-medium mb-4">請放上NFC卡片</h2>
-                <p class="text-lg text-gray-600">抽取屬於你的雞湯</p>
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="font-medium mb-6">雞湯準備好了...</h2>
+                <p class="text-lg">將桌上的罐子放在紅色的裝置上，以獲取一句雞湯</p>
             </div>
         </div>
     </div>
@@ -184,7 +187,6 @@
             document.querySelectorAll('.yes-no-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            document.getElementById('confirm-q2').classList.remove('visible');
         }
 
         function restart() {
