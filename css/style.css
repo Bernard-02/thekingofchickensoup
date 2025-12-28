@@ -7,11 +7,23 @@
     box-sizing: border-box;
 }
 
+/* 字體規範 */
 body {
-    font-family: 'Helvetica', 'Noto Sans TC', sans-serif;
+    font-family: 'Noto Sans TC', 'Helvetica', sans-serif;
     background-color: #f2f2f2;
     color: #000000;
     overflow: hidden;
+}
+
+/* 中文字體 */
+h1, h2, h3, p, button {
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+/* 英文字體（需要時使用 .en 類別） */
+.en {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    letter-spacing: -0.02em; /* 緊湊的字母間距 */
 }
 
 /* 頁面切換 */
@@ -77,20 +89,52 @@ body {
     background-color: #f2f2f2;
 }
 
-/* 首頁 Logo */
-#home-view #logo {
+/* 首頁標題大小 */
+#home-view h1 {
+    font-size: 4rem; /* 64px */
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+
+#home-view h2 {
+    font-size: 2.5rem; /* 40px */
+    line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+    #home-view h1 {
+        font-size: 5rem; /* 80px */
+        line-height: 1.1;
+        margin-bottom: 0.75rem;
+    }
+
+    #home-view h2 {
+        font-size: 3rem; /* 48px */
+        line-height: 1.2;
+    }
+}
+
+/* Logo - 在所有頁面顯示（除了雞湯頁） */
+#logo {
     position: fixed;
     bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
     height: 32px;
-    z-index: 10;
+    z-index: 100; /* 確保在所有頁面之上 */
+    transition: opacity 0.3s ease; /* 平滑過渡 */
 }
 
 @media (min-width: 768px) {
-    #home-view #logo {
+    #logo {
         height: 40px;
     }
+}
+
+/* 雞湯頁時隱藏 logo */
+#logo.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* 視圖容器 */
@@ -100,11 +144,39 @@ body {
     left: 0;
     width: 100%;
     height: 100vh;
-    transition: opacity 0.5s ease;
+    display: none;
+    opacity: 0;
 }
 
-.view-container.hidden {
-    display: none;
+.view-container.active {
+    display: block;
+    opacity: 1; /* 確保 active 的頁面可見 */
+}
+
+.view-container.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.view-container.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
 
 /* 雞湯頁視圖 */
@@ -113,15 +185,100 @@ body {
     z-index: 20;
 }
 
-/* 雞湯文字樣式 */
+/* 使用提示頁面樣式 */
+#guide-view h2 {
+    font-size: 2rem; /* 32px */
+    margin-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+    #guide-view h2 {
+        font-size: 2.5rem; /* 40px */
+    }
+}
+
+/* 問題頁面樣式 */
+#question1-view h2,
+#question2-view h2 {
+    font-size: 2rem; /* 32px */
+}
+
+@media (min-width: 768px) {
+    #question1-view h2,
+    #question2-view h2 {
+        font-size: 2.5rem; /* 40px */
+    }
+}
+
+/* 步驟卡片容器 */
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+@media (min-width: 768px) {
+    .guide-steps {
+        flex-direction: row;
+        justify-content: center;
+        gap: 2rem;
+    }
+}
+
+/* 步驟卡片 */
+.step-card {
+    flex: 1;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: transparent;
+    border: 1px solid #000;
+}
+
+@media (min-width: 768px) {
+    .step-card {
+        max-width: 200px;
+    }
+}
+
+/* 問題1選項容器 */
+#q1-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* 選項之間的間距 */
+}
+
+/* 雞湯頁面字體大小 */
+#quote-number-text {
+    font-size: 2rem; /* 32px */
+}
+
 #quote-zh-text {
+    font-size: 2.5rem; /* 40px */
     text-wrap: balance;
     line-height: 1.2;
 }
 
 #quote-en-text {
+    font-size: 2rem; /* 32px */
     text-wrap: balance;
     letter-spacing: -0.02em;
+}
+
+@media (min-width: 768px) {
+    #quote-number-text {
+        font-size: 2.5rem; /* 40px */
+    }
+
+    #quote-zh-text {
+        font-size: 3rem; /* 48px */
+    }
+
+    #quote-en-text {
+        font-size: 2.5rem; /* 40px */
+    }
 }
 
 /* WebSocket 狀態指示器 */
@@ -177,15 +334,127 @@ body {
 /* 按鈕樣式 */
 button {
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: none; /* 移除過渡效果 */
 }
 
-button:hover {
-    transform: translateY(-2px);
+.experience-btn {
+    position: fixed;
+    bottom: 160px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    padding: 0; /* 移除 padding */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    color: #000;
 }
 
-button:active {
-    transform: translateY(0);
+.experience-btn:hover {
+    background: #000; /* 黑色填充覆蓋文字 */
+    color: #000; /* 保持文字黑色（被黑底覆蓋） */
+    transform: translateX(-50%);
+}
+
+.primary-btn {
+    padding: 0; /* 移除 padding */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    color: #000;
+    margin-top: 2rem; /* 按鈕往下移 */
+}
+
+.primary-btn:hover {
+    background: #000; /* 黑色填充覆蓋文字 */
+    color: #000; /* 保持文字黑色（被黑底覆蓋） */
+}
+
+.option-btn {
+    width: 100%;
+    padding: 0; /* 移除 padding */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 400;
+    color: #000;
+    text-align: left;
+    display: block;
+}
+
+.option-btn:hover {
+    background: #000; /* 黑色填充覆蓋文字 */
+    color: #000; /* hover 時文字保持黑色（被覆蓋） */
+}
+
+.option-btn.selected {
+    background: #000; /* 選中時黑色背景 */
+    color: #f2f2f2; /* 只有選中時白色文字 */
+}
+
+.option-btn.selected:hover {
+    background: #000;
+    color: #f2f2f2; /* 選中時 hover 仍保持白色文字 */
+}
+
+/* 確定按鈕 */
+.confirm-btn {
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    color: #000;
+    margin-top: 3rem;
+    opacity: 0; /* 預設透明（不可見但佔位） */
+    pointer-events: none; /* 預設不可點擊 */
+}
+
+.confirm-btn.visible {
+    opacity: 1; /* 可見 */
+    pointer-events: auto; /* 可點擊 */
+}
+
+.confirm-btn:hover {
+    background: #000;
+    color: #000;
+}
+
+.yes-no-btn {
+    padding: 0; /* 移除 padding */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 500;
+    color: #000;
+    margin: 0 2rem; /* 增加左右間距 */
+}
+
+.yes-no-btn:hover {
+    background: #000; /* 黑色填充覆蓋文字 */
+    color: #000; /* hover 時文字保持黑色（被覆蓋） */
+}
+
+.yes-no-btn.selected {
+    background: #000; /* 選中時黑色背景 */
+    color: #f2f2f2; /* 只有選中時白色文字 */
+}
+
+.yes-no-btn.selected:hover {
+    background: #000;
+    color: #f2f2f2; /* 選中時 hover 仍保持白色文字 */
 }
 
 /* 日誌容器 */

@@ -5,166 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The King of Chicken Soup</title>
 
-    <!-- Google Fonts - Noto Sans TC -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f2f2f2;
-        }
-
-        /* 视图切换 */
-        .view-container {
-            display: none;
-        }
-
-        .view-container.active {
-            display: block;
-        }
-
-        /* 按钮样式 */
-        .experience-btn {
-            position: fixed;
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 500;
-            color: #000;
-        }
-
-        .experience-btn:hover {
-            background: #000;
-            color: #f2f2f2;
-            transform: translateX(-50%);
-        }
-
-        .primary-btn {
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 500;
-            color: #000;
-        }
-
-        .primary-btn:hover {
-            background: #000;
-            color: #f2f2f2;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 16px 24px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 400;
-            color: #000;
-            text-align: left;
-        }
-
-        .option-btn:hover {
-            background: #000;
-            color: #f2f2f2;
-        }
-
-        .yes-no-btn {
-            padding: 8px 16px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 500;
-            color: #000;
-        }
-
-        .yes-no-btn:hover {
-            background: #000;
-            color: #f2f2f2;
-        }
-
-        /* Logo */
-        #logo {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 32px;
-            z-index: 10;
-        }
-
-        @media (min-width: 768px) {
-            #logo {
-                height: 40px;
-            }
-        }
-
-        /* WebSocket 状态 */
-        #ws-status-container {
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 100;
-            opacity: 0.3;
-        }
-
-        #ws-status {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #ef4444;
-        }
-
-        #ws-status.connected {
-            background-color: #10b981;
-        }
-
-        #ws-status-text {
-            font-size: 14px;
-        }
-    </style>
 </head>
 <body>
     <!-- 首页 -->
     <div id="home-view" class="view-container active">
         <div class="flex flex-col items-center justify-center min-h-screen">
-            <h1 class="text-6xl font-bold mb-4">這個人超會寫雞湯。</h1>
-            <h2 class="text-4xl mb-16">The King of Chicken Soup</h2>
+            <h1 class="font-bold">這個人超會寫雞湯</h1>
+            <h2 class="en">The King of Chicken Soup</h2>
         </div>
-        <img id="logo" src="Logo/雞湯Logo.png" alt="Logo">
         <button class="experience-btn" onclick="goToGuide()">開始體驗</button>
     </div>
 
     <!-- 使用提示 -->
     <div id="guide-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="max-w-md mx-auto text-center">
-                <h2 class="text-2xl md:text-3xl font-bold mb-8">如何使用</h2>
-                <div class="text-left space-y-4 mb-8">
-                    <p class="text-lg">① 回答兩個問題</p>
-                    <p class="text-lg">② 放上NFC卡片抽取雞湯</p>
-                    <p class="text-lg">③ 找對應編號罐子查看脈絡</p>
+            <div class="w-full text-center">
+                <h2 class="font-bold">操作提示</h2>
+                <div class="guide-steps">
+                    <div class="step-card">
+                        <p class="text-lg">回答兩個問題</p>
+                    </div>
+                    <div class="step-card">
+                        <p class="text-lg">放上NFC卡片抽取雞湯</p>
+                    </div>
+                    <div class="step-card">
+                        <p class="text-lg">找對應編號罐子查看脈絡</p>
+                    </div>
                 </div>
                 <button class="primary-btn" onclick="goToQuestion1()">開始</button>
             </div>
@@ -175,14 +46,15 @@
     <div id="question1-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center">
-                <h2 class="text-2xl md:text-3xl font-medium mb-12">嗨，其實也沒什麼大道理，<br>只是想問你最近過得好嗎？</h2>
-                <div class="space-y-4">
-                    <button class="option-btn" onclick="selectQ1('confused')">總覺得哪裡怪怪的，不太確定現在的方向。</button>
-                    <button class="option-btn" onclick="selectQ1('relationships')">感覺『人』比我想像中複雜了一點。</button>
-                    <button class="option-btn" onclick="selectQ1('tired')">有點疲憊，想喘口氣。</button>
-                    <button class="option-btn" onclick="selectQ1('motivated')">可能需要點新的想法。</button>
-                    <button class="option-btn" onclick="selectQ1('random')">就那樣吧，日子還算滋潤。</button>
+                <h2 class="font-medium mb-12">嗨，其實也沒什麼大道理，<br>只是想問你最近過得好嗎？</h2>
+                <div id="q1-options">
+                    <button class="option-btn" data-value="confused">總覺得哪裡怪怪的，不太確定現在的方向。</button>
+                    <button class="option-btn" data-value="relationships">感覺「人」比我想像中複雜了一點。</button>
+                    <button class="option-btn" data-value="tired">有點疲憊，想喘口氣。</button>
+                    <button class="option-btn" data-value="motivated">可能需要點新的想法。</button>
+                    <button class="option-btn" data-value="random">就那樣吧，日子還算滋潤。</button>
                 </div>
+                <button id="confirm-q1" class="confirm-btn">確定</button>
             </div>
         </div>
     </div>
@@ -191,10 +63,10 @@
     <div id="question2-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center">
-                <h2 class="text-2xl md:text-3xl font-medium mb-12">你喜歡你目前的生活嗎？</h2>
-                <div class="flex gap-6 justify-center">
-                    <button class="yes-no-btn" onclick="selectQ2('yes')">是</button>
-                    <button class="yes-no-btn" onclick="selectQ2('no')">否</button>
+                <h2 class="font-medium mb-12">你喜歡你目前的生活嗎？</h2>
+                <div class="flex justify-center">
+                    <button class="yes-no-btn" data-value="yes">是</button>
+                    <button class="yes-no-btn" data-value="no">否</button>
                 </div>
             </div>
         </div>
@@ -214,13 +86,13 @@
     <div id="quote-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="text-center mb-8">
-                <p id="quote-number-text" class="text-3xl md:text-4xl font-normal">#1</p>
+                <p id="quote-number-text" class="en font-normal">#1</p>
             </div>
             <div class="max-w-2xl mx-auto text-center mb-4">
-                <p id="quote-zh-text" class="text-3xl md:text-5xl font-bold">載入中...</p>
+                <p id="quote-zh-text" class="font-bold">載入中...</p>
             </div>
             <div class="max-w-2xl mx-auto text-center mb-8">
-                <p id="quote-en-text" class="text-3xl md:text-4xl font-normal">Loading...</p>
+                <p id="quote-en-text" class="en font-normal">Loading...</p>
             </div>
             <div id="quote-actions" class="hidden mt-8 text-center">
                 <p class="text-lg text-gray-600 mb-4">想了解這句話的脈絡？<br>請找對應編號的雞湯罐子</p>
@@ -228,6 +100,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Logo - 獨立於所有頁面之外，不受淡入淡出影響 -->
+    <img id="logo" src="Logo/雞湯Logo.png" alt="Logo">
 
     <!-- WebSocket 状态 -->
     <div id="ws-status-container">
@@ -246,10 +121,44 @@
             q2: null
         };
 
-        // 显示指定view
+        let selectedQ1 = null;
+        let selectedQ2 = null;
+
+        // 显示指定view（帶淡入淡出效果）
         function showView(viewId) {
-            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
+            const currentView = document.querySelector('.view-container.active');
+            const nextView = document.getElementById(viewId);
+            const logo = document.getElementById('logo');
+
+            if (!nextView) return;
+
+            // 控制 Logo 顯示/隱藏
+            if (viewId === 'quote-view') {
+                logo.classList.add('hidden');
+            } else {
+                logo.classList.remove('hidden');
+            }
+
+            // 如果當前有活動頁面，先淡出
+            if (currentView && currentView !== nextView) {
+                currentView.classList.add('fade-out');
+
+                // 等待淡出完成後切換
+                setTimeout(() => {
+                    currentView.classList.remove('active', 'fade-out', 'fade-in', 'visible');
+
+                    // 顯示下一個頁面並淡入
+                    nextView.classList.add('active');
+                    // 使用 requestAnimationFrame 確保 display 變更後再觸發動畫
+                    requestAnimationFrame(() => {
+                        nextView.classList.add('fade-in');
+                    });
+                }, 300); // 對應 fadeOut 動畫時間
+            } else {
+                // 首次載入，直接顯示
+                nextView.classList.add('active', 'fade-in');
+            }
+
             console.log('显示页面:', viewId);
         }
 
@@ -260,38 +169,90 @@
 
         function goToQuestion1() {
             showView('question1-view');
+            // 重置選擇
+            selectedQ1 = null;
+            document.querySelectorAll('#q1-options .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('confirm-q1').classList.remove('visible');
         }
 
-        function selectQ1(choice) {
-            userSelection.q1 = choice;
-            console.log('问题1:', choice);
+        function goToQuestion2() {
             showView('question2-view');
-        }
-
-        function selectQ2(choice) {
-            userSelection.q2 = choice;
-            console.log('问题2:', choice);
-            showView('waiting-nfc-view');
-
-            // 传递用户选择给NFC管理器
-            if (window.nfcManager) {
-                nfcManager.userSelection = userSelection;
-            }
+            // 重置選擇
+            selectedQ2 = null;
+            document.querySelectorAll('.yes-no-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.getElementById('confirm-q2').classList.remove('visible');
         }
 
         function restart() {
             userSelection = { q1: null, q2: null };
+            selectedQ1 = null;
+            selectedQ2 = null;
             document.getElementById('quote-actions').classList.add('hidden');
             showView('home-view');
         }
 
-        // 初始化
+        // 初始化問題1和問題2的選項點擊事件
         document.addEventListener('DOMContentLoaded', () => {
+            // 問題1選項
+            const q1Options = document.querySelectorAll('#q1-options .option-btn');
+            const confirmQ1Btn = document.getElementById('confirm-q1');
+
+            q1Options.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 移除所有選項的selected類
+                    q1Options.forEach(b => b.classList.remove('selected'));
+                    // 添加當前選項的selected類
+                    btn.classList.add('selected');
+                    // 記錄選擇
+                    selectedQ1 = btn.getAttribute('data-value');
+                    // 顯示確定按鈕
+                    confirmQ1Btn.classList.add('visible');
+                });
+            });
+
+            // 問題1確定按鈕
+            confirmQ1Btn.addEventListener('click', () => {
+                if (selectedQ1) {
+                    userSelection.q1 = selectedQ1;
+                    console.log('问题1确认:', selectedQ1);
+                    goToQuestion2();
+                }
+            });
+
+            // 問題2選項 - 直接進入下一頁，不需要確定按鈕
+            const q2Options = document.querySelectorAll('.yes-no-btn');
+
+            q2Options.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // 移除所有選項的selected類
+                    q2Options.forEach(b => b.classList.remove('selected'));
+                    // 添加當前選項的selected類
+                    btn.classList.add('selected');
+                    // 記錄選擇
+                    selectedQ2 = btn.getAttribute('data-value');
+                    userSelection.q2 = selectedQ2;
+                    console.log('问题2确认:', selectedQ2);
+
+                    // 直接進入NFC等待頁面
+                    showView('waiting-nfc-view');
+
+                    // 传递用户选择给NFC管理器
+                    if (window.nfcManager) {
+                        nfcManager.userSelection = userSelection;
+                    }
+                });
+            });
+
             // 初始化 WebSocket
             if (window.nfcManager) {
                 nfcManager.connect();
             }
         });
+
     </script>
 </body>
 </html>
