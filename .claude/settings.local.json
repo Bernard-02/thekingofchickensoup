@@ -10,7 +10,9 @@
       "Bash(powershell -Command:*)",
       "Bash(git clean:*)",
       "Bash(node -e:*)",
-      "Bash(python -m http.server:*)"
+      "Bash(python -m http.server:*)",
+      "Bash(done)",
+      "Bash(node generate_contexts.js:*)"
     ],
     "deny": [],
     "ask": []

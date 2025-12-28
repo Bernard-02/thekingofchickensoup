@@ -44,7 +44,7 @@ bool clientConnected = false;
 
 // 時間窗口控制：同一張卡片需要間隔一定時間才能再次觸發
 unsigned long lastTriggerTime = 0;  // 上次觸發的時間戳
-const unsigned long TRIGGER_COOLDOWN = 1000;  // 冷卻時間（毫秒），1秒後可以再掃
+const unsigned long TRIGGER_COOLDOWN = 1500;  // 冷卻時間（毫秒），1.5秒後可以再掃
 
 // ===== 當前狀態追蹤 =====
 int currentQuoteNumber = -1;  // 當前顯示的雞湯編號（由前端更新）
@@ -252,8 +252,16 @@ void loop() {
     // 偵測 NFC 類型
     NFCType nfcType = detectNFCType(currentUID);
 
-    // 檢查是否可以觸發（只有 UID 改變時才處理）
-    bool shouldProcess = (currentUID != lastUID);
+    // 檢查是否可以觸發
+    bool shouldProcess = false;
+
+    if (nfcType == NFC_TRIGGER) {
+      // 觸發卡片：只有 UID 改變時才觸發（需要移開再放回）
+      shouldProcess = (currentUID != lastUID);
+    } else {
+      // 脈絡卡片：只有 UID 改變時才觸發（新卡片）
+      shouldProcess = (currentUID != lastUID);
+    }
 
     if (shouldProcess) {
       lastUID = currentUID;

@@ -25,8 +25,29 @@ class ContextManager {
         this.hintElement = document.getElementById('context-hint');
 
         // 綁定按鈕事件
-        this.prevBtn.addEventListener('click', () => this.prev());
-        this.nextBtn.addEventListener('click', () => this.next());
+        this.prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止觸發覆蓋層的點擊事件
+            this.prev();
+        });
+        this.nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.next();
+        });
+
+        // 點擊覆蓋層任意位置關閉脈絡
+        this.overlay.addEventListener('click', (e) => {
+            // 點擊媒體顯示區域、控制按鈕、指示器時不關閉
+            const clickedElement = e.target;
+            const isMediaDisplay = clickedElement.closest('#context-media-display');
+            const isControl = clickedElement.closest('.context-nav-btn');
+            const isIndicator = clickedElement.closest('.context-indicators');
+
+            // 如果不是點擊這些元素，就關閉
+            if (!isMediaDisplay && !isControl && !isIndicator) {
+                log('點擊覆蓋層，關閉脈絡', 'info');
+                this.hide();
+            }
+        });
 
         log('ContextManager 初始化完成', 'info');
     }
@@ -52,7 +73,7 @@ class ContextManager {
 
             // 重置提示文字為正常提示
             if (this.hintElement) {
-                this.hintElement.textContent = '將罐子移開以返回';
+                this.hintElement.textContent = '點擊畫面任意位置以返回';
             }
 
             // 只有在有多個媒體時才創建指示器和控制按鈕
@@ -94,7 +115,7 @@ class ContextManager {
 
         // 更新提示文字為空白脈絡提示
         if (this.hintElement) {
-            this.hintElement.textContent = '此脈絡尚未轉換，將罐子移開以返回';
+            this.hintElement.textContent = '此脈絡尚未轉換，點擊畫面任意位置以返回';
         }
 
         // 顯示覆蓋層（空白畫面）
