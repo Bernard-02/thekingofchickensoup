@@ -128,19 +128,45 @@ class NFCManager {
 
             // 只從前 50 句中選擇（唯一抽籤卡專用）
             quotes = quotes.filter(q => q.number <= 50);
-            log(`從前 50 句中隨機選擇（共 ${quotes.length} 句）`, 'info');
+
+            // 根據用戶選擇篩選
+            if (this.userSelection && this.userSelection.question1 && this.userSelection.question1 !== 'random') {
+                const selectedTag = this.userSelection.question1;
+                const filteredQuotes = quotes.filter(q => q.tags && q.tags.includes(selectedTag));
+
+                if (filteredQuotes.length > 0) {
+                    quotes = filteredQuotes;
+                    log(`根據選擇 "${selectedTag}" 篩選，共 ${quotes.length} 句`, 'info');
+                } else {
+                    log(`選擇 "${selectedTag}" 沒有匹配的雞湯，使用所有50句`, 'info');
+                }
+            } else {
+                log(`從所有前 50 句中隨機選擇（共 ${quotes.length} 句）`, 'info');
+            }
 
             // 隨機選擇一句
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
             log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
 
-            // 使用 appState 切換到雞湯頁（如果存在）
-            if (window.appState) {
-                await appState.switchTo('quote', randomQuote);
-            } else {
-                // 降級方案：使用舊的多頁面方式
-                localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
-                window.location.href = 'quote.html';
+            // 隐藏所有视图，显示雞湯页
+            const views = ['home-view', 'guide-view', 'question1-view', 'question2-view', 'waiting-nfc-view'];
+            views.forEach(id => {
+                document.getElementById(id)?.classList.add('hidden');
+            });
+
+            const quoteView = document.getElementById('quote-view');
+            if (quoteView) {
+                quoteView.classList.remove('hidden');
+
+                // 更新雞湯内容
+                document.getElementById('quote-number-text').textContent = `#${randomQuote.number}`;
+                document.getElementById('quote-zh-text').textContent = randomQuote.textCN;
+                document.getElementById('quote-en-text').textContent = randomQuote.textEN;
+
+                // 2秒后显示底部提示
+                setTimeout(() => {
+                    document.getElementById('quote-actions')?.classList.remove('hidden');
+                }, 2000);
             }
 
         } catch (error) {

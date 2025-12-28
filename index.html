@@ -13,121 +13,285 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- p5.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f2f2f2;
+        }
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+        /* 视图切换 */
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        /* 按钮样式 */
+        .experience-btn {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .experience-btn:hover {
+            background: #000;
+            color: #f2f2f2;
+            transform: translateX(-50%);
+        }
+
+        .primary-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .primary-btn:hover {
+            background: #000;
+            color: #f2f2f2;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 400;
+            color: #000;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: #000;
+            color: #f2f2f2;
+        }
+
+        .yes-no-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
+            color: #000;
+        }
+
+        .yes-no-btn:hover {
+            background: #000;
+            color: #f2f2f2;
+        }
+
+        /* Logo */
+        #logo {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 32px;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            #logo {
+                height: 40px;
+            }
+        }
+
+        /* WebSocket 状态 */
+        #ws-status-container {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            opacity: 0.3;
+        }
+
+        #ws-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ef4444;
+        }
+
+        #ws-status.connected {
+            background-color: #10b981;
+        }
+
+        #ws-status-text {
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <!-- 首頁 View: p5.js Canvas -->
-    <div id="home-view" class="view-container">
-        <div id="p5-canvas"></div>
-
-        <!-- Logo -->
-        <img id="logo" src="Logo/雞湯Logo.png" alt="The King of Chicken Soup">
+    <!-- 首页 -->
+    <div id="home-view" class="view-container active">
+        <div class="flex flex-col items-center justify-center min-h-screen">
+            <h1 class="text-6xl font-bold mb-4">這個人超會寫雞湯。</h1>
+            <h2 class="text-4xl mb-16">The King of Chicken Soup</h2>
+        </div>
+        <img id="logo" src="Logo/雞湯Logo.png" alt="Logo">
+        <button class="experience-btn" onclick="goToGuide()">開始體驗</button>
     </div>
 
-    <!-- 雞湯頁 View -->
-    <div id="quote-view" class="view-container hidden">
+    <!-- 使用提示 -->
+    <div id="guide-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <!-- 雞湯編號 -->
-            <div class="text-center mb-8">
-                <p id="quote-number-text" class="text-3xl md:text-4xl font-normal">#1</p>
-            </div>
-
-            <!-- 雞湯文字 (中文) -->
-            <div class="max-w-2xl mx-auto text-center mb-4">
-                <p id="quote-zh-text" class="text-3xl md:text-5xl font-bold">
-                    載入中...
-                </p>
-            </div>
-
-            <!-- 雞湯文字 (英文) -->
-            <div class="max-w-2xl mx-auto text-center">
-                <p id="quote-en-text" class="text-3xl md:text-4xl font-normal">
-                    Loading...
-                </p>
+            <div class="max-w-md mx-auto text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-8">如何使用</h2>
+                <div class="text-left space-y-4 mb-8">
+                    <p class="text-lg">① 回答兩個問題</p>
+                    <p class="text-lg">② 放上NFC卡片抽取雞湯</p>
+                    <p class="text-lg">③ 找對應編號罐子查看脈絡</p>
+                </div>
+                <button class="primary-btn" onclick="goToQuestion1()">開始</button>
             </div>
         </div>
     </div>
 
-    <!-- WebSocket 狀態指示器 -->
+    <!-- 问题1 -->
+    <div id="question1-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-2xl md:text-3xl font-medium mb-12">嗨，其實也沒什麼大道理，<br>只是想問你最近過得好嗎？</h2>
+                <div class="space-y-4">
+                    <button class="option-btn" onclick="selectQ1('confused')">總覺得哪裡怪怪的，不太確定現在的方向。</button>
+                    <button class="option-btn" onclick="selectQ1('relationships')">感覺『人』比我想像中複雜了一點。</button>
+                    <button class="option-btn" onclick="selectQ1('tired')">有點疲憊，想喘口氣。</button>
+                    <button class="option-btn" onclick="selectQ1('motivated')">可能需要點新的想法。</button>
+                    <button class="option-btn" onclick="selectQ1('random')">就那樣吧，日子還算滋潤。</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 问题2 -->
+    <div id="question2-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-2xl mx-auto text-center">
+                <h2 class="text-2xl md:text-3xl font-medium mb-12">你喜歡你目前的生活嗎？</h2>
+                <div class="flex gap-6 justify-center">
+                    <button class="yes-no-btn" onclick="selectQ2('yes')">是</button>
+                    <button class="yes-no-btn" onclick="selectQ2('no')">否</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 等待NFC -->
+    <div id="waiting-nfc-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-md mx-auto text-center">
+                <h2 class="text-2xl md:text-3xl font-medium mb-4">請放上NFC卡片</h2>
+                <p class="text-lg text-gray-600">抽取屬於你的雞湯</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 雞湯页 -->
+    <div id="quote-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="text-center mb-8">
+                <p id="quote-number-text" class="text-3xl md:text-4xl font-normal">#1</p>
+            </div>
+            <div class="max-w-2xl mx-auto text-center mb-4">
+                <p id="quote-zh-text" class="text-3xl md:text-5xl font-bold">載入中...</p>
+            </div>
+            <div class="max-w-2xl mx-auto text-center mb-8">
+                <p id="quote-en-text" class="text-3xl md:text-4xl font-normal">Loading...</p>
+            </div>
+            <div id="quote-actions" class="hidden mt-8 text-center">
+                <p class="text-lg text-gray-600 mb-4">想了解這句話的脈絡？<br>請找對應編號的雞湯罐子</p>
+                <button class="primary-btn" onclick="restart()">重新開始</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebSocket 状态 -->
     <div id="ws-status-container">
         <div id="ws-status"></div>
         <span id="ws-status-text">未連線</span>
     </div>
 
-    <!-- 測試按鈕（開發用） -->
-    <div style="position: fixed; top: 16px; left: 16px; z-index: 200; display: flex; gap: 8px; flex-wrap: wrap; max-width: 400px;">
-        <button onclick="testSwitchToQuote()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-            測試：切換到雞湯頁
-        </button>
-        <button onclick="testSwitchToHome()" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-            返回首頁
-        </button>
-    </div>
-
     <!-- JavaScript -->
     <script src="js/config.js"></script>
-    <script src="js/app-state.js"></script>
     <script src="js/nfc.js"></script>
-    <script src="js/sketch.js"></script>
 
     <script>
-        // 初始化 WebSocket 連線
+        // 用户选择
+        let userSelection = {
+            q1: null,
+            q2: null
+        };
+
+        // 显示指定view
+        function showView(viewId) {
+            document.querySelectorAll('.view-container').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            console.log('显示页面:', viewId);
+        }
+
+        // 导航
+        function goToGuide() {
+            showView('guide-view');
+        }
+
+        function goToQuestion1() {
+            showView('question1-view');
+        }
+
+        function selectQ1(choice) {
+            userSelection.q1 = choice;
+            console.log('问题1:', choice);
+            showView('question2-view');
+        }
+
+        function selectQ2(choice) {
+            userSelection.q2 = choice;
+            console.log('问题2:', choice);
+            showView('waiting-nfc-view');
+
+            // 传递用户选择给NFC管理器
+            if (window.nfcManager) {
+                nfcManager.userSelection = userSelection;
+            }
+        }
+
+        function restart() {
+            userSelection = { q1: null, q2: null };
+            document.getElementById('quote-actions').classList.add('hidden');
+            showView('home-view');
+        }
+
+        // 初始化
         document.addEventListener('DOMContentLoaded', () => {
-            // 初始化狀態管理器
-            if (window.appState) {
-                appState.init();
+            // 初始化 WebSocket
+            if (window.nfcManager) {
+                nfcManager.connect();
             }
-
-            // 初始化 WebSocket 連線
-            nfcManager.connect();
         });
-
-        // 測試函數：模擬 NFC 切換到雞湯頁
-        async function testSwitchToQuote() {
-            console.log('測試：手動切換到雞湯頁');
-
-            try {
-                // 載入雞湯資料
-                const response = await fetch('data/quotes.json');
-                const quotes = await response.json();
-
-                if (quotes.length === 0) {
-                    console.error('沒有雞湯資料');
-                    return;
-                }
-
-                // 隨機選一句
-                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-                console.log('選中的雞湯:', randomQuote);
-
-                // 切換到雞湯頁
-                if (!window.appState) {
-                    console.error('❌ appState 不存在');
-                    return;
-                }
-
-                await appState.switchTo('quote', randomQuote);
-                console.log('✅ 切換成功');
-            } catch (error) {
-                console.error('測試失敗:', error);
-            }
-        }
-
-        // 測試函數：返回首頁
-        async function testSwitchToHome() {
-            console.log('測試：返回首頁');
-
-            if (window.appState) {
-                await appState.switchTo('home');
-                console.log('✅ 返回首頁成功');
-            } else {
-                console.error('appState 未初始化');
-            }
-        }
     </script>
 </body>
 </html>

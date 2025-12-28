@@ -115,11 +115,10 @@ class AppStateManager {
 
     // 直接顯示某個 view（無動畫）
     showView(state) {
-        // 隱藏所有 view
+        // 只隱藏 appState 管理的 view
         Object.values(this.views).forEach(view => {
             if (view) {
                 view.classList.add('hidden');
-                view.style.opacity = '0';
             }
         });
 
@@ -127,7 +126,6 @@ class AppStateManager {
         const targetView = this.views[state];
         if (targetView) {
             targetView.classList.remove('hidden');
-            targetView.style.opacity = '1';
             this.currentState = state;
         }
     }

@@ -8,7 +8,8 @@
       "Bash(platformio run:*)",
       "Bash(cat:*)",
       "Bash(powershell -Command:*)",
-      "Bash(git clean:*)"
+      "Bash(git clean:*)",
+      "Bash(node -e:*)"
     ],
     "deny": [],
     "ask": []

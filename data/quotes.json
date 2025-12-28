@@ -6,7 +6,10 @@
     "textCN": "除了期待天空一直不會下雨，你還可以學會在雨天跳舞。",
     "textEN": "Instead of wishing for the sky to never rain, you can learn to dance in the rain.",
     "nfcUID": "04:8D:D5:22:BF:2A:81",
-    "contextId": "001"
+    "contextId": "001",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "002",
@@ -15,7 +18,10 @@
     "textCN": "人生所有的點都是連結在一起的。",
     "textEN": "Every point in life is connected.",
     "nfcUID": "04:82:D5:22:BF:2A:81",
-    "contextId": "002"
+    "contextId": "002",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "003",
@@ -24,7 +30,10 @@
     "textCN": "向前看，過去讓它過去。",
     "textEN": "Look forward — let bygones be bygones.",
     "nfcUID": "04:F2:D5:22:BF:2A:81",
-    "contextId": "003"
+    "contextId": "003",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "004",
@@ -33,7 +42,10 @@
     "textCN": "每件事情發生都有它的原因。",
     "textEN": "Everything that happens has its own meaning.",
     "nfcUID": "04:8C:D5:22:BF:2A:81",
-    "contextId": "004"
+    "contextId": "004",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "005",
@@ -42,7 +54,10 @@
     "textCN": "時間是人際關係的衡量標準之一。",
     "textEN": "Time is one of the standards by which relationships are measured.",
     "nfcUID": "04:8B:D5:22:BF:2A:81",
-    "contextId": "005"
+    "contextId": "005",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "006",
@@ -51,7 +66,10 @@
     "textCN": "生命有限，可以偶爾浪費，但不要完全浪費。",
     "textEN": "Life is limited — you may waste a little of it sometimes, but don't waste it entirely.",
     "nfcUID": "04:8A:D5:22:BF:2A:81",
-    "contextId": "006"
+    "contextId": "006",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "007",
@@ -60,7 +78,10 @@
     "textCN": "相遇即是一種緣分，珍惜出現在你生命裡的人。",
     "textEN": "Every encounter is a kind of fate — cherish the people who appear in your life.",
     "nfcUID": "04:96:D5:22:BF:2A:81",
-    "contextId": "007"
+    "contextId": "007",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "008",
@@ -69,7 +90,10 @@
     "textCN": "人生也許就該像蘇軾一樣，也無風雨也無晴。",
     "textEN": "Perhaps life, like Su Shi wrote, is neither stormy nor sunny.",
     "nfcUID": "04:95:D5:22:BF:2A:81",
-    "contextId": "008"
+    "contextId": "008",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "009",
@@ -78,7 +102,10 @@
     "textCN": "破鏡無法重圓，對待與他人的關係請小心輕放。",
     "textEN": "A broken mirror can't be mended — handle your relationships with care.",
     "nfcUID": "04:94:D5:22:BF:2A:81",
-    "contextId": "009"
+    "contextId": "009",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "010",
@@ -87,7 +114,10 @@
     "textCN": "你最該認識且了解的人，是你自己。",
     "textEN": "The person you should know and understand the most is yourself.",
     "nfcUID": "04:93:D5:22:BF:2A:81",
-    "contextId": "010"
+    "contextId": "010",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "011",
@@ -96,7 +126,10 @@
     "textCN": "自己選擇的路，不一定要跪著走，也可以站起來走，或者換個舒服的方式走。",
     "textEN": "The path you chose doesn't have to be walked on your knees — you can stand and walk, or choose a more comfortable way to walk it.",
     "nfcUID": "04:9E:D5:22:BF:2A:81",
-    "contextId": "011"
+    "contextId": "011",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "012",
@@ -105,7 +138,10 @@
     "textCN": "人生是拿來體驗的，不一定要拿來完美。",
     "textEN": "Life is meant to be experienced — it doesn't need to be perfect.",
     "nfcUID": "04:9D:D5:22:BF:2A:81",
-    "contextId": "012"
+    "contextId": "012",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "013",
@@ -114,7 +150,10 @@
     "textCN": "我們應該要做好接受任何結果的準備。",
     "textEN": "We should be prepared to accept any outcome.",
     "nfcUID": "04:9C:D5:22:BF:2A:81",
-    "contextId": "013"
+    "contextId": "013",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "014",
@@ -123,7 +162,10 @@
     "textCN": "想活成怎樣的自己，只有你自己能夠決定。",
     "textEN": "Only you can decide what kind of person you want to become.",
     "nfcUID": "04:9B:D5:22:BF:2A:81",
-    "contextId": "014"
+    "contextId": "014",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "015",
@@ -132,7 +174,10 @@
     "textCN": "覺得很煩躁的時候，可以去看大自然。當感覺自己渺小的時候，就會感到心曠神怡。",
     "textEN": "When you feel irritated, go look at nature. When you feel your own smallness, you'll feel a refreshing sense of relief.",
     "nfcUID": "04:A7:D5:22:BF:2A:81",
-    "contextId": "015"
+    "contextId": "015",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "016",
@@ -141,7 +186,10 @@
     "textCN": "別人在背後說你壞話，有可能你是個萬人迷，也有可能是因為你走在他們前面。",
     "textEN": "If people talk badly about you behind your back, it might mean you're charming — or that you're ahead of them.",
     "nfcUID": "04:A6:D5:22:BF:2A:81",
-    "contextId": "016"
+    "contextId": "016",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "017",
@@ -150,7 +198,10 @@
     "textCN": "想要的東西就自己去爭取，你不再是個嗷嗷待哺的小孩了。",
     "textEN": "Go after the things you want — you're no longer a child waiting to be fed.",
     "nfcUID": "04:A5:D5:22:BF:2A:81",
-    "contextId": "017"
+    "contextId": "017",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "018",
@@ -159,7 +210,8 @@
     "textCN": "這世界上有兩種事：不關我的事及不關你的事。",
     "textEN": "In this world, there are two kinds of matters: those that don't concern me, and those that don't concern you.",
     "nfcUID": "04:A4:D5:22:BF:2A:81",
-    "contextId": "018"
+    "contextId": "018",
+    "tags": []
   },
   {
     "id": "019",
@@ -168,7 +220,10 @@
     "textCN": "人生像是一班列車，每個階段上車的人都不一樣：有的可以陪你到終點站，有的則會在幾站就下車了，所以珍惜在車上的時間吧。",
     "textEN": "Life is like a train — the people who get on at each phase are different. Some will stay with you until the final stop, and some will get off after just a few stations. So cherish the time shared on the train.",
     "nfcUID": "04:AF:D5:22:BF:2A:81",
-    "contextId": "019"
+    "contextId": "019",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "020",
@@ -177,7 +232,10 @@
     "textCN": "先愛自己，才能愛別人。",
     "textEN": "Love yourself first — only then can you love others.",
     "nfcUID": "04:AE:D5:22:BF:2A:81",
-    "contextId": "020"
+    "contextId": "020",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "021",
@@ -186,7 +244,10 @@
     "textCN": "好運跟厄運本來就各佔50%，不需要刻意放大不開心的事情。",
     "textEN": "Good luck and bad luck are each naturally 50% — there's no need to magnify unhappy things.",
     "nfcUID": "04:AD:D5:22:BF:2A:81",
-    "contextId": "021"
+    "contextId": "021",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "022",
@@ -195,7 +256,10 @@
     "textCN": "對在乎的人及在乎你的人好就可以了。",
     "textEN": "Just be good to the people you care about, and the people who care about you.",
     "nfcUID": "04:AC:D5:22:BF:2A:81",
-    "contextId": "022"
+    "contextId": "022",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "023",
@@ -204,7 +268,10 @@
     "textCN": "過去的事情可以放在心裡收好，沒必要一直帶著走。",
     "textEN": "You can store your past carefully in your heart — there's no need to carry it around forever.",
     "nfcUID": "04:B8:D5:22:BF:2A:81",
-    "contextId": "023"
+    "contextId": "023",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "024",
@@ -213,7 +280,8 @@
     "textCN": "對自己誠實，不要連自己都要騙。",
     "textEN": "Be honest with yourself — don't lie even to your own heart.",
     "nfcUID": "04:B7:D5:22:BF:2A:81",
-    "contextId": "024"
+    "contextId": "024",
+    "tags": []
   },
   {
     "id": "025",
@@ -222,7 +290,10 @@
     "textCN": "有些事情需要開始做才會有進展，不是等準備好了才開始。",
     "textEN": "Some things only make progress after you begin — don't wait until you think you're fully ready.",
     "nfcUID": "04:B6:D5:22:BF:2A:81",
-    "contextId": "025"
+    "contextId": "025",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "026",
@@ -231,7 +302,10 @@
     "textCN": "我們的時間很寶貴，不要浪費在不重要的人身上。",
     "textEN": "Our time is precious — don't waste it on people who don't matter.",
     "nfcUID": "04:B5:D5:22:BF:2A:81",
-    "contextId": "026"
+    "contextId": "026",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "027",
@@ -240,7 +314,10 @@
     "textCN": "當所有人都在反對你的時候，請你不要連自己都責怪。",
     "textEN": "When everyone is against you, please don't blame yourself too.",
     "nfcUID": "04:C1:D5:22:BF:2A:81",
-    "contextId": "027"
+    "contextId": "027",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "028",
@@ -249,7 +326,10 @@
     "textCN": "有些事情是沒有答案的，不要太過於執著，那樣會很累。",
     "textEN": "Some things simply have no answers — don't cling too tightly, or you'll exhaust yourself.",
     "nfcUID": "04:BF:D5:22:BF:2A:81",
-    "contextId": "028"
+    "contextId": "028",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "029",
@@ -258,7 +338,10 @@
     "textCN": "沒有什麽東西是永恆不變的，唯一不變的東西就是改變本身。",
     "textEN": "Nothing is truly permanent — the only thing that never changes is change itself.",
     "nfcUID": "04:BE:D5:22:BF:2A:81",
-    "contextId": "029"
+    "contextId": "029",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "030",
@@ -267,7 +350,10 @@
     "textCN": "無論你做的再好，總會有人討厭你。你要做的不是討好他們，而是把重心放在那些支持你的人。",
     "textEN": "No matter how well you do, there will always be people who dislike you. What you should do is not please them, but put your focus on those who support you.",
     "nfcUID": "04:BD:D5:22:BF:2A:81",
-    "contextId": "030"
+    "contextId": "030",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "031",
@@ -276,7 +362,10 @@
     "textCN": "不要只是數著日子過，試著讓每一天都有意義吧。",
     "textEN": "Don't count the day, make the days count.",
     "nfcUID": "04:C9:D5:22:BF:2A:81",
-    "contextId": "031"
+    "contextId": "031",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "032",
@@ -285,7 +374,10 @@
     "textCN": "保持善良，那不需要花你半毛錢。",
     "textEN": "Be kind. It costs nothing.",
     "nfcUID": "04:C8:D5:22:BF:2A:81",
-    "contextId": "032"
+    "contextId": "032",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "033",
@@ -294,7 +386,10 @@
     "textCN": "處在不適合的群體，不是想著要怎麽變成像他們一樣，而是去尋找下一個更合適的群體。",
     "textEN": "When you're in a group that doesn't suit you, don't think about becoming like them — instead, look for a group that fits you better.",
     "nfcUID": "04:C7:D5:22:BF:2A:81",
-    "contextId": "033"
+    "contextId": "033",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "034",
@@ -303,7 +398,10 @@
     "textCN": "你做的每一個決定都需要承擔它所帶來的後果，做之前請三思。",
     "textEN": "Every decision you make comes with consequences — think carefully before you act.",
     "nfcUID": "04:C6:D5:22:BF:2A:81",
-    "contextId": "034"
+    "contextId": "034",
+    "tags": [
+      "confused"
+    ]
   },
   {
     "id": "035",
@@ -312,7 +410,10 @@
     "textCN": "我們很常預設別人會怎麽看我們，但有時候事實並不像我們想的那樣，放輕鬆。",
     "textEN": "We often assume how others will see us, but reality isn't always what we imagine — relax.",
     "nfcUID": "04:B4:C6:23:BF:2A:81",
-    "contextId": "035"
+    "contextId": "035",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "036",
@@ -321,7 +422,8 @@
     "textCN": "人的付出具有稀缺性，越稀少越珍貴，付出的同時注意別讓自己掉價了。",
     "textEN": "What you give has scarcity — the rarer it is, the more valuable it becomes. While giving, make sure you don't devalue yourself.",
     "nfcUID": "04:CF:D5:22:BF:2A:81",
-    "contextId": "036"
+    "contextId": "036",
+    "tags": []
   },
   {
     "id": "037",
@@ -330,7 +432,10 @@
     "textCN": "我們不需要每天都很正向，請允許自己擁有各式各樣的情緒。",
     "textEN": "We don't need to be positive every day — allow yourself to have all kinds of emotions.",
     "nfcUID": "04:CE:D5:22:BF:2A:81",
-    "contextId": "037"
+    "contextId": "037",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "038",
@@ -339,7 +444,10 @@
     "textCN": "情緒平復、獲得能量之後，接下來應該要找尋實際的解決方法，而不是停留於此。",
     "textEN": "After calming down and rebuilding your energy, you should seek actual solutions — don't stay stuck at the emotional stage.",
     "nfcUID": "04:DA:D5:22:BF:2A:81",
-    "contextId": "038"
+    "contextId": "038",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "039",
@@ -348,7 +456,8 @@
     "textCN": "人生本來就是不公平的。",
     "textEN": "Life is inherently unfair. If you want fair, then go funfair.",
     "nfcUID": "04:D9:D5:22:BF:2A:81",
-    "contextId": "039"
+    "contextId": "039",
+    "tags": []
   },
   {
     "id": "040",
@@ -357,7 +466,10 @@
     "textCN": "有誤解就要說出來，沒有人會讀心術。",
     "textEN": "If there's misunderstanding, speak it out — no one can read minds.",
     "nfcUID": "04:D8:D5:22:BF:2A:81",
-    "contextId": "040"
+    "contextId": "040",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "041",
@@ -366,7 +478,10 @@
     "textCN": "多出門曬點太陽，就不會覺得自己是溫室裡的爛草莓，被兇一下就玻璃心碎。",
     "textEN": "Go outside and get more sunlight — you won't feel like a fragile greenhouse strawberry that shatters emotionally the moment someone scolds you.",
     "nfcUID": "04:E3:D5:22:BF:2A:81",
-    "contextId": "041"
+    "contextId": "041",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "042",
@@ -375,7 +490,10 @@
     "textCN": "記錄一天中認為開心或幸運的事情，這一天過得也不算太糟。",
     "textEN": "Record the things that made you happy or lucky today — then the day won't feel so bad after all.",
     "nfcUID": "04:E1:D5:22:BF:2A:81",
-    "contextId": "042"
+    "contextId": "042",
+    "tags": [
+      "tired"
+    ]
   },
   {
     "id": "043",
@@ -384,7 +502,10 @@
     "textCN": "對待重要的人事物，要用心。",
     "textEN": "Treat the people and things that matter with heart.",
     "nfcUID": "04:DF:D5:22:BF:2A:81",
-    "contextId": "043"
+    "contextId": "043",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "044",
@@ -393,7 +514,8 @@
     "textCN": "每個人的想法都是獨一無二的，也正因為如此，我們必須要站在對方的角度才能看清事情的全貌。",
     "textEN": "Everyone's thoughts are unique — and because of that, we must learn to stand in others' shoes to see the full picture.",
     "nfcUID": "04:EB:D5:22:BF:2A:81",
-    "contextId": "044"
+    "contextId": "044",
+    "tags": []
   },
   {
     "id": "045",
@@ -402,7 +524,10 @@
     "textCN": "改變自己比改變別人還要容易。",
     "textEN": "Changing yourself is easier than changing others.",
     "nfcUID": "04:EA:D5:22:BF:2A:81",
-    "contextId": "045"
+    "contextId": "045",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "046",
@@ -411,7 +536,10 @@
     "textCN": "你可以不認同對方，但起碼要尊重。",
     "textEN": "You don't have to agree with someone, but at the very least, show respect.",
     "nfcUID": "04:E9:D5:22:BF:2A:81",
-    "contextId": "046"
+    "contextId": "046",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "047",
@@ -420,7 +548,8 @@
     "textCN": "道歉是承認自己的錯誤，而不是索取他人的原諒。",
     "textEN": "An apology is acknowledging your own mistake — not demanding forgiveness from others.",
     "nfcUID": "04:E8:D5:22:BF:2A:81",
-    "contextId": "047"
+    "contextId": "047",
+    "tags": []
   },
   {
     "id": "048",
@@ -429,7 +558,10 @@
     "textCN": "感激他人的付出，因為大家的時間都很寶貴。",
     "textEN": "Be grateful for others' efforts — because everyone's time is valuable.",
     "nfcUID": "04:F4:D5:22:BF:2A:81",
-    "contextId": "048"
+    "contextId": "048",
+    "tags": [
+      "motivated"
+    ]
   },
   {
     "id": "049",
@@ -438,7 +570,8 @@
     "textCN": "很私人的煩惱，傾訴給幾個人知道就好，沒有必要告知天下。",
     "textEN": "Private worries only need to be shared with a few close people — there's no need to announce them to the world.",
     "nfcUID": "04:F3:D5:22:BF:2A:81",
-    "contextId": "049"
+    "contextId": "049",
+    "tags": []
   },
   {
     "id": "050",
@@ -447,7 +580,10 @@
     "textCN": "如果你身邊有沒事也會想起你的朋友，請你好好珍惜這樣的人。",
     "textEN": "If you have friends who think of you even when nothing is happening, treasure them well.",
     "nfcUID": "04:56:6C:97:CC:2A:81",
-    "contextId": "050"
+    "contextId": "050",
+    "tags": [
+      "relationships"
+    ]
   },
   {
     "id": "051",
