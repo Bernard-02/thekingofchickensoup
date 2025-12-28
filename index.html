@@ -29,15 +29,15 @@
                 <div class="guide-steps">
                     <div class="step-card">
                         <div class="step-number">①</div>
-                        <p class="step-text">回答兩個問題</p>
+                        <p class="step-text">請回答兩個問題</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">②</div>
-                        <p class="step-text">放上NFC卡片抽取雞湯</p>
+                        <p class="step-text">將桌上的罐子放在裝置上以抽取雞湯</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">③</div>
-                        <p class="step-text">找對應編號罐子查看脈絡</p>
+                        <p class="step-text">用對應編號的罐子查看脈絡</p>
                     </div>
                 </div>
                 <button class="primary-btn" onclick="goToQuestion1()">ok，我已了解</button>
@@ -79,7 +79,7 @@
     <div id="waiting-nfc-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center">
-                <h2 class="font-medium mb-6">雞湯準備好了...</h2>
+                <h2 class="font-medium mb-6">雞湯快準備好了...</h2>
                 <p class="text-lg">將桌上的罐子放在紅色的裝置上，以獲取一句雞湯</p>
             </div>
         </div>
@@ -97,9 +97,29 @@
             <div class="max-w-2xl mx-auto text-center mb-8">
                 <p id="quote-en-text" class="en font-normal">Loading...</p>
             </div>
-            <div id="quote-actions" class="hidden mt-8 text-center">
-                <p class="text-lg text-gray-600 mb-4">想了解這句話的脈絡？<br>請找對應編號的雞湯罐子</p>
+            <div id="quote-actions" class="mt-8 text-center">
+                <p class="text-lg mb-2">好奇這句話怎麼來的？找對應編號的罐子掃一掃吧！</p>
                 <button class="primary-btn" onclick="restart()">重新開始</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脈絡媒體覆蓋層 -->
+    <div id="context-overlay" class="context-overlay hidden">
+        <div class="context-media-container">
+            <!-- 媒體內容區域 -->
+            <div id="context-media-display"></div>
+
+            <!-- 輪播控制 -->
+            <div class="context-controls">
+                <button id="context-prev" class="context-nav-btn">←</button>
+                <div id="context-indicators" class="context-indicators"></div>
+                <button id="context-next" class="context-nav-btn">→</button>
+            </div>
+
+            <!-- 提示文字 -->
+            <div id="context-hint" class="context-hint">
+                將罐子移開以返回
             </div>
         </div>
     </div>
@@ -115,6 +135,7 @@
 
     <!-- JavaScript -->
     <script src="js/config.js"></script>
+    <script src="js/context.js"></script>
     <script src="js/nfc.js"></script>
 
     <script>
@@ -128,7 +149,7 @@
         let selectedQ2 = null;
 
         // 显示指定view（帶淡入淡出效果）
-        function showView(viewId) {
+        window.showView = function(viewId) {
             const currentView = document.querySelector('.view-container.active');
             const nextView = document.getElementById(viewId);
             const logo = document.getElementById('logo');
@@ -163,7 +184,10 @@
             }
 
             console.log('显示页面:', viewId);
-        }
+        };
+
+        // 創建局部別名
+        const showView = window.showView;
 
         // 导航
         function goToGuide() {
@@ -193,7 +217,8 @@
             userSelection = { q1: null, q2: null };
             selectedQ1 = null;
             selectedQ2 = null;
-            document.getElementById('quote-actions').classList.add('hidden');
+            // 重置提示文字狀態
+            document.getElementById('quote-actions').classList.remove('visible');
             showView('home-view');
         }
 
@@ -250,8 +275,14 @@
             });
 
             // 初始化 WebSocket
+            console.log('檢查 nfcManager:', window.nfcManager);
+            console.log('檢查 CONFIG:', window.CONFIG);
+
             if (window.nfcManager) {
+                console.log('準備連接 WebSocket...');
                 nfcManager.connect();
+            } else {
+                console.error('錯誤：nfcManager 未定義！');
             }
         });
 

@@ -285,6 +285,21 @@ h1, h2, h3, p, button {
     font-size: 2rem; /* 32px */
     text-wrap: balance;
     letter-spacing: -0.02em;
+    line-height: 1.1; /* 更緊湊的行距 */
+}
+
+/* 雞湯頁面提示文字 */
+#quote-actions {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+#quote-actions.visible {
+    opacity: 1;
+}
+
+#quote-actions p {
+    color: rgba(0, 0, 0, 0.5); /* 0.5黑 */
 }
 
 @media (min-width: 768px) {
@@ -299,6 +314,127 @@ h1, h2, h3, p, button {
     #quote-en-text {
         font-size: 2.5rem; /* 40px */
     }
+}
+
+/* 脈絡媒體覆蓋層 */
+.context-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: transparent;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.context-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.context-media-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    position: relative;
+}
+
+#context-media-display {
+    width: 90%;
+    max-width: 900px;
+    max-height: 75vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#context-media-display img,
+#context-media-display video {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    display: block;
+}
+
+/* 輪播控制 */
+.context-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.context-nav-btn {
+    background: transparent;
+    border: 1px solid #000;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    color: #000;
+}
+
+.context-nav-btn:hover {
+    background: #000;
+    color: #f2f2f2;
+}
+
+.context-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.context-nav-btn:disabled:hover {
+    background: transparent;
+    color: #000;
+}
+
+/* 指示器 */
+.context-indicators {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.context-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.context-indicator.active {
+    background-color: #000;
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* 脈絡提示文字 */
+.context-hint {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    text-align: center;
+    z-index: 210;
 }
 
 /* WebSocket 狀態指示器 */

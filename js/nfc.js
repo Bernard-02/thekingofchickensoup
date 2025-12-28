@@ -78,8 +78,12 @@ class NFCManager {
                     this.handleCategorySelected(message);
                     break;
                 case 'show_context':
-                    // 處理顯示脈絡
+                    // 處理顯示脈絡（舊版，保留相容性）
                     this.handleShowContext(message);
+                    break;
+                case 'toggle_context':
+                    // 處理切換脈絡顯示
+                    this.handleToggleContext(message);
                     break;
                 case 'save_quote':
                     // 處理儲存雞湯
@@ -93,7 +97,8 @@ class NFCManager {
                     this.handleNFCRead(message.data);
                     break;
                 case 'nfc_removed':
-                    this.handleNFCRemoved(message.data);
+                    // 不再處理 NFC 移除事件，改用切換邏輯
+                    log('收到 NFC 移除訊息（已忽略）', 'info');
                     break;
                 case 'nfc_write_success':
                     this.handleNFCWriteSuccess(message.data);
@@ -155,26 +160,27 @@ class NFCManager {
             const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
             log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
 
-            // 隐藏所有视图，显示雞湯页
-            const views = ['home-view', 'guide-view', 'question1-view', 'question2-view', 'waiting-nfc-view'];
-            views.forEach(id => {
-                document.getElementById(id)?.classList.add('hidden');
-            });
+            // 更新雞湯内容
+            document.getElementById('quote-number-text').textContent = `#${randomQuote.number}`;
+            document.getElementById('quote-zh-text').textContent = randomQuote.textCN;
+            document.getElementById('quote-en-text').textContent = randomQuote.textEN;
 
-            const quoteView = document.getElementById('quote-view');
-            if (quoteView) {
-                quoteView.classList.remove('hidden');
-
-                // 更新雞湯内容
-                document.getElementById('quote-number-text').textContent = `#${randomQuote.number}`;
-                document.getElementById('quote-zh-text').textContent = randomQuote.textCN;
-                document.getElementById('quote-en-text').textContent = randomQuote.textEN;
-
-                // 2秒后显示底部提示
-                setTimeout(() => {
-                    document.getElementById('quote-actions')?.classList.remove('hidden');
-                }, 2000);
+            // 使用 showView 函數切換到雞湯頁面（帶淡入淡出效果）
+            if (typeof window.showView === 'function') {
+                window.showView('quote-view');
+            } else {
+                // 降級方案：直接切換（如果 showView 不存在）
+                log('警告：showView 函數未定義，使用降級方案', 'warn');
+                document.querySelectorAll('.view-container').forEach(view => {
+                    view.classList.remove('active');
+                });
+                document.getElementById('quote-view').classList.add('active');
             }
+
+            // 2秒后显示底部提示（使用淡入效果）
+            setTimeout(() => {
+                document.getElementById('quote-actions')?.classList.add('visible');
+            }, 2000);
 
         } catch (error) {
             log(`載入雞湯失敗: ${error}`, 'error');
@@ -215,16 +221,81 @@ class NFCManager {
         }
     }
 
-    // 處理顯示脈絡
-    handleShowContext(message) {
-        const { quoteId } = message;
-        log(`顯示脈絡! Quote ID: ${quoteId}`, 'info');
+    // 處理切換脈絡顯示（新版）
+    async handleToggleContext(message) {
+        const { uid } = message;
+        log(`切換脈絡! 收到 UID: "${uid}"`, 'info');
 
-        // 儲存 quoteId 到 localStorage
-        localStorage.setItem('contextQuoteId', quoteId);
+        try {
+            // 檢查脈絡是否已經顯示
+            if (window.contextManager && window.contextManager.isShowing()) {
+                // 已顯示 → 隱藏
+                log('脈絡已顯示，執行隱藏', 'info');
+                window.contextManager.hide();
+            } else {
+                // 未顯示 → 查找並顯示
+                const response = await fetch('data/quotes.json');
+                const quotes = await response.json();
+                const matchedQuote = quotes.find(q => q.nfcUID === uid);
 
-        // 跳轉到 context.html
-        window.location.href = 'context.html';
+                if (matchedQuote) {
+                    log(`找到匹配的雞湯: #${matchedQuote.number}`, 'info');
+                    if (window.contextManager) {
+                        window.contextManager.show(matchedQuote.number);
+                    } else {
+                        log('警告：contextManager 未定義', 'warn');
+                    }
+                } else {
+                    log(`找不到匹配的雞湯，UID: ${uid}`, 'warn');
+                }
+            }
+        } catch (error) {
+            log(`處理脈絡時發生錯誤: ${error}`, 'error');
+        }
+    }
+
+    // 處理顯示脈絡（舊版，保留相容性）
+    async handleShowContext(message) {
+        const { uid } = message;
+        log(`[DEBUG] 顯示脈絡! 收到 UID: "${uid}"`, 'info');
+        log(`[DEBUG] UID 類型: ${typeof uid}, 長度: ${uid ? uid.length : 'undefined'}`, 'info');
+
+        try {
+            // 根據 UID 查找對應的雞湯編號
+            const response = await fetch('data/quotes.json');
+            const quotes = await response.json();
+            log(`[DEBUG] 已載入 ${quotes.length} 筆雞湯資料`, 'info');
+
+            // 查找匹配的 nfcUID
+            const matchedQuote = quotes.find(q => q.nfcUID === uid);
+
+            if (matchedQuote) {
+                log(`[DEBUG] ✓ 找到匹配的雞湯: #${matchedQuote.number} (UID: ${matchedQuote.nfcUID})`, 'info');
+
+                // 使用覆蓋層顯示脈絡媒體
+                if (window.contextManager) {
+                    window.contextManager.show(matchedQuote.number);
+                } else {
+                    log('警告：contextManager 未定義', 'warn');
+                }
+            } else {
+                log(`[DEBUG] ✗ 找不到匹配的雞湯`, 'warn');
+                log(`[DEBUG] 搜尋的 UID: "${uid}"`, 'warn');
+
+                // 列出前3個和#30、#33的 UID 供參考
+                log(`[DEBUG] 資料庫中的 UID 範例:`, 'warn');
+                quotes.slice(0, 3).forEach(q => {
+                    log(`  #${q.number}: "${q.nfcUID}"`, 'warn');
+                });
+                const quote30 = quotes.find(q => q.number === 30);
+                const quote33 = quotes.find(q => q.number === 33);
+                if (quote30) log(`  #30: "${quote30.nfcUID}"`, 'warn');
+                if (quote33) log(`  #33: "${quote33.nfcUID}"`, 'warn');
+            }
+
+        } catch (error) {
+            log(`處理脈絡時發生錯誤: ${error}`, 'error');
+        }
     }
 
     // 處理儲存雞湯（此函數現在由 ESP8266 主動觸發寫入，這裡保留用於 UI 回饋）
@@ -321,6 +392,11 @@ class NFCManager {
     // 處理 NFC 移除
     handleNFCRemoved(data) {
         log(`NFC 標籤移除: UID=${data.uid}`, 'info');
+
+        // 隱藏脈絡媒體覆蓋層
+        if (window.contextManager) {
+            window.contextManager.hide();
+        }
 
         // 更新 UI
         const resultDiv = document.getElementById('nfc-read-result');
@@ -568,4 +644,8 @@ class NFCManager {
 }
 
 // 全域 NFC 管理器實例
-const nfcManager = new NFCManager();
+window.NFCManager = NFCManager;
+window.nfcManager = new NFCManager();
+
+// 創建全局別名以便向後兼容
+const nfcManager = window.nfcManager;

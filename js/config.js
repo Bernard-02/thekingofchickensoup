@@ -1,10 +1,10 @@
 // 專案配置檔案
 
-const CONFIG = {
+window.CONFIG = {
     // WebSocket 設定
     websocket: {
         // ESP8266 的 IP 位址（連接到 BERNARD-LAPTOP）
-        url: 'ws://192.168.137.209:81',
+        url: 'ws://192.168.137.175:81',
         reconnectInterval: 3000, // 重連間隔（毫秒）
         heartbeatInterval: 30000 // 心跳間隔（毫秒）
     },
@@ -36,8 +36,8 @@ const CONFIG = {
 };
 
 // 日誌函數
-function log(message, type = 'info') {
-    if (!CONFIG.debug && type !== 'error') return;
+window.log = function(message, type = 'info') {
+    if (!window.CONFIG.debug && type !== 'error') return;
 
     const timestamp = new Date().toLocaleTimeString('zh-TW');
     const prefix = `[${timestamp}]`;
@@ -62,4 +62,8 @@ function log(message, type = 'info') {
         logContainer.appendChild(logEntry);
         logContainer.scrollTop = logContainer.scrollHeight;
     }
-}
+};
+
+// 創建全局別名以便向後兼容
+const CONFIG = window.CONFIG;
+const log = window.log;

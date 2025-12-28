@@ -44,7 +44,7 @@ bool clientConnected = false;
 
 // 時間窗口控制：同一張卡片需要間隔一定時間才能再次觸發
 unsigned long lastTriggerTime = 0;  // 上次觸發的時間戳
-const unsigned long TRIGGER_COOLDOWN = 2000;  // 冷卻時間（毫秒），建議 2-5 秒
+const unsigned long TRIGGER_COOLDOWN = 1000;  // 冷卻時間（毫秒），1秒後可以再掃
 
 // ===== 當前狀態追蹤 =====
 int currentQuoteNumber = -1;  // 當前顯示的雞湯編號（由前端更新）
@@ -224,6 +224,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 void loop() {
   webSocket.loop();  // 處理 WebSocket 連線
 
+  // 取得當前時間（在外層作用域，讓整個 loop 都能使用）
+  unsigned long currentTime = millis();
+
   if (nfc.tagPresent()) {
     // 快速讀取 UID（不讀取完整 NDEF 資料，避免 "Failed read page" 錯誤）
     NfcTag tag = nfc.read();
@@ -249,33 +252,8 @@ void loop() {
     // 偵測 NFC 類型
     NFCType nfcType = detectNFCType(currentUID);
 
-    // 檢查是否可以觸發
-    bool shouldProcess = false;
-    unsigned long currentTime = millis();
-
-    if (nfcType == NFC_TRIGGER) {
-      // 觸發卡片邏輯：
-      // 1. 如果是新卡片（UID 不同），直接觸發
-      // 2. 如果是同一張卡片，需要卡片移除後重新放置且超過冷卻時間
-
-      if (currentUID != lastUID) {
-        shouldProcess = true;
-      } else if (lastUID == "") {
-        if (currentTime - lastTriggerTime >= TRIGGER_COOLDOWN) {
-          shouldProcess = true;
-        } else {
-          unsigned long remainingTime = (TRIGGER_COOLDOWN - (currentTime - lastTriggerTime)) / 1000;
-          Serial.print("冷卻中，請等待 ");
-          Serial.print(remainingTime + 1);
-          Serial.println(" 秒後再試");
-          delay(200);
-          return;
-        }
-      }
-    } else {
-      // 其他卡片：只有 UID 改變時才處理
-      shouldProcess = (currentUID != lastUID);
-    }
+    // 檢查是否可以觸發（只有 UID 改變時才處理）
+    bool shouldProcess = (currentUID != lastUID);
 
     if (shouldProcess) {
       lastUID = currentUID;
@@ -298,26 +276,21 @@ void loop() {
           Serial.println(">>> 注意：WebSocket 未連線，但已嘗試發送 <<<");
         }
       } else {
-        // 其他卡片 - 目前只顯示 UID（測試模式）
-        Serial.println("Type: Other Card");
-        Serial.println(">>> 測試模式：只顯示 UID，不執行寫入 <<<");
+        // 其他卡片 - 顯示脈絡
+        Serial.println("Type: Context Card (顯示脈絡)");
         Serial.println("=================================\n");
 
-        // TODO: 之後可以改回儲存功能
-        // if (currentQuoteNumber <= 0) {
-        //   Serial.println("錯誤：沒有當前顯示的雞湯，無法寫入");
-        //   sendWriteResult(false, 0, "no_quote_displayed");
-        // } else {
-        //   Serial.printf("準備寫入雞湯 #%d 的 URL...\n", currentQuoteNumber);
-        //   bool writeSuccess = writeURLToNFC(currentQuoteNumber);
-        //   if (writeSuccess) {
-        //     Serial.printf("成功！雞湯 #%d 的 URL 已寫入 NFC\n", currentQuoteNumber);
-        //     sendWriteResult(true, currentQuoteNumber);
-        //   } else {
-        //     Serial.println("寫入失敗");
-        //     sendWriteResult(false, currentQuoteNumber, "write_failed");
-        //   }
-        // }
+        // 發送完整的 UID 給前端，由前端去 quotes.json 查找對應編號
+        Serial.printf("發送 UID: %s\n", currentUID.c_str());
+
+        // 發送 show_context 訊息給前端（包含 UID）
+        if (clientConnected) {
+          String message = "{\"type\":\"show_context\",\"uid\":\"" + currentUID + "\"}";
+          webSocket.broadcastTXT(message);
+          Serial.println("已發送顯示脈絡指令");
+        } else {
+          Serial.println(">>> 注意：WebSocket 未連線 <<<");
+        }
       }
     }
 
