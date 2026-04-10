@@ -1,0 +1,26 @@
+{
+  "about": {
+    "zh": [
+      "這個人思考很久，自己的大四畢製要做什麽。他想做感性的議題，覺得這樣可以在作品中貫徹自己的人格特質。至於為什麽會做雞湯，是某次跟老師討論後發現自己一直以來做的作品都有貌似雞湯的特質存在。他其實很少在看雞湯，真的，只是比較常用文字表達罷了。",
+      "他跟大多數人一樣，都沒那麽順利定下自己作品的方向。既然雞湯屬性已經曡好曡滿了，倒不如好好利用它。於是，在經過多次跟老師同學交流討論之後，他決定將文字撰寫納入自己的作品中，所以寫了好多好多句雞湯。",
+      "此網站內的雞湯文，也可以說是語錄、格言、或隨便你怎麽叫（排骨湯也可以），其實都沒有任何想要療癒他人的成分存在，只是這個人這20多年來的一些感悟與小結。如果有，那麽這是他的榮幸。如果沒有，你不認同他寫的東西，請也不要見怪，因為雞湯本身就會因為讀者的人生歷練與成長時間而產生不同的詮釋與理解。",
+      "這些文字都這個人寫的，沒有靠G哥的協助。啊，英文有啦（雖然他的多益有890分，但在書寫上還是要G哥潤一下）。",
+      "嗯？你也許很好奇這個人是誰？那你可以點他的名字來認識他。"
+    ],
+    "en": [
+      "This person spent a long time figuring out what to create for his senior-year project. He knew he wanted to explore something emotional—something that could express his own personality. As for why it became \"chicken soup,\" it was during a discussion with his professor that he realized his past works already had a chicken-soup-like quality. He doesn't really read inspirational quotes, honestly. He just naturally expresses himself through writing.",
+      "Like most people, he didn't find his project direction easily. Since the \"chicken soup\" trait was already there, he decided to lean into it. After many conversations with professors and classmates, he chose to make writing part of his project—so he wrote many, many quotes.",
+      "The \"chicken soup\" on this website can be called quotes, sayings, reflections—whatever you prefer (even pork-rib soup). They're not meant to heal anyone. They're simply bits of insight collected from his twenty-plus years of life. If they resonate, that's an honor. If not, that's fine too—because these things naturally shift depending on the reader's experiences and growth.",
+      "All of these texts were written by the King of Chicken Soup, without any help from ChatGPT except for English.",
+      "Hmm? Curious who the King of Chicken Soup is? Click his name to find out."
+    ]
+  },
+  "research": {
+    "title": "Research",
+    "content": [
+      "在專案的初期，我們收集了超過數百句在網路上廣為流傳的「雞湯金句」。",
+      "我們將這些句子分為三大類：人生哲理、人際關係、處世態度。經過語意分析與受眾測試，我們發現人們在不同的情緒狀態下，對於不同類型的金句會有截然不同的感受。",
+      "例如，當人處於極度疲憊（Tired）時，過度積極的鼓勵（Action）反而會造成反效果；此時他們更需要的是「放過自己（Let-go）」的處方箋。這個網站的演算法正是基於這些研究結果所建立的。"
+    ]
+  }
+}

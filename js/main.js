@@ -1,0 +1,741 @@
+// 用戶選擇（動態，key 為問題 id）
+let userSelection = {};
+
+// 問題資料
+let questions = [];
+let currentQuestionIndex = 0;
+let currentSelectedValue = null;
+let currentSelectedOption = null; // 新增：用來暫存完整的選項物件
+let userAnswers = [];             // 新增：儲存所有答題的完整物件（包含 scores）
+let finalQuizResult = null;       // 新增：儲存測驗算出來的結果
+
+// 顯示指定view（帶淡入淡出效果）
+window.showView = function(viewId) {
+    const currentView = document.querySelector('.view-container.active');
+    const nextView = document.getElementById(viewId);
+    const logo = document.getElementById('logo');
+
+    if (!nextView) return;
+
+    // 控制全域 Logo 顯示/隱藏 (因為資訊頁面自己有專屬左下角Logo，所以全域的要藏起來)
+    if (viewId === 'info-website-view') {
+        logo.classList.add('hidden');
+    } else {
+        logo.classList.remove('hidden');
+    }
+
+    if (currentView && currentView !== nextView) {
+        currentView.classList.add('fade-out');
+        setTimeout(() => {
+            currentView.classList.remove('active', 'fade-out', 'fade-in', 'visible');
+            nextView.classList.add('active');
+            requestAnimationFrame(() => {
+                nextView.classList.add('fade-in');
+            });
+        }, 300);
+    } else {
+        nextView.classList.add('active', 'fade-in');
+    }
+
+    console.log('显示页面:', viewId);
+};
+
+const showView = window.showView;
+
+// Accordion 開合（GSAP 動畫）
+window.toggleAccordion = function(btn) {
+    const content = btn.nextElementSibling;
+    const icon = btn.querySelector('.accordion-icon');
+    const isOpen = content._accordionOpen;
+
+    if (isOpen) {
+        gsap.to(content, {
+            height: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            duration: 0.35,
+            ease: 'sine.inOut',
+            onComplete: () => {
+                content.style.display = 'none';
+                content._accordionOpen = false;
+            }
+        });
+        icon.textContent = '+';
+    } else {
+        // 先隱藏地測量目標高度與 padding
+        content.style.visibility = 'hidden';
+        content.style.display = 'block';
+        content.style.overflow = 'hidden';
+        content.style.height = 'auto';
+        content.style.paddingTop = '';
+        content.style.paddingBottom = '';
+        const targetHeight = content.scrollHeight;
+        const computed = window.getComputedStyle(content);
+        const targetPaddingTop = parseFloat(computed.paddingTop) || 0;
+        const targetPaddingBottom = parseFloat(computed.paddingBottom) || 0;
+
+        // 復原 visibility，從 0 開始動畫
+        content.style.visibility = '';
+        gsap.fromTo(content,
+            { height: 0, paddingTop: 0, paddingBottom: 0 },
+            {
+                height: targetHeight,
+                paddingTop: targetPaddingTop,
+                paddingBottom: targetPaddingBottom,
+                duration: 0.35,
+                ease: 'sine.inOut',
+                onComplete: () => {
+                    content.style.height = 'auto';
+                    content._accordionOpen = true;
+                }
+            }
+        );
+        icon.textContent = '−';
+    }
+};
+
+// 通用 scroll-in 動畫（IntersectionObserver）
+const scrollObservers = {};
+
+function initScrollAnim(key, targets) {
+    if (scrollObservers[key]) scrollObservers[key].disconnect();
+
+    const scrollRoot = document.getElementById('info-right-panel');
+    gsap.set(targets, { opacity: 0, y: 20 });
+
+    let batchTimer = null;
+    let batch = [];
+
+    scrollObservers[key] = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                batch.push(entry.target);
+                scrollObservers[key].unobserve(entry.target);
+            }
+        });
+
+        // 收集同一幀內的所有 entry，再一起做 stagger
+        clearTimeout(batchTimer);
+        batchTimer = setTimeout(() => {
+            batch.forEach((el, i) => {
+                gsap.to(el, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: i * 0.06 });
+            });
+            batch = [];
+        }, 20);
+    }, { root: scrollRoot, threshold: 0.1 });
+
+    targets.forEach(el => scrollObservers[key].observe(el));
+}
+
+function initResearchScrollAnim(pane) {
+    const targets = Array.from(pane.querySelectorAll('[data-scroll-anim]'));
+    initScrollAnim('research', targets);
+}
+
+function initQuotesScrollAnim(items) {
+    if (scrollObservers['quotes']) scrollObservers['quotes'].disconnect();
+
+    const scrollRoot = document.getElementById('info-right-panel');
+    gsap.set(items, { opacity: 0, y: 40 });
+
+    let initialBatch = true;
+    let initialOrder = 0;
+
+    scrollObservers['quotes'] = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const delay = initialBatch ? initialOrder * 0.05 : 0;
+                initialOrder++;
+                gsap.to(el, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay });
+                scrollObservers['quotes'].unobserve(el);
+            }
+        });
+
+        // 初始批次結束後，後續 scroll 進來的立刻出現
+        setTimeout(() => { initialBatch = false; }, 50);
+    }, { root: scrollRoot, threshold: 0.1 });
+
+    items.forEach(el => scrollObservers['quotes'].observe(el));
+}
+
+// 切換資訊網站面板
+window.switchInfoTab = function(tabId) {
+    // 隱藏所有面板
+    document.querySelectorAll('.info-pane').forEach(pane => pane.classList.add('hidden'));
+
+    // 重置所有導航按鈕
+    document.querySelectorAll('.info-nav-btn').forEach(btn => {
+        btn.classList.remove('active-tab');
+    });
+
+    // 顯示目標面板
+    const targetPane = document.getElementById(`info-pane-${tabId}`);
+    if (targetPane) {
+        targetPane.classList.remove('hidden');
+
+        if (tabId === 'about') {
+            // About：段落逐一從下往上 fade in
+            const paragraphs = Array.from(targetPane.querySelectorAll('p, a'));
+            gsap.fromTo(paragraphs,
+                { opacity: 0, y: 16 },
+                { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.1 }
+            );
+        } else if (tabId === 'research') {
+            // Research：scroll into view 才觸發動畫
+            initResearchScrollAnim(targetPane);
+        } else {
+            const children = Array.from(targetPane.children);
+            gsap.fromTo(children,
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.08 }
+            );
+        }
+    }
+
+    // 加底線到 active 按鈕
+    const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+    if (targetBtn) targetBtn.classList.add('active-tab');
+
+    // 右側內容回到頂部
+    const rightPanel = document.getElementById('info-right-panel');
+    if (rightPanel) rightPanel.scrollTop = 0;
+
+    // Research anchor 展開/收合
+    const researchAnchors = document.getElementById('research-anchors');
+    if (tabId === 'research') {
+        researchAnchors.classList.remove('hidden');
+    } else {
+        researchAnchors.classList.add('hidden');
+    }
+};
+
+// 回到 info 頁面右側頂部
+window.scrollInfoToTop = function() {
+    const rightPanel = document.getElementById('info-right-panel');
+    if (rightPanel) rightPanel.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// Scroll 到 research 指定 part
+window.scrollToResearchPart = function(event, partId) {
+    event.preventDefault();
+
+    const target = document.getElementById(partId);
+    if (!target) return;
+
+    // 更新 anchor btn 的 active 狀態
+    document.querySelectorAll('.research-anchor-btn').forEach(btn => {
+        btn.classList.remove('active-anchor');
+    });
+    event.currentTarget.classList.add('active-anchor');
+
+    // scroll
+    const scrollParent = document.querySelector('#info-pane-research').parentElement;
+    scrollParent.scrollTo({ top: target.offsetTop - 96, behavior: 'smooth' });
+};
+
+// 導航
+function goToGuide() {
+    showView('guide-view');
+}
+
+function goToQuestions() {
+    currentQuestionIndex = 0;
+    userSelection = {};
+    userAnswers = [];
+    currentSelectedValue = null;
+    currentSelectedOption = null;
+    finalQuizResult = null;
+    renderQuestion(currentQuestionIndex);
+    showView('question-view');
+}
+
+function restart() {
+    userSelection = {};
+    currentQuestionIndex = 0;
+    currentSelectedValue = null;
+    currentSelectedOption = null;
+    userAnswers = [];
+    finalQuizResult = null;
+    document.getElementById('quote-actions').classList.remove('visible');
+    showView('home-view');
+}
+
+// 渲染問題
+function renderQuestion(index) {
+    const q = questions[index];
+    if (!q) return;
+
+    // 問題文字
+    document.getElementById('question-text').textContent = q.text;
+
+    // 進度
+    document.getElementById('question-progress').textContent = `${index + 1} / ${questions.length}`;
+
+    // 選項
+    const optionsContainer = document.getElementById('question-options');
+    optionsContainer.innerHTML = '';
+    currentSelectedValue = null;
+    currentSelectedOption = null;
+
+    // 確定按鈕
+    const confirmBtn = document.getElementById('confirm-question');
+    confirmBtn.classList.remove('visible');
+
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.setAttribute('data-value', opt.value);
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'option-number';
+        numberSpan.textContent = `${'①②③④⑤⑥⑦⑧'[i]}`;
+
+        btn.appendChild(numberSpan);
+        btn.appendChild(document.createTextNode(opt.text));
+        optionsContainer.appendChild(btn);
+
+        // 綁定點擊事件 (移到迴圈內，這樣才能正確抓到 opt 物件)
+        btn.addEventListener('click', () => {
+            optionsContainer.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            currentSelectedValue = opt.value;
+            currentSelectedOption = opt; // 這裡就不會再報錯了！
+            confirmBtn.classList.add('visible');
+        });
+    });
+}
+
+// 確定按鈕點擊 → 前進到下一題或分叉
+function confirmQuestion() {
+    if (!currentSelectedValue) return;
+
+    const q = questions[currentQuestionIndex];
+    userSelection[q.id] = currentSelectedValue;
+    userAnswers.push(currentSelectedOption); // 儲存包含計分的完整物件
+    console.log(`${q.id} 確認:`, currentSelectedValue);
+
+    // Q8（最後一題）— 分叉
+    if (currentQuestionIndex === questions.length - 1) {
+        if (window.nfcManager) {
+            nfcManager.userAnswers = userAnswers; // 把完整的計分陣列交給 NFC Manager
+        }
+        if (currentSelectedValue === 'chat') {
+            showView('chat-view');
+        } else {
+            // 跳過 NFC，直接計算結果並顯示轉譯
+            calculateAndShowTranslation();
+        }
+        return;
+    }
+
+    // 下一題
+    currentQuestionIndex++;
+    currentSelectedValue = null;
+    renderQuestion(currentQuestionIndex);
+}
+
+// 計算結果並顯示轉譯
+async function calculateAndShowTranslation() {
+    try {
+        // 載入雞湯資料
+        const response = await fetch('data/quotes-selected.json');
+        let quotes = await response.json();
+        
+        // 只從前 50 句中選擇 (唯一抽籤卡專用限制)
+        quotes = quotes.filter(q => q.number <= 50);
+
+        // 動態載入 3D 計分大腦
+        const { getQuizResult } = await import('./quizLogic.js');
+        finalQuizResult = getQuizResult(userAnswers, quotes);
+
+        console.log(`🎯 測驗匹配選中: #${finalQuizResult.quote.number} (痛點組合: ${finalQuizResult.userCombo.join(', ')})`);
+
+        // 更新並顯示轉譯畫面
+        document.getElementById('translation-text').textContent = finalQuizResult.quote.translation;
+        showView('translation-view');
+    } catch (error) {
+        console.error('計算結果失敗:', error);
+    }
+}
+
+// 建立 quotes list
+let allQuotes = [];
+let selectedQuoteNumber = null;
+
+async function buildQuotesList(highlightNumber) {
+    if (allQuotes.length === 0) {
+        const res = await fetch('data/quotes-selected.json');
+        allQuotes = await res.json();
+    }
+
+    selectedQuoteNumber = highlightNumber;
+    const container = document.getElementById('quotes-list');
+    container.innerHTML = '';
+
+    allQuotes.forEach(q => {
+        const item = document.createElement('div');
+        item.className = 'flex items-baseline gap-4 px-2 py-2 border-t-2 border-black cursor-pointer last:border-b-2';
+        item.id = `quote-item-${q.number}`;
+        item.innerHTML = `
+            <span class="en flex-shrink-0 text-lg tracking-tight" style="width: 3.5rem;">#${q.number}</span>
+            <span class="flex-1 flex flex-col">
+                <span class="text-lg leading-relaxed">${q.translation}</span>
+                <span class="quote-page en text-lg text-right opacity-40 tracking-tight">P00</span>
+            </span>
+        `;
+
+        item.addEventListener('click', () => openQuotePanel(q));
+
+        container.appendChild(item);
+    });
+
+    // 每個 list item scroll into view 才 fade in（一條條進場）
+    initQuotesScrollAnim(Array.from(container.children));
+
+    // scroll 到抽中的那句
+    if (highlightNumber) {
+        setTimeout(() => {
+            const target = document.getElementById(`quote-item-${highlightNumber}`);
+            const scrollParent = document.querySelector('#info-pane-quotes').parentElement;
+            if (target && scrollParent) {
+                scrollParent.scrollTo({ top: target.offsetTop - 96, behavior: 'smooth' });
+            }
+        }, 300);
+    }
+}
+
+// Canvas particle 系統（支援多元素）
+let particleCanvases = [];
+let particleAnimFrame = null;
+
+// 用 Range 取得實際文字的 bounding rect（相對於 el）
+function getTextBounds(el) {
+    const elRect = el.getBoundingClientRect();
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const rects = Array.from(range.getClientRects());
+    if (rects.length === 0) return { left: 0, top: 0, width: elRect.width, height: elRect.height };
+
+    const left   = Math.min(...rects.map(r => r.left))   - elRect.left;
+    const top    = Math.min(...rects.map(r => r.top))    - elRect.top;
+    const right  = Math.max(...rects.map(r => r.right))  - elRect.left;
+    const bottom = Math.max(...rects.map(r => r.bottom)) - elRect.top;
+    return { left, top, width: right - left, height: bottom - top };
+}
+
+const FADE_ZONE = 30; // 邊緣淡出範圍（px）
+
+function makeParticles(w, h) {
+    const count = Math.floor((w * h) / 60);
+    const fadeZone = Math.min(FADE_ZONE, w * 0.2, h * 0.4);
+
+    const pts = Array.from({ length: count }, () => {
+        const x = Math.random() * w;
+        const y = Math.random() * h;
+        // 距最近邊緣的距離，0=邊緣，1=內部
+        const margin = Math.min(x, y, w - x, h - y);
+        const edgeFactor = Math.min(margin / fadeZone, 1);
+        const r = edgeFactor * 2.5 + 0.3 + Math.random() * 0.2;
+
+        return {
+            x, y, r,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+        };
+    });
+
+    // 預先跑 120 幀
+    for (let i = 0; i < 120; i++) {
+        pts.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
+        });
+    }
+
+    return pts;
+}
+
+const PAD = 10; // 超出邊界的緩衝
+
+function startParticles(elements) {
+    stopParticles();
+
+    const collected = [];
+
+    elements.forEach(el => {
+        const elRect = el.getBoundingClientRect();
+        el.style.position = 'relative';
+
+        // 每一行各自一個 canvas
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const lineRects = Array.from(range.getClientRects());
+
+        lineRects.forEach(lineRect => {
+            const w = lineRect.width;
+            const h = lineRect.height;
+            const left = lineRect.left - elRect.left;
+            const top  = lineRect.top  - elRect.top;
+
+            const canvas = document.createElement('canvas');
+            canvas.width  = w + PAD * 2;
+            canvas.height = h + PAD * 2;
+            canvas.style.cssText = `position:absolute;left:${left - PAD}px;top:${top - PAD}px;pointer-events:none;z-index:10;`;
+            el.appendChild(canvas);
+
+            collected.push({ canvas, particles: makeParticles(w, h), w, h });
+        });
+    });
+
+    particleCanvases = collected;
+
+    function draw() {
+        particleCanvases.forEach(({ canvas, particles, w, h }) => {
+            const ctx = canvas.getContext('2d');
+            // 清除整個 canvas（padding 區透明）
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 灰底只填文字區
+            ctx.fillStyle = '#f2f2f2';
+            ctx.fillRect(PAD, PAD, w, h);
+            // 黑色粒子（座標偏移 PAD）
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > w) p.vx *= -1;
+                if (p.y < 0 || p.y > h) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x + PAD, p.y + PAD, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
+                ctx.fill();
+            });
+        });
+        particleAnimFrame = requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function stopParticles() {
+    cancelAnimationFrame(particleAnimFrame);
+    particleAnimFrame = null;
+    particleCanvases.forEach(({ canvas }) => canvas.remove());
+    particleCanvases = [];
+}
+
+// 開啟 slide panel
+function openQuotePanel(quote) {
+    const panel = document.getElementById('quote-slide-panel');
+    const nfcSection = document.getElementById('quote-panel-nfc');
+    const revealSection = document.getElementById('quote-panel-reveal');
+
+    const zhEl = document.getElementById('quote-panel-zh');
+    const enEl = document.getElementById('quote-panel-en');
+
+    // 填入文字
+    nfcSection.classList.add('hidden');
+    document.getElementById('quote-panel-number').textContent = `#${quote.number}`;
+    zhEl.textContent = quote.textCN;
+    enEl.textContent = quote.textEN;
+    revealSection.classList.remove('hidden');
+
+    // 立刻隱藏文字（避免閃爍），重置 hint
+    zhEl.style.color = '#f2f2f2';
+    enEl.style.color = '#f2f2f2';
+    document.getElementById('quote-panel-hint').textContent = '請掃描對應編號的瓶子以查看原句';
+
+    // 開啟 panel
+    panel.classList.add('open');
+    document.getElementById('quote-slide-backdrop').classList.add('open');
+
+    // 立刻啟動粒子（canvas 位置相對父元素，不依賴 panel 位置）
+    requestAnimationFrame(() => startParticles([zhEl, enEl]));
+}
+
+// 關閉 slide panel
+function closeQuotePanel() {
+    stopParticles();
+    document.getElementById('quote-panel-zh').style.color = '';
+    document.getElementById('quote-panel-en').style.color = '';
+    document.getElementById('quote-slide-panel').classList.remove('open');
+    document.getElementById('quote-slide-backdrop').classList.remove('open');
+}
+window.closeQuotePanel = closeQuotePanel;
+
+// NFC 掃描成功後，粒子 scatter 並 reveal（供 nfc.js 呼叫）
+window.revealQuoteInPanel = function() {
+    cancelAnimationFrame(particleAnimFrame);
+    particleAnimFrame = null;
+
+    // 立刻顯示 zh/en 文字（粒子在透明底上叠加，慢慢透出）
+    document.getElementById('quote-panel-zh').style.color = '';
+    document.getElementById('quote-panel-en').style.color = '';
+
+    const snapshot = [...particleCanvases];
+    particleCanvases = [];
+
+    // 計算所有 canvas 合併後的全局中心點
+    const allBounds = snapshot.map(({ canvas, w, h }) => ({
+        left:   parseFloat(canvas.style.left) + PAD,
+        top:    parseFloat(canvas.style.top)  + PAD,
+        right:  parseFloat(canvas.style.left) + PAD + w,
+        bottom: parseFloat(canvas.style.top)  + PAD + h,
+    }));
+    const globalCX = (Math.min(...allBounds.map(b => b.left)) + Math.max(...allBounds.map(b => b.right)))  / 2;
+    const globalCY = (Math.min(...allBounds.map(b => b.top))  + Math.max(...allBounds.map(b => b.bottom))) / 2;
+
+    // 給每個粒子疊加向外的速度
+    snapshot.forEach(({ canvas, particles }) => {
+        const canvasLeft = parseFloat(canvas.style.left) + PAD;
+        const canvasTop  = parseFloat(canvas.style.top)  + PAD;
+        const localCX = globalCX - canvasLeft;
+        const localCY = globalCY - canvasTop;
+        particles.forEach(p => {
+            const dx = p.x - localCX || 0.1;
+            const dy = p.y - localCY || 0.1;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const boost = Math.random() * 0.4 + 0.1;
+            p.vx += (dx / dist) * boost;
+            p.vy += (dy / dist) * boost;
+        });
+    });
+
+    // 記錄初始粒子數量
+    snapshot.forEach(item => { item.initialCount = item.particles.length; });
+
+    // 0.5s 內根據進度移除粒子，透明底讓文字從粒子之間透出
+    const startTime = performance.now();
+    const DURATION = 500;
+
+    function dissolve(now) {
+        const t = Math.min((now - startTime) / DURATION, 1);
+        const keepFraction = 1 - t;
+
+        let anyLeft = false;
+        snapshot.forEach(({ canvas, particles, initialCount }) => {
+            // 按比例隨機移除粒子
+            const target = Math.floor(initialCount * keepFraction);
+            while (particles.length > target) {
+                particles.splice(Math.floor(Math.random() * particles.length), 1);
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // 透明底，zh/en 文字從粒子之間透出
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                ctx.beginPath();
+                ctx.arc(p.x + PAD, p.y + PAD, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
+                ctx.fill();
+            });
+
+            if (particles.length > 0) anyLeft = true;
+        });
+
+        if (anyLeft || t < 1) {
+            particleAnimFrame = requestAnimationFrame(dissolve);
+        } else {
+            particleAnimFrame = null;
+            snapshot.forEach(({ canvas }) => canvas.remove());
+
+            // hint 文字：先 fade out，停留 2s，再換字 fade in
+            const hint = document.getElementById('quote-panel-hint');
+            gsap.to(hint, {
+                opacity: 0, duration: 0.4, ease: 'power2.out',
+                onComplete: () => {
+                    hint.textContent = '翻閱書本以了解這句的脈絡';
+                    gsap.to(hint, { opacity: 0.5, duration: 0.6, delay: 0.5, ease: 'power2.out' });
+                }
+            });
+        }
+    }
+
+    particleAnimFrame = requestAnimationFrame(dissolve);
+};
+
+// 進入解籤畫面
+window.decodeQuote = function() {
+    if (!finalQuizResult) return;
+
+    const finalQuote = finalQuizResult.quote;
+
+    // 通知 NFC Manager (ESP8266) 當前顯示的雞湯編號
+    if (window.nfcManager) {
+        window.nfcManager.updateCurrentQuote(finalQuote.number);
+    }
+
+    // 建立 list 並 scroll 到抽中的句子
+    buildQuotesList(finalQuote.number);
+
+    // 確保一進來是顯示 Quotes 畫面
+    switchInfoTab('quotes');
+
+    showView('info-website-view');
+};
+
+// 載入問題資料
+async function loadQuestions() {
+    try {
+        const response = await fetch('data/questions.json');
+        questions = await response.json();
+        console.log(`載入 ${questions.length} 題問題`);
+    } catch (error) {
+        console.error('載入問題失敗:', error);
+    }
+}
+
+// 載入 About 與 Research 資訊資料
+async function loadInfoData() {
+    try {
+        const response = await fetch('data/info.json');
+        const data = await response.json();
+
+        // About 中文
+        const aboutZhHtml = data.about.zh.map(text => `<p>${text}</p>`).join('');
+        document.getElementById('about-zh').innerHTML = aboutZhHtml;
+
+        // About 英文
+        const aboutEnHtml = data.about.en.map(text => `<p>${text}</p>`).join('');
+        document.getElementById('about-en').innerHTML = aboutEnHtml;
+
+        const researchHtml = data.research.content.map(text => `<p>${text}</p>`).join('');
+        document.getElementById('research-content').innerHTML = researchHtml;
+        
+    } catch (error) {
+        console.error('載入資訊資料失敗:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // 載入問題與資訊資料
+    await loadQuestions();
+    await loadInfoData();
+
+    // 確定按鈕
+    document.getElementById('confirm-question').addEventListener('click', confirmQuestion);
+
+    // 初始化 WebSocket
+    console.log('檢查 nfcManager:', window.nfcManager);
+    console.log('檢查 CONFIG:', window.CONFIG);
+
+    if (window.nfcManager) {
+        console.log('準備連接 WebSocket...');
+        nfcManager.connect();
+    } else {
+        console.error('錯誤：nfcManager 未定義！');
+    }
+
+    // ==========================================
+    // 🛠️ 快速測試專用：直接跳轉到解籤與資訊頁面
+    // (測試完畢後，記得把這段註解掉或刪除)
+    // ==========================================
+    try {
+        const res = await fetch('data/quotes-selected.json');
+        const mockQuotes = await res.json();
+        finalQuizResult = { quote: mockQuotes[0], userCombo: ['測試用'] }; // 隨便塞第一句雞湯當假資料
+        decodeQuote(); 
+    } catch (e) { console.error(e); }
+});

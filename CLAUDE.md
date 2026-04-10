@@ -1,0 +1,128 @@
+# Chicken Soup Quote — 專案說明
+
+## 專案概述
+
+這是一個互動裝置專案，結合 NFC 技術、網頁前端與 AI，讓觀眾透過回答問題，獲得一句對應的雞湯語錄。作者 Bernard Liew 是本專案語錄的唯一創作者，所有 200 句語錄皆為其親筆撰寫。
+
+---
+
+## 專案結構
+
+```
+/
+├── index.html              # 主頁面（裝置端）
+├── css/style.css           # 全域樣式
+├── js/
+│   ├── config.js           # 全域設定（WebSocket URL、資料路徑）
+│   ├── main.js             # 頁面邏輯、問題渲染、流程控制
+│   ├── nfc.js              # NFC WebSocket 通訊（連接 ESP8266）
+│   └── context.js          # 脈絡媒體覆蓋層
+├── data/
+│   ├── quotes.json         # 完整 200 句語錄（備份用，勿直接使用）
+│   ├── quotes-selected.json # 篩選後的 100 句（裝置使用的資料來源）
+│   ├── questions.json      # 8 題問答資料（動態渲染）
+│   └── contexts.json       # 每句話的脈絡媒體資料
+└── src/main.cpp            # ESP8266 韌體（PlatformIO）
+```
+
+---
+
+## 技術棧
+
+- **前端**：原生 HTML / CSS / JavaScript
+- **樣式**：Tailwind CSS（CDN）、自訂 `style.css`
+- **動畫**：GSAP 3.12.5（CDN，含 TextPlugin / Flip / MotionPathPlugin / EasePack）
+- **字體**：Noto Sans TC（中文）、Helvetica（英文，用 `.en` class 套用）
+- **硬體通訊**：WebSocket 連接 ESP8266 NFC 讀取裝置
+- **硬體**：ESP8266 + PN532 NFC 模組
+
+---
+
+## 互動流程
+
+```
+首頁
+  ↓
+操作提示（guide-view）
+  ↓
+8 題問答（question-view，動態渲染自 questions.json）
+  ↓
+Q8 分叉：
+  ├── 「隨緣」→ 等待 NFC（waiting-nfc-view）
+  │              ↓
+  │           掃 NFC 瓶子 → 抽取語錄（quote-view）
+  │              ↓
+  │           掃對應編號瓶子 → 查看脈絡
+  │
+  └── 「想多說」→ AI 聊天（chat-view，開發中）
+                   ↓
+                AI 用作者口吻產出客製化語錄
+                   ↓
+                觀眾調整參數（顏色、字體、語氣）
+                   ↓
+                掃 QR code 帶走（數位卡片）
+```
+
+---
+
+## 語錄資料說明
+
+### quotes-selected.json 欄位
+
+```json
+{
+  "id": "001",
+  "number": 1,
+  "category": "人生哲理",       // 人生哲理 / 人際關係 / 處世態度
+  "textCN": "中文語錄",
+  "textEN": "英文翻譯",
+  "nfcUID": "04:8D:D5:22:BF:2A:81",  // 對應 NFC 標籤 UID
+  "contextId": "001",
+  "tags": ["tired"],             // 待完善，篩選用
+  "translation": "轉譯後的籤文"  // 模糊的意象描述，用於裝置顯示
+}
+```
+
+### 語錄分類
+- `人生哲理` — 對生命、自我的觀察
+- `人際關係` — 對他人、關係的觀察
+- `處世態度` — 面對事情的方式
+
+### 轉譯（translation）
+每句語錄有一個「轉譯」版本，像籤文一樣——用客觀描述一個場景或意象，不直接說出道理，讓觀眾自行解讀。裝置顯示的是轉譯，掃 NFC 後才看到原句。
+
+---
+
+## 問答設計（questions.json）
+
+8 題單選題，動態渲染。每個選項有 `scores` 物件，對應不同的主題權重，用於加權篩選語錄。
+
+目前的 score 維度（開發中）：
+`confused` / `tired` / `hurt` / `action` / `courage` / `let-go` / `perspective` / `patience` / `relationships` / `self-worth` / `overthinking` / `setback`
+
+---
+
+## 設計原則
+
+- **作者口吻**：直接、不繞彎、帶點幽默，不說教、不哄人，像一個稍微走在你前面的朋友說的話
+- **不要太多 layer**：裝置給轉譯 → 掃瓶子得原句 → 書裡有脈絡，不超過三層
+- **共鳴優先**：句子的目的是讓觀眾感到「被說中」，不是「被建議」
+
+---
+
+## 硬體設定
+
+- WebSocket URL 設定在 `js/config.js` 的 `CONFIG.websocket.url`
+- 目前連接 `ws://192.168.137.223:81`（需根據實際環境調整）
+- NFC 掃描邏輯在 `js/nfc.js`，資料來源統一從 `CONFIG.dataFiles.quotes` 讀取
+
+---
+
+## 待完成事項
+
+1. 幫 100 句語錄補齊標籤（用主題關鍵字）
+2. 設計加權篩選邏輯（根據 8 題 scores 篩出最對應的語錄）
+3. 建立獨立的 `quotes.html`（網站整合，列表顯示 200 句轉譯）
+4. AI 聊天路線實作（用作者口吻產出客製化語錄）
+5. 客製化卡片產生器（調參數、預覽、QR code 帶走）
+6. 書的頁碼資料補齊（之後加進 quotes-selected.json）

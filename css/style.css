@@ -7,6 +7,34 @@
     box-sizing: border-box;
 }
 
+/* Scrollbar — Firefox */
+@supports (-moz-appearance: none) {
+    html {
+        scrollbar-width: thin;
+        scrollbar-color: #000 transparent;
+    }
+}
+
+/* Scrollbar — Chrome / Edge / Safari */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #000 !important;
+    border-radius: 0 !important;
+}
+
+::-webkit-scrollbar-button { display: none !important; height: 0 !important; width: 0 !important; }
+::-webkit-scrollbar-button:vertical:start:decrement { display: none !important; height: 0 !important; }
+::-webkit-scrollbar-button:vertical:end:increment { display: none !important; height: 0 !important; }
+::-webkit-scrollbar-button:vertical:start:increment { display: none !important; height: 0 !important; }
+::-webkit-scrollbar-button:vertical:end:decrement { display: none !important; height: 0 !important; }
+
 /* 字體規範 */
 body {
     font-family: 'Noto Sans TC', 'Helvetica', sans-serif;
@@ -16,15 +44,40 @@ body {
 }
 
 /* 中文字體 */
-h1, h2, h3, p, button {
+h1, h2, h3, h4, h5, h6, p, button {
     font-family: 'Noto Sans TC', sans-serif;
 }
 
 /* 英文字體（需要時使用 .en 類別） */
-.en {
+.en,
+.en h1, .en h2, .en h3, .en h4, .en h5, .en h6 {
     font-family: 'Helvetica', 'Arial', sans-serif;
-    letter-spacing: -0.02em; /* 緊湊的字母間距 */
+    letter-spacing: -0.02em;
 }
+
+.en p {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+}
+
+/* ──────────────────────────────
+   Type Scale
+   h1  64px  → 首頁大標
+   h2  40px  → 頁面標題、問題文字
+   h3  28px  → 區塊標題
+   h4  22px  → 次要標題
+   h5  18px  → 小標、導航選單
+   h6  14px  → 標籤、輔助資訊
+   p   16px  → 內文（預設）
+────────────────────────────── */
+h1 { font-size: 4rem !important;    line-height: 1.1; }   /* 64px */
+h2 { font-size: 2.5rem !important;  line-height: 1.2; }   /* 40px */
+h3 { font-size: 1.75rem !important; line-height: 1.3; }   /* 28px */
+h4 { font-size: 1.375rem !important; line-height: 1.4; }  /* 22px */
+h5 { font-size: 1.125rem !important; line-height: 1.4; }  /* 18px */
+h6 { font-size: 0.875rem !important; line-height: 1.5; }  /* 14px */
+p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 
 /* 頁面切換 */
 .page {
@@ -198,15 +251,15 @@ h1, h2, h3, p, button {
 }
 
 /* 問題頁面樣式 */
-#question1-view h2,
-#question2-view h2,
-#waiting-nfc-view h2 {
+#question-view h2,
+#waiting-nfc-view h2,
+#translation-view h2 {
     font-size: 2rem; /* 32px */
+    line-height: 1.3;
 }
 
 @media (min-width: 768px) {
-    #question1-view h2,
-    #question2-view h2,
+    #question-view h2,
     #waiting-nfc-view h2 {
         font-size: 2.5rem; /* 40px */
     }
@@ -263,29 +316,181 @@ h1, h2, h3, p, button {
     line-height: 1.4;
 }
 
-/* 問題1選項容器 */
-#q1-options {
+/* 問題選項容器 */
+#question-options {
     display: flex;
     flex-direction: column;
-    gap: 2rem; /* 選項之間的間距 */
+    gap: 1rem;
 }
 
 /* 雞湯頁面字體大小 */
 #quote-number-text {
-    font-size: 2rem; /* 32px */
+    font-size: 1rem; /* 16px — 小標 */
+    opacity: 0.4;
 }
 
 #quote-zh-text {
-    font-size: 2.5rem; /* 40px */
+    font-size: 2rem; /* 32px */
     text-wrap: balance;
-    line-height: 1.2;
+    line-height: 1.3;
 }
 
 #quote-en-text {
-    font-size: 2rem; /* 32px */
+    font-size: 1.25rem; /* 20px */
     text-wrap: balance;
     letter-spacing: -0.02em;
-    line-height: 1.1; /* 更緊湊的行距 */
+    line-height: 1.4;
+    opacity: 0.5;
+}
+
+/* 資訊頁導航按鈕 */
+.info-nav-btn {
+    font-size: 1.375rem; /* h4 — 22px */
+    background: transparent;
+    border: none;
+    color: #000;
+    cursor: pointer;
+    padding: 0;
+    opacity: 1;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+    align-self: flex-start;
+}
+
+.info-nav-btn:hover {
+    background: transparent;
+    color: #000;
+}
+
+.info-nav-btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s ease;
+}
+
+.info-nav-btn:hover::after {
+    transform: scaleX(1);
+}
+
+/* 資訊頁 active tab — 永久顯示底線 */
+.info-nav-btn.active-tab::after {
+    transform: scaleX(1);
+}
+
+/* Research anchor 連結 */
+.research-anchor-btn {
+    font-size: 1.375rem; /* h4 — 與導航 btn 同 */
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    text-align: left;
+    margin-left: 1rem;
+    position: relative;
+    width: fit-content;
+    align-self: flex-start;
+}
+
+.research-anchor-btn:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.research-anchor-btn::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s ease;
+}
+
+.research-anchor-btn:hover::after {
+    transform: scaleX(1);
+}
+
+.research-anchor-btn.active-anchor::after {
+    transform: scaleX(1);
+}
+
+/* Hover underline 動畫（左→右生長，取消時右→左收回） */
+.hover-underline {
+    position: relative;
+    display: inline-block;
+}
+
+.hover-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s ease;
+}
+
+.hover-underline:hover::after {
+    transform: scaleX(1);
+}
+
+/* Quotes list hover */
+#quotes-list > div:hover {
+    background-color: #000;
+}
+
+#quotes-list > div:hover span {
+    color: #fff;
+}
+
+
+/* Quote slide backdrop（左半邊，點擊關閉） */
+.quote-slide-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50vw;
+    height: 100vh;
+    z-index: 49;
+    display: none;
+    cursor: pointer;
+}
+
+.quote-slide-backdrop.open {
+    display: block;
+}
+
+/* Quote slide panel */
+.quote-slide-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50vw;
+    height: 100vh;
+    background-color: #f2f2f2;
+    border-left: 2px solid #000;
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+    z-index: 50;
+}
+
+.quote-slide-panel.open {
+    transform: translateX(0);
 }
 
 /* 雞湯頁面提示文字 */
@@ -323,7 +528,7 @@ h1, h2, h3, p, button {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.8); /* 0.8 白色背景 */
     z-index: 200;
     display: flex;
     align-items: center;
@@ -342,15 +547,16 @@ h1, h2, h3, p, button {
     width: 100%;
     height: 100vh;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 2rem;
     position: relative;
+    padding: 0 2rem;
 }
 
 #context-media-display {
-    width: 90%;
+    flex: 1;
     max-width: 900px;
     max-height: 75vh;
     display: flex;
@@ -367,13 +573,7 @@ h1, h2, h3, p, button {
     display: block;
 }
 
-/* 輪播控制 */
-.context-controls {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
+/* 輪播控制按鈕 */
 .context-nav-btn {
     background: transparent;
     border: 1px solid #000;
@@ -387,6 +587,9 @@ h1, h2, h3, p, button {
     justify-content: center;
     transition: all 0.2s ease;
     color: #000;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 210;
 }
 
 .context-nav-btn:hover {
@@ -404,34 +607,31 @@ h1, h2, h3, p, button {
     color: #000;
 }
 
-/* 指示器 */
+/* 左右箭頭位置（已透過 flex 排列，不需要額外定位） */
+.context-nav-left {
+    order: -1;
+}
+
+.context-nav-right {
+    order: 1;
+}
+
+/* 指示器（隱藏，但保留功能給 JS 使用） */
 .context-indicators {
-    display: flex;
-    gap: 0.5rem;
+    display: none !important;
 }
 
 .context-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.context-indicator.active {
-    background-color: #000;
-    width: 24px;
-    border-radius: 4px;
+    display: none;
 }
 
 /* 脈絡提示文字 */
 .context-hint {
     position: fixed;
-    bottom: 40px;
+    bottom: 8vh; /* 距離底部 15vh，更靠近媒體 */
     left: 50%;
     transform: translateX(-50%);
-    color: rgba(0, 0, 0, 0.5);
+    color: #000; /* 黑色文字 */
     font-size: 1rem;
     text-align: center;
     z-index: 210;
@@ -442,7 +642,7 @@ h1, h2, h3, p, button {
     position: fixed;
     bottom: 16px;
     right: 16px;
-    display: flex;
+    display: none; /* 隱藏連線狀態 */
     align-items: center;
     gap: 8px;
     z-index: 100;
@@ -499,46 +699,47 @@ button {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
-    padding: 0; /* 移除 padding */
+    padding: 5px 10px;
     background: transparent;
-    border: none;
+    border: 1px solid #000;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
 }
 
 .experience-btn:hover {
-    background: #000; /* 黑色填充覆蓋文字 */
-    color: #000; /* 保持文字黑色（被黑底覆蓋） */
+    background: #000;
+    color: #f2f2f2;
     transform: translateX(-50%);
 }
 
 .primary-btn {
-    padding: 0; /* 移除 padding */
+    padding: 5px 10px;
     background: transparent;
-    border: none;
+    border: 1px solid #000;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
-    margin-top: 2rem; /* 按鈕往下移 */
+    margin-top: 2rem;
+    margin-bottom: 80px; /* 確保不會遮擋 logo */
 }
 
 .primary-btn:hover {
-    background: #000; /* 黑色填充覆蓋文字 */
-    color: #000; /* 保持文字黑色（被黑底覆蓋） */
+    background: #000;
+    color: #f2f2f2; /* hover 時白色文字 */
 }
 
 .option-btn {
     width: 100%;
-    padding: 0; /* 移除 padding */
+    padding: 5px 10px;
     background: transparent;
-    border: none;
+    border: 1px solid #000;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 400;
     color: #000;
@@ -550,16 +751,16 @@ button {
 /* 選項前的圓圈數字 */
 .option-number {
     margin-right: 0.5rem;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .option-btn:hover {
-    background: #000; /* 黑色填充覆蓋文字 */
-    color: #000; /* hover 時文字保持黑色（被覆蓋） */
+    background: #000;
+    color: #f2f2f2; /* hover 時白色文字 */
 }
 
 .option-btn.selected {
-    background: #000; /* 選中時黑色背景 */
+    background: #000;
     color: #f2f2f2; /* 只有選中時白色文字 */
 }
 
@@ -570,55 +771,30 @@ button {
 
 /* 確定按鈕 */
 .confirm-btn {
-    padding: 0;
+    padding: 5px 10px;
     background: transparent;
-    border: none;
+    border: 1px solid #000;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     font-family: 'Noto Sans TC', sans-serif;
     font-weight: 500;
     color: #000;
     margin-top: 3rem;
-    opacity: 0; /* 預設透明（不可見但佔位） */
-    pointer-events: none; /* 預設不可點擊 */
+    margin-bottom: 80px; /* 確保不會遮擋 logo */
+    opacity: 0;
+    pointer-events: none;
 }
 
 .confirm-btn.visible {
-    opacity: 1; /* 可見 */
-    pointer-events: auto; /* 可點擊 */
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .confirm-btn:hover {
     background: #000;
-    color: #000;
+    color: #f2f2f2; /* hover 時白色文字 */
 }
 
-.yes-no-btn {
-    padding: 0; /* 移除 padding */
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-weight: 500;
-    color: #000;
-    margin: 0 2rem; /* 增加左右間距 */
-}
-
-.yes-no-btn:hover {
-    background: #000; /* 黑色填充覆蓋文字 */
-    color: #000; /* hover 時文字保持黑色（被覆蓋） */
-}
-
-.yes-no-btn.selected {
-    background: #000; /* 選中時黑色背景 */
-    color: #000; /* 選中時文字保持黑色（被覆蓋） */
-}
-
-.yes-no-btn.selected:hover {
-    background: #000;
-    color: #000; /* 選中時 hover 仍保持黑色文字（被覆蓋） */
-}
 
 /* 日誌容器 */
 #log-container {

@@ -6,6 +6,8 @@ class NFCManager {
         this.isConnected = false;
         this.reconnectTimer = null;
         this.heartbeatTimer = null;
+        this.reconnectAttempts = 0; // 重連嘗試次數
+        this.currentQuoteNumber = -1; // 當前顯示的雞湯編號
 
         // 事件回調
         this.onReadCallback = null;
@@ -24,6 +26,7 @@ class NFCManager {
             this.ws.onopen = () => {
                 log('WebSocket 連線成功', 'info');
                 this.isConnected = true;
+                this.reconnectAttempts = 0; // 重置重連計數器
                 this.updateUIStatus(true);
                 this.startHeartbeat();
 
@@ -130,7 +133,7 @@ class NFCManager {
 
         try {
             // 載入雞湯資料
-            const response = await fetch('data/quotes.json');
+            const response = await fetch(CONFIG.dataFiles.quotes);
             let quotes = await response.json();
 
             if (quotes.length === 0) {
@@ -141,40 +144,43 @@ class NFCManager {
             // 只從前 50 句中選擇（唯一抽籤卡專用）
             quotes = quotes.filter(q => q.number <= 50);
 
-            // 根據用戶選擇篩選
-            if (this.userSelection && this.userSelection.question1 && this.userSelection.question1 !== 'random') {
-                const selectedTag = this.userSelection.question1;
-                const filteredQuotes = quotes.filter(q => q.tags && q.tags.includes(selectedTag));
-
-                if (filteredQuotes.length > 0) {
-                    quotes = filteredQuotes;
-                    log(`根據選擇 "${selectedTag}" 篩選，共 ${quotes.length} 句`, 'info');
-                } else {
-                    log(`選擇 "${selectedTag}" 沒有匹配的雞湯，使用所有50句`, 'info');
-                }
+            // 🧠 匯入我們的 3D 計分邏輯大腦
+            const { getQuizResult } = await import('./quizLogic.js');
+            
+            let finalQuote;
+            let resultCombo = [];
+            
+            // 如果有做測驗 (存在 userAnswers)，就使用 3D 匹配邏輯
+            if (this.userAnswers && this.userAnswers.length > 0) {
+                const result = getQuizResult(this.userAnswers, quotes);
+                finalQuote = result.quote;
+                resultCombo = result.userCombo;
+                log(`🎯 測驗匹配選中: #${finalQuote.number} (痛點組合: ${resultCombo.join(', ')})`, 'info');
             } else {
-                log(`從所有前 50 句中隨機選擇（共 ${quotes.length} 句）`, 'info');
+                // 否則維持原本的隨機盲抽邏輯 (防呆機制)
+                finalQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                log(`隨機選中: #${finalQuote.number}`, 'info');
             }
 
-            // 隨機選擇一句
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
-
             // 更新雞湯内容
-            document.getElementById('quote-number-text').textContent = `#${randomQuote.number}`;
-            document.getElementById('quote-zh-text').textContent = randomQuote.textCN;
-            document.getElementById('quote-en-text').textContent = randomQuote.textEN;
+            document.getElementById('quote-number-text').textContent = `#${finalQuote.number}`;
+            document.getElementById('quote-zh-text').textContent = finalQuote.textCN;
+            document.getElementById('quote-en-text').textContent = finalQuote.textEN;
+
+            // *** 重要：發送當前雞湯編號給 ESP8266 ***
+            this.updateCurrentQuote(finalQuote.number);
 
             // 使用 showView 函數切換到雞湯頁面（帶淡入淡出效果）
             if (typeof window.showView === 'function') {
-                window.showView('quote-view');
+                window.switchInfoTab('quotes');
+                window.showView('info-website-view');
             } else {
                 // 降級方案：直接切換（如果 showView 不存在）
                 log('警告：showView 函數未定義，使用降級方案', 'warn');
                 document.querySelectorAll('.view-container').forEach(view => {
                     view.classList.remove('active');
                 });
-                document.getElementById('quote-view').classList.add('active');
+                document.getElementById('info-website-view').classList.add('active');
             }
 
             // 2秒后显示底部提示（使用淡入效果）
@@ -194,7 +200,7 @@ class NFCManager {
 
         try {
             // 載入雞湯資料
-            const response = await fetch('data/quotes.json');
+            const response = await fetch(CONFIG.dataFiles.quotes);
             const quotes = await response.json();
 
             // 篩選該分類的雞湯
@@ -234,12 +240,23 @@ class NFCManager {
                 window.contextManager.hide();
             } else {
                 // 未顯示 → 查找並顯示
-                const response = await fetch('data/quotes.json');
+                const response = await fetch(CONFIG.dataFiles.quotes);
                 const quotes = await response.json();
                 const matchedQuote = quotes.find(q => q.nfcUID === uid);
 
                 if (matchedQuote) {
-                    log(`找到匹配的雞湯: #${matchedQuote.number}`, 'info');
+                    // *** 新增：檢查當前顯示的雞湯編號 ***
+                    const currentQuote = this.currentQuoteNumber;
+
+                    if (currentQuote !== -1 && matchedQuote.number !== currentQuote) {
+                        log(`⚠ 錯誤的瓶子！當前雞湯是 #${currentQuote}，但掃描的是 #${matchedQuote.number} 的瓶子`, 'warn');
+                        log(`請使用編號 #${currentQuote} 的瓶子來查看脈絡`, 'warn');
+                        // 顯示錯誤提示
+                        this.showWrongBottleWarning(currentQuote, matchedQuote.number);
+                        return; // 不顯示脈絡
+                    }
+
+                    log(`✓ 找到匹配的雞湯: #${matchedQuote.number}`, 'info');
                     if (window.contextManager) {
                         window.contextManager.show(matchedQuote.number);
                     } else {
@@ -262,7 +279,7 @@ class NFCManager {
 
         try {
             // 根據 UID 查找對應的雞湯編號
-            const response = await fetch('data/quotes.json');
+            const response = await fetch(CONFIG.dataFiles.quotes);
             const quotes = await response.json();
             log(`[DEBUG] 已載入 ${quotes.length} 筆雞湯資料`, 'info');
 
@@ -271,6 +288,17 @@ class NFCManager {
 
             if (matchedQuote) {
                 log(`[DEBUG] ✓ 找到匹配的雞湯: #${matchedQuote.number} (UID: ${matchedQuote.nfcUID})`, 'info');
+
+                // *** 新增：檢查當前顯示的雞湯編號 ***
+                const currentQuote = this.currentQuoteNumber;
+
+                if (currentQuote !== -1 && matchedQuote.number !== currentQuote) {
+                    log(`⚠ 錯誤的瓶子！當前雞湯是 #${currentQuote}，但掃描的是 #${matchedQuote.number} 的瓶子`, 'warn');
+                    log(`請使用編號 #${currentQuote} 的瓶子來查看脈絡`, 'warn');
+                    // 顯示錯誤提示
+                    this.showWrongBottleWarning(currentQuote, matchedQuote.number);
+                    return; // 不顯示脈絡
+                }
 
                 // 使用覆蓋層顯示脈絡媒體
                 if (window.contextManager) {
@@ -316,8 +344,12 @@ class NFCManager {
 
     // 發送當前顯示的雞湯編號給 ESP8266
     updateCurrentQuote(quoteNumber) {
+        // 無論是否連線，都先儲存到本地
+        this.currentQuoteNumber = quoteNumber;
+        log(`已更新本地雞湯編號: ${quoteNumber}`, 'info');
+
         if (!this.isConnected || !this.ws) {
-            log('未連線，無法更新當前雞湯編號', 'warn');
+            log('未連線，無法發送雞湯編號給 ESP8266', 'warn');
             return false;
         }
 
@@ -327,7 +359,7 @@ class NFCManager {
                 quoteNumber: quoteNumber
             });
             this.ws.send(message);
-            log(`已發送當前雞湯編號: ${quoteNumber}`, 'sent');
+            log(`已發送當前雞湯編號給 ESP8266: ${quoteNumber}`, 'sent');
             return true;
         } catch (error) {
             log(`發送雞湯編號失敗: ${error}`, 'error');
@@ -538,6 +570,60 @@ class NFCManager {
         });
     }
 
+    // 顯示錯誤瓶子的警告提示
+    showWrongBottleWarning(correctNumber, scannedNumber) {
+        const overlay = document.createElement('div');
+        overlay.id = 'wrong-bottle-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+
+        overlay.innerHTML = `
+            <div style="
+                position: fixed;
+                bottom: 8vh;
+                left: 50%;
+                transform: translateX(-50%);
+                text-align: center;
+                color: #000;
+                width: 100%;
+                padding: 0 2rem;
+            ">
+                <p style="font-size: 1rem; font-weight: 500;">好像有點不對，請掃描對應編號的瓶子。</p>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // 淡入
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+        }, 10);
+
+        // 2秒後淡出並移除
+        setTimeout(() => {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        }, 2000);
+
+        // 點擊關閉
+        overlay.addEventListener('click', () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 300);
+        });
+    }
+
     // 發送訊息
     send(type, data = {}) {
         if (!this.isConnected || !this.ws) {
@@ -588,14 +674,27 @@ class NFCManager {
             clearTimeout(this.reconnectTimer);
         }
 
+        // 檢查是否達到最大重連次數
+        const maxAttempts = CONFIG.websocket.maxReconnectAttempts || 10;
+
+        if (this.reconnectAttempts >= maxAttempts) {
+            log(`已達最大重連次數 (${maxAttempts})，暫停重連。請檢查 ESP8266 是否運行中。`, 'warn');
+            this.updateUIStatus(false, '連線失敗');
+            return;
+        }
+
+        this.reconnectAttempts++;
+        const delay = CONFIG.websocket.reconnectInterval;
+
+        log(`嘗試重新連線... (${this.reconnectAttempts}/${maxAttempts})`, 'info');
+
         this.reconnectTimer = setTimeout(() => {
-            log('嘗試重新連線...', 'info');
             this.connect();
-        }, CONFIG.websocket.reconnectInterval);
+        }, delay);
     }
 
     // 更新 UI 狀態
-    updateUIStatus(connected) {
+    updateUIStatus(connected, customMessage = null) {
         const statusDot = document.getElementById('ws-status');
         const statusText = document.getElementById('ws-status-text');
 
@@ -606,7 +705,11 @@ class NFCManager {
         }
 
         if (statusText) {
-            statusText.textContent = connected ? '已連線' : '未連線';
+            if (customMessage) {
+                statusText.textContent = customMessage;
+            } else {
+                statusText.textContent = connected ? '已連線' : '未連線';
+            }
         }
     }
 

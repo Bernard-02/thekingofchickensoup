@@ -127,19 +127,23 @@ class ContextManager {
         log('顯示空白脈絡畫面', 'info');
     }
 
-    // 顯示控制按鈕
+    // 顯示控制按鈕（左右箭頭）
     showControls() {
-        const controls = document.querySelector('.context-controls');
-        if (controls) {
-            controls.style.display = 'flex';
+        if (this.prevBtn) {
+            this.prevBtn.style.display = 'flex';
+        }
+        if (this.nextBtn) {
+            this.nextBtn.style.display = 'flex';
         }
     }
 
-    // 隱藏控制按鈕
+    // 隱藏控制按鈕（左右箭頭）
     hideControls() {
-        const controls = document.querySelector('.context-controls');
-        if (controls) {
-            controls.style.display = 'none';
+        if (this.prevBtn) {
+            this.prevBtn.style.display = 'none';
+        }
+        if (this.nextBtn) {
+            this.nextBtn.style.display = 'none';
         }
     }
 

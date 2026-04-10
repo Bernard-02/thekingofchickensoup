@@ -1,0 +1,105 @@
+[
+  {
+    "id": "q1",
+    "text": "嗨，其實也沒什麼大道理，只是看你剛好點進來，想問問你最近過得好嗎？",
+    "type": "single",
+    "tag": "mood",
+    "options": [
+      { "value": "confused", "text": "總覺得哪裡怪怪的，不太確定現在的方向", "scores": { "confused": 1, "action": 1 } },
+      { "value": "relationships", "text": "感覺「人」比我想像中複雜了一點", "scores": { "hurt": 1, "relationships": 1 } },
+      { "value": "tired", "text": "有點疲憊，想喘口氣", "scores": { "tired": 1, "let-go": 1 } },
+      { "value": "motivated", "text": "可能需要點新的想法", "scores": { "action": 1, "courage": 1 } },
+      { "value": "random", "text": "就那樣吧，日子還算滋潤", "scores": { "perspective": 1, "patience": 1 } }
+    ]
+  },
+  {
+    "id": "q2",
+    "text": "原來如此。那如果順著這個感覺，要你更具體形容一下，現在腦子裡最常冒出來的念頭是什麼？",
+    "type": "single",
+    "tag": "thought",
+    "options": [
+      { "value": "self", "text": "「我到底想要什麼？」", "scores": { "confused": 1, "self-worth": 1 } },
+      { "value": "relationships", "text": "「這個人到底在想什麼？」", "scores": { "overthinking": 1, "relationships": 1 } },
+      { "value": "doubt", "text": "「我這樣做對嗎？」", "scores": { "overthinking": 1, "self-worth": 1 } },
+      { "value": "action", "text": "「我什麼時候才要開始？」", "scores": { "action": 1, "courage": 1 } },
+      { "value": "random", "text": "也沒什麼特別，腦子還好", "scores": { "let-go": 1 } }
+    ]
+  },
+  {
+    "id": "q3",
+    "text": "當這些念頭讓你覺得累了或煩了的時候，你通常會怎麼讓自己好過一點？",
+    "type": "single",
+    "tag": "coping",
+    "options": [
+      { "value": "alone", "text": "一個人待著，什麼都不做，讓腦子放空", "scores": { "tired": 1, "let-go": 1 } },
+      { "value": "outside", "text": "出去走走，換個地方透透氣", "scores": { "perspective": 1 } },
+      { "value": "talk", "text": "找個人說說話，不一定要建議，有人聽就好", "scores": { "relationships": 1, "perspective": 1 } },
+      { "value": "change", "text": "做一件平常不會做的事，換個感覺", "scores": { "action": 1, "courage": 1 } },
+      { "value": "none", "text": "說實話，我還沒找到什麼真的有效的方法", "scores": { "confused": 1, "patience": 1 } }
+    ]
+  },
+  {
+    "id": "q4",
+    "text": "在這些尋找出口的過程裡，你覺得你跟自己的關係怎麼樣？有好好關注自己內心的狀態嗎？",
+    "type": "single",
+    "tag": "self",
+    "options": [
+      { "value": "lost", "text": "有點失聯，不太清楚自己在幹嘛", "scores": { "confused": 1, "self-worth": 1 } },
+      { "value": "avoid", "text": "刻意不去深究，習慣先用別的事把注意力填滿", "scores": { "tired": 1, "courage": 1 } },
+      { "value": "overthink", "text": "關注得有點過頭了，常常在心裡跟自己打架", "scores": { "overthinking": 1, "let-go": 1 } },
+      { "value": "ok", "text": "還算和平，偶爾才會停下來想一想", "scores": { "perspective": 1, "patience": 1 } },
+      { "value": "clear", "text": "其實很清楚，只是現階段有點無力，需要被接住", "scores": { "tired": 1, "relationships": 1 } }
+    ]
+  },
+  {
+    "id": "q5",
+    "text": "有時候我們失去自己的節奏，是因為外界的聲音太吵。別人怎麼看你，對現在的你來說有多重要？",
+    "type": "single",
+    "tag": "social",
+    "options": [
+      { "value": "please_others", "text": "很怕讓別人失望，常常不自覺地去配合大家", "scores": { "hurt": 1, "self-worth": 1 } },
+      { "value": "care_a_lot", "text": "還是會在意，沒辦法完全不管", "scores": { "hurt": 1, "relationships": 1 } },
+      { "value": "know_but_cant", "text": "道理上知道不該在意，但心裡還是會", "scores": { "overthinking": 1, "self-worth": 1 } },
+      { "value": "annoyed", "text": "覺得很煩，只想叫那些指指點點的聲音閉嘴", "scores": { "tired": 1, "let-go": 1 } },
+      { "value": "less_now", "text": "已經沒那麼放在心上了，大概", "scores": { "let-go": 1, "perspective": 1 } },
+      { "value": "dont_care", "text": "不太在乎，活自己的就好", "scores": { "courage": 1, "self-worth": 1 } }
+    ]
+  },
+  {
+    "id": "q6",
+    "text": "那如果不看別人，只看自己的前方呢？講到「未來」或「以後」，你現在的直覺反應是哪種感覺？",
+    "type": "single",
+    "tag": "future",
+    "options": [
+      { "value": "lost", "text": "有點茫，看不太到前面的樣子", "scores": { "confused": 1, "patience": 1 } },
+      { "value": "tired", "text": "有方向，但走起來比想像中累", "scores": { "tired": 1, "setback": 1 } },
+      { "value": "present", "text": "不太想想那麼遠，先把今天過好就好", "scores": { "let-go": 1, "perspective": 1 } },
+      { "value": "excited", "text": "還滿期待的，甚至有點想快進", "scores": { "action": 1, "courage": 1 } },
+      { "value": "anxious", "text": "其實滿焦慮的，總會忍不住去想最壞的狀況", "scores": { "overthinking": 1, "let-go": 1 } }
+    ]
+  },
+  {
+    "id": "q7",
+    "text": "面對生活和未來，有些人會不自覺給自己很大的壓力。你對自己算嚴格嗎？還是那種表面沒事、私下卻一直在檢討自己的人？",
+    "type": "single",
+    "tag": "strict",
+    "options": [
+      { "value": "very", "text": "很嚴，有時候連我自己都覺得太苛了", "scores": { "overthinking": 1, "let-go": 1 } },
+      { "value": "hidden", "text": "對，就是那種表面沒事但其實一直在檢討的", "scores": { "overthinking": 1, "hurt": 1 } },
+      { "value": "normal", "text": "普通吧，會犯錯但不太會一直糾結", "scores": { "perspective": 1, "courage": 1 } },
+      { "value": "easy", "text": "比較寬鬆，我覺得對自己好一點比較重要", "scores": { "let-go": 1 } },
+      { "value": "compare", "text": "與其說嚴格，不如說常常覺得自己比不上別人", "scores": { "self-worth": 1, "perspective": 1 } },
+      { "value": "procrastinate", "text": "想做到最好，反而因為怕搞砸而遲遲不敢開始", "scores": { "action": 1, "courage": 1 } }
+    ]
+  },
+  {
+    "id": "q8",
+    "text": "不知不覺聊到了最後。今天來這裡，你還有什麼想說的嗎？",
+    "type": "single",
+    "tag": "chat",
+    "options": [
+      { "value": "chat", "text": "有，我想多說一點", "scores": { "action": 1, "courage": 1 } },
+      { "value": "skip", "text": "沒有，我想說的都說完了", "scores": { "let-go": 1, "patience": 1 } }
+    ]
+  }
+]

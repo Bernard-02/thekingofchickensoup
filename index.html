@@ -2,7 +2,13 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- 全螢幕模式設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+
     <title>The King of Chicken Soup</title>
 
     <!-- CSS -->
@@ -10,15 +16,22 @@
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/EasePack.min.js"></script>
 </head>
 <body>
     <!-- 首页 -->
     <div id="home-view" class="view-container active">
-        <div class="flex flex-col items-center justify-center min-h-screen">
+        <div class="flex flex-col items-center justify-center min-h-screen pb-16">
             <h1 class="font-bold">這個人超會寫雞湯</h1>
-            <h2 class="en">The King of Chicken Soup</h2>
+            <h2 class="en mb-16">The King of Chicken Soup</h2>
+            <button class="experience-btn" onclick="goToGuide()">點我開始</button>
         </div>
-        <button class="experience-btn" onclick="goToGuide()">開始</button>
     </div>
 
     <!-- 使用提示 -->
@@ -29,48 +42,40 @@
                 <div class="guide-steps">
                     <div class="step-card">
                         <div class="step-number">①</div>
-                        <p class="step-text">請回答兩個問題</p>
+                        <p class="step-text">請回答 8 個問題</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">②</div>
-                        <p class="step-text">將桌上的罐子放在裝置上以抽取雞湯</p>
+                        <p class="step-text">將裝置放在紅色的 NFC 讀取平台以抽取雞湯</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">③</div>
-                        <p class="step-text">用對應編號的罐子查看脈絡</p>
+                        <p class="step-text">用對應編號的裝置查看脈絡</p>
                     </div>
                 </div>
-                <button class="primary-btn" onclick="goToQuestion1()">ok，我已了解</button>
+                <button class="primary-btn" onclick="goToQuestions()">ok，我已了解</button>
             </div>
         </div>
     </div>
 
-    <!-- 问题1 -->
-    <div id="question1-view" class="view-container">
+    <!-- 問題（動態渲染） -->
+    <div id="question-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="max-w-2xl mx-auto text-center">
-                <h2 class="font-medium mb-12">嗨，其實也沒什麼大道理，<br>只是想問你最近過得好嗎？</h2>
-                <div id="q1-options">
-                    <button class="option-btn" data-value="confused"><span class="option-number">①</span>總覺得哪裡怪怪的，不太確定現在的方向。</button>
-                    <button class="option-btn" data-value="relationships"><span class="option-number">②</span>感覺「人」比我想像中複雜了一點。</button>
-                    <button class="option-btn" data-value="tired"><span class="option-number">③</span>有點疲憊，想喘口氣。</button>
-                    <button class="option-btn" data-value="motivated"><span class="option-number">④</span>可能需要點新的想法。</button>
-                    <button class="option-btn" data-value="random"><span class="option-number">⑤</span>就那樣吧，日子還算滋潤。</button>
-                </div>
-                <button id="confirm-q1" class="confirm-btn">確定</button>
+            <div class="max-w-2xl mx-auto text-center w-full">
+                <p id="question-progress" class="en font-normal mb-6">1 / 8</p>
+                <h2 id="question-text" class="font-medium mb-12"></h2>
+                <div id="question-options"></div>
+                <button id="confirm-question" class="confirm-btn">確定</button>
             </div>
         </div>
     </div>
 
-    <!-- 问题2 -->
-    <div id="question2-view" class="view-container">
+    <!-- 聊天（佔位） -->
+    <div id="chat-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center">
-                <h2 class="font-medium mb-12">你喜歡你目前的生活嗎？</h2>
-                <div class="flex justify-center">
-                    <button class="yes-no-btn" data-value="yes">當然，愛死了</button>
-                    <button class="yes-no-btn" data-value="no">我其實是在生存</button>
-                </div>
+                <h2 class="font-medium mb-6">聊聊吧</h2>
+                <p class="text-lg">（聊天功能開發中）</p>
             </div>
         </div>
     </div>
@@ -85,21 +90,312 @@
         </div>
     </div>
 
-    <!-- 雞湯页 -->
-    <div id="quote-view" class="view-container">
+    <!-- 轉譯頁面（先給暗示文字） -->
+    <div id="translation-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="text-center mb-8">
-                <p id="quote-number-text" class="en font-normal">#1</p>
+            <div class="max-w-2xl mx-auto text-center w-full">
+                <p class="font-normal text-black mb-6 text-lg">以下是你的結果...</p>
+                <h2 id="translation-text" class="font-medium text-black mb-12"></h2>
+                <div class="flex flex-row items-center justify-center gap-4">
+                    <button class="primary-btn" style="background-color: transparent; color: #000; border: 1px solid #000;" onclick="restart()">再來一次</button>
+                    <button class="primary-btn" style="background-color: #000; color: #fff; border: 1px solid #000;" onclick="decodeQuote()">查看更多 / 解籤</button>
+                </div>
             </div>
-            <div class="max-w-2xl mx-auto text-center mb-4">
-                <p id="quote-zh-text" class="font-bold">載入中...</p>
+        </div>
+    </div>
+
+    <!-- 資訊網站頁面 (左右分區 50vw) -->
+    <div id="info-website-view" class="view-container">
+        <div class="flex w-full h-screen">
+            <!-- 左半邊：導航區塊 -->
+            <div class="w-1/2 h-full relative flex flex-col justify-start p-8">
+                <!-- 返回按鈕 -->
+                <button onclick="restart()" class="en absolute top-8 left-8 flex items-center text-black opacity-40 hover:opacity-100 text-base font-normal">
+                    <span>← Back</span>
+                </button>
+
+                <!-- 選單按鈕 -->
+                <div class="flex flex-col gap-2 mt-16" id="info-nav">
+                    <button onclick="switchInfoTab('quotes')" id="tab-btn-quotes" class="en info-nav-btn text-left font-normal">Quotes</button>
+                    <button onclick="switchInfoTab('about')" id="tab-btn-about" class="en info-nav-btn text-left font-normal">About</button>
+                    <button onclick="switchInfoTab('research')" id="tab-btn-research" class="en info-nav-btn text-left font-normal">Research</button>
+
+                    <!-- Research anchor 連結（點 Research 才展開） -->
+                    <div id="research-anchors" class="hidden flex flex-col gap-1 mt-2 ml-4">
+                        <a href="#" onclick="scrollToResearchPart(event, 'research-part1')" class="en research-anchor-btn">Part 1</a>
+                        <a href="#" onclick="scrollToResearchPart(event, 'research-part2')" class="en research-anchor-btn">Part 2</a>
+                        <a href="#" onclick="scrollToResearchPart(event, 'research-part3')" class="en research-anchor-btn">Part 3</a>
+                        <a href="#" onclick="scrollToResearchPart(event, 'research-part4')" class="en research-anchor-btn">Part 4</a>
+                    </div>
+                </div>
+
+                <!-- 專案 Logo (左下角) -->
+                <div class="absolute bottom-8 left-8">
+                    <img src="Logo/雞湯Logo.png" alt="Logo" class="w-24">
+                </div>
             </div>
-            <div class="max-w-2xl mx-auto text-center mb-8">
-                <p id="quote-en-text" class="en font-normal">Loading...</p>
+
+            <!-- Quote slide panel 背景遮罩（點左半邊關閉） -->
+            <div id="quote-slide-backdrop" onclick="closeQuotePanel()" class="quote-slide-backdrop"></div>
+
+            <!-- Quote slide panel（50vw，從右滑入） -->
+            <div id="quote-slide-panel" class="quote-slide-panel">
+                <button onclick="closeQuotePanel()" class="en hover-underline absolute top-8 right-8 text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;">✕ Close</button>
+                <div id="quote-panel-content" class="flex flex-col justify-center h-full px-12">
+                    <!-- NFC 等待狀態 -->
+                    <div id="quote-panel-nfc">
+                        <p class="font-medium text-lg mb-4">掃描對應編號的罐子</p>
+                        <p class="opacity-40" id="quote-panel-nfc-number"></p>
+                    </div>
+                    <!-- 雞湯文（掃完才顯示） -->
+                    <div id="quote-panel-reveal" class="hidden">
+                        <p id="quote-panel-number" class="en font-normal mb-4" style="font-size:2.5rem; line-height:1.2;"></p>
+                        <p id="quote-panel-zh" class="font-medium mb-3" style="font-size:2rem; line-height:1.3;"></p>
+                        <p id="quote-panel-en" class="en font-normal" style="font-size:2rem; line-height:1.3;"></p>
+                        <p id="quote-panel-hint" class="mt-8 opacity-50" style="font-size:1rem; line-height:1.5;">請掃描對應編號的瓶子以查看原句</p>
+                        <button onclick="revealQuoteInPanel()" class="mt-4 px-4 py-2 border border-black text-sm hover:bg-black hover:text-white transition-colors" style="font-size:0.875rem;">🧪 模擬掃描</button>
+                    </div>
+                </div>
             </div>
-            <div id="quote-actions" class="mt-8 text-center">
-                <p class="text-lg mb-2">好奇這句話怎麼來的？找對應編號的罐子掃一掃吧！</p>
-                <button class="primary-btn" onclick="restart()">重新開始</button>
+
+            <!-- 右半邊：內容區塊 -->
+            <div id="info-right-panel" class="w-1/2 h-full overflow-y-auto relative">
+                <!-- Quotes 面板 (預設顯示) -->
+                <div id="info-pane-quotes" class="info-pane w-full" style="padding-top: 6rem; padding-right: 3rem; padding-bottom: 2rem;">
+                    <div id="quotes-list"></div>
+                </div>
+
+                <!-- About 面板 -->
+                <div id="info-pane-about" class="info-pane hidden w-full pt-24 pb-8 pr-8">
+                    <div class="flex flex-col gap-16">
+                        <!-- 中文 -->
+                        <div id="about-zh" class="leading-relaxed flex flex-col gap-6" style="max-width: 70%;">
+                            <p>載入中...</p>
+                        </div>
+                        <!-- 英文 -->
+                        <div id="about-en" class="en flex flex-col gap-6" style="max-width: 70%;">
+                        </div>
+                        <!-- 社群連結 -->
+                        <div class="flex flex-col gap-2">
+                            <a href="https://www.instagram.com/thekingofchickensoup/" target="_blank" class="en hover-underline w-fit">Instagram</a>
+                            <a href="https://www.threads.com/@thekingofchickensoup" target="_blank" class="en hover-underline w-fit">Threads</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Research 面板 -->
+                <div id="info-pane-research" class="info-pane hidden w-full pr-8 pb-24">
+                    <div class="flex flex-col gap-24">
+                        <h4 class="pt-24" style="max-width: 70%; font-weight: normal;">雞湯的目的不在於「解決問題」，而在於產生共鳴，所以對於不同的人群有不同的意義和感受。</h4>
+                        <section id="research-part1" class="flex flex-col gap-8" data-scroll-anim style="max-width: 70%;">
+                            <div class="en">Part 1</div>
+                            <div id="research-content-1" class="leading-relaxed flex flex-col gap-6">
+                                <div class="flex flex-col">
+                                    <h4 style="font-weight: normal;">什麼是雞湯文</h4>
+                                    <h4 class="en" style="font-weight: normal;">The Chicken Soup Quote</h4>
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <p>心靈雞湯（Chicken Soup for the Soul）名稱最早來自美國，是一個系列書籍名稱。該系列透過簡短、感人、小故事集合，談人生體悟、情感療癒等主題。</p>
+                                    <p>這樣的書在中文市場被翻譯、改編、流傳，「心靈雞湯」逐漸被當作一種文體／語境中的通稱，用來指那些溫暖勵志、哲理語錄、小故事療癒文等。</p>
+                                    <p>在中文語境裡，「心靈雞湯」這個詞後來被泛化，不僅指書籍，也指網路貼文、社群文字、格言警句、療癒語錄等，變成一種流行文化現象。</p>
+                                </div>
+                                <h4 class="mt-8" style="font-weight: normal;">定義雞湯文</h4>
+                                <div class="flex flex-col">
+                                    <div class="accordion-item">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>勵志 / 鼓舞意味</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>文本中常有激勵、鼓舞、希望、正向的調子</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item border-t-2 border-black">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>情感訴求強</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>較少論理性分析，而訴諸共鳴、情緒、感受</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item border-t-2 border-black">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>簡短、精練</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>通常為短句、警句、或短篇小故事、斷句明確</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item border-t-2 border-black">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>期望變好 / 光明未來</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>傾向給出「你可以」「要堅持」「總會有光」這類語句</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item border-t-2 border-black">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>模糊的因果 / 方法缺乏</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>有時鼓勵多於實際策略，缺少可操作內容</p>
+                                        </div>
+                                    </div>
+                                    <div class="accordion-item border-t-2 border-black border-b-2">
+                                        <button class="accordion-btn w-full text-left py-3 flex justify-between items-center" onclick="toggleAccordion(this)">
+                                            <span>語境脫離現實或極端化</span>
+                                            <span class="accordion-icon en">+</span>
+                                        </button>
+                                        <div class="accordion-content pb-4" style="display:none; overflow:hidden;">
+                                            <p>有些語句過度簡化、理想化現實，忽略複雜性</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="research-part2" class="flex flex-col gap-4" data-scroll-anim style="max-width: 70%;">
+                            <div class="en">Part 2</div>
+                            <div id="research-content-2" class="leading-relaxed flex flex-col gap-6">
+                                <div class="flex flex-col">
+                                    <h4 style="font-weight: normal;">為什麼大家討厭 / 排斥雞湯文？</h4>
+                                    <h4 class="en" style="font-weight: normal;">Why do we Dislike?</h4>
+                                </div>
+                                <div class="flex flex-col gap-8">
+                                    <!-- Row 1 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>過度泛濫與機械化，使人麻木</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>社交媒體時代，各種勵志語錄、雞湯文大量湧現，變成一種「社交媒體式」的快消文字。雞湯文被過度消費、反覆轉貼、套路化，很多人開始對其失去信服感。</p>
+                                            <p>雞湯文被用「修辭代替說理」，以情緒包裝理論，<strong>缺乏邏輯與實質批判</strong>。這讓一些讀者感到「只是好聽的話」而非可以落地的思考。</p>
+                                            <p>被稱為「毒雞湯」的文章常以渲染絕望或焦慮吸引眼球，製造情緒刺激。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 2 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>落差與幻滅感</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>有些人在閱讀雞湯文時曾得到<strong>短暫鼓舞</strong>，但面對現實的壓力、挫折、制度限制時，回過頭去發現「雞湯」沒辦法改變大環境，也無法提供真正的支援。</p>
+                                            <p>雞湯文靠「激勵」維持，希望讀者藉此感受能量，然而若缺乏方法與持續支援，容易讓人感覺空洞。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 3 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>倫理與責任問題</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>某些雞湯文鼓勵「只要努力就能成功」或「所有苦難都是必經過程」等論調，就可能忽視結構性的不平等、個體能力差異、外部阻礙與社會制度因素。這類文句容易被批評為「對弱勢者不公平的話語」或「責怪式勵志」。</p>
+                                            <p>有些溫暖語句背後隱含操控或壓迫語氣（例如「你若不努力就是懶惰」之類的語言），使讀者感到被施壓或內耗。若人在脆弱時過度信任這些語句，可能對自我造成傷害。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 4 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>文化語境變遷</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>在資訊過載、思想多元、批判意識抬頭的時代，簡單化的勵志語句可能被視為膚淺、矯情或虛假。人們期待更多真實、複雜、帶有脈絡與思考的內容。</p>
+                                            <p>雞湯文被視為「慰藉型消費文化」的一部分，即以消費方式獲取短暫慰藉，而非真正的自治與思考。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="research-part3" class="flex flex-col gap-8" data-scroll-anim style="max-width: 70%;">
+                            <div class="en">Part 3</div>
+                            <div id="research-content-3" class="leading-relaxed flex flex-col gap-6">
+                                <div class="flex flex-col">
+                                    <h4 style="font-weight: normal;">心靈雞湯的需求</h4>
+                                    <h4 class="en" style="font-weight: normal;">The needs</h4>
+                                </div>
+                                <div class="flex flex-col gap-8">
+                                    <!-- Row 1 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>情緒壓力與焦慮常態化</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>現代生活節奏快、競爭激烈、社會變動大，使得焦慮、孤獨、挫敗感等情緒非常普遍。</p>
+                                            <p>人們在面臨困難、挫折時，渴望被理解、被安慰、被鼓舞。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 2 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>社群媒體與資訊過載</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>在社群平台中，人們常被碎片化訊息包圍，需要一些快速、簡潔、情感上的支持。</p>
+                                            <p>雞湯文因為短小易讀、容易被轉貼，符合這種需求。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 3 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>傳統支持系統弱化</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>過去或許有較強的家庭、社區、宗教、世代傳承的情感支持結構，但在現代社會這些支持結構可能被弱化，許多人不得不透過閱讀、網絡社群尋找安慰與歸屬。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 4 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>意義尋求與精神空缺</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>現代社會在物質富足之後，人們的精神／意義需求變得更突出。</p>
+                                            <p>即便物質上足夠，也可能在心理、情感、生命意義上感到缺乏。雞湯文正好提供一種「意義感的瞬間補品」。</p>
+                                        </div>
+                                    </div>
+                                    <!-- Row 5 -->
+                                    <div class="flex gap-8 border-t-2 border-black pt-6">
+                                        <div style="width: 35%;">
+                                            <p>自我反思與成長的渴望</p>
+                                        </div>
+                                        <div class="flex flex-col gap-4" style="width: 65%;">
+                                            <p>有些人閱讀雞湯文是為了反思自己、理清思緒、重整信念，尋求內在力量。雖然有時落差，但那個渴望是真實存在的。</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <section id="research-part4" class="flex flex-col gap-8" data-scroll-anim style="max-width: 70%;">
+                            <div class="en">Part 4</div>
+                            <div id="research-content-4" class="leading-relaxed flex flex-col gap-6">
+                                <div class="flex flex-col">
+                                    <h4 style="font-weight: normal;">毒雞湯</h4>
+                                    <h4 class="en" style="font-weight: normal;">The Poison Chicken Soup</h4>
+                                </div>
+                                <h4 class="mt-4" style="font-weight: normal;">定義與特質</h4>
+                                <p>一些文字看起來很有道理，也有蠻多人認同，但讀起來有些部分怪怪的。是對雞湯文化的一種反撲 / 批評語言，用來指那些「表面溫暖、實則有害」的語錄或文章。</p>
+                                <div class="flex flex-col gap-3">
+                                    <div class="flex gap-3"><span>①</span><p>語句看似勸世、正能量，但若過度信賴可能導致對自我更加苛責或焦慮。</p></div>
+                                    <div class="flex gap-3"><span>②</span><p>往往強調單一因果或簡化成功公式（如「努力就能成功」、「你必須很努力，才能看起來毫不費力」），忽略情境、運氣、資源不平等等因素。</p></div>
+                                    <div class="flex gap-3"><span>③</span><p>常有誇大、片面、二元對立的語調（把世界分為「成功者 / 普通人」「努力者 / 失敗者」等）</p></div>
+                                    <div class="flex gap-3"><span>④</span><p>容易引發內耗、焦慮、比較與自我懷疑 — 當你做不到它說的那樣，你可能會自責。</p></div>
+                                    <div class="flex gap-3"><span>⑤</span><p>在網絡文化中，毒雞湯也可能被刻意做成噱頭、反諷版本，以「毒性」和悲觀語調混用，造成娛樂性或諷刺效果。</p></div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="flex flex-col gap-8" style="max-width: 70%;">
+                            <div class="leading-relaxed flex flex-col gap-6">
+                                <h4 style="font-weight: normal;">這個人認為</h4>
+                                <p>雞湯是一種說法，但不完全正確，因為它模糊、簡單且正向。它會隨著讀者的人生經歷、社會歷練和思想深度而產生不同的見解。不論是相信／不相信這種說法，都會深化成某種生活態度與思想。</p>
+                            </div>
+                        </section>
+                        <button onclick="scrollInfoToTop()" class="en hover-underline self-start" style="background:none; border:none; cursor:pointer; padding:0; color:#000; font-size:1.125rem;">↑ Back to top</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -107,15 +403,17 @@
     <!-- 脈絡媒體覆蓋層 -->
     <div id="context-overlay" class="context-overlay hidden">
         <div class="context-media-container">
+            <!-- 左側箭頭 -->
+            <button id="context-prev" class="context-nav-btn context-nav-left">←</button>
+
             <!-- 媒體內容區域 -->
             <div id="context-media-display"></div>
 
-            <!-- 輪播控制 -->
-            <div class="context-controls">
-                <button id="context-prev" class="context-nav-btn">←</button>
-                <div id="context-indicators" class="context-indicators"></div>
-                <button id="context-next" class="context-nav-btn">→</button>
-            </div>
+            <!-- 右側箭頭 -->
+            <button id="context-next" class="context-nav-btn context-nav-right">→</button>
+
+            <!-- 隱藏的指示器容器（保留給 JS 使用但不顯示） -->
+            <div id="context-indicators" class="context-indicators" style="display: none;"></div>
 
             <!-- 提示文字 -->
             <div id="context-hint" class="context-hint">
@@ -137,155 +435,6 @@
     <script src="js/config.js"></script>
     <script src="js/context.js"></script>
     <script src="js/nfc.js"></script>
-
-    <script>
-        // 用户选择
-        let userSelection = {
-            q1: null,
-            q2: null
-        };
-
-        let selectedQ1 = null;
-        let selectedQ2 = null;
-
-        // 显示指定view（帶淡入淡出效果）
-        window.showView = function(viewId) {
-            const currentView = document.querySelector('.view-container.active');
-            const nextView = document.getElementById(viewId);
-            const logo = document.getElementById('logo');
-
-            if (!nextView) return;
-
-            // 控制 Logo 顯示/隱藏
-            if (viewId === 'quote-view') {
-                logo.classList.add('hidden');
-            } else {
-                logo.classList.remove('hidden');
-            }
-
-            // 如果當前有活動頁面，先淡出
-            if (currentView && currentView !== nextView) {
-                currentView.classList.add('fade-out');
-
-                // 等待淡出完成後切換
-                setTimeout(() => {
-                    currentView.classList.remove('active', 'fade-out', 'fade-in', 'visible');
-
-                    // 顯示下一個頁面並淡入
-                    nextView.classList.add('active');
-                    // 使用 requestAnimationFrame 確保 display 變更後再觸發動畫
-                    requestAnimationFrame(() => {
-                        nextView.classList.add('fade-in');
-                    });
-                }, 300); // 對應 fadeOut 動畫時間
-            } else {
-                // 首次載入，直接顯示
-                nextView.classList.add('active', 'fade-in');
-            }
-
-            console.log('显示页面:', viewId);
-        };
-
-        // 創建局部別名
-        const showView = window.showView;
-
-        // 导航
-        function goToGuide() {
-            showView('guide-view');
-        }
-
-        function goToQuestion1() {
-            showView('question1-view');
-            // 重置選擇
-            selectedQ1 = null;
-            document.querySelectorAll('#q1-options .option-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            document.getElementById('confirm-q1').classList.remove('visible');
-        }
-
-        function goToQuestion2() {
-            showView('question2-view');
-            // 重置選擇
-            selectedQ2 = null;
-            document.querySelectorAll('.yes-no-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-        }
-
-        function restart() {
-            userSelection = { q1: null, q2: null };
-            selectedQ1 = null;
-            selectedQ2 = null;
-            // 重置提示文字狀態
-            document.getElementById('quote-actions').classList.remove('visible');
-            showView('home-view');
-        }
-
-        // 初始化問題1和問題2的選項點擊事件
-        document.addEventListener('DOMContentLoaded', () => {
-            // 問題1選項
-            const q1Options = document.querySelectorAll('#q1-options .option-btn');
-            const confirmQ1Btn = document.getElementById('confirm-q1');
-
-            q1Options.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // 移除所有選項的selected類
-                    q1Options.forEach(b => b.classList.remove('selected'));
-                    // 添加當前選項的selected類
-                    btn.classList.add('selected');
-                    // 記錄選擇
-                    selectedQ1 = btn.getAttribute('data-value');
-                    // 顯示確定按鈕
-                    confirmQ1Btn.classList.add('visible');
-                });
-            });
-
-            // 問題1確定按鈕
-            confirmQ1Btn.addEventListener('click', () => {
-                if (selectedQ1) {
-                    userSelection.q1 = selectedQ1;
-                    console.log('问题1确认:', selectedQ1);
-                    goToQuestion2();
-                }
-            });
-
-            // 問題2選項 - 直接進入下一頁，不需要確定按鈕
-            const q2Options = document.querySelectorAll('.yes-no-btn');
-
-            q2Options.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // 移除所有選項的selected類
-                    q2Options.forEach(b => b.classList.remove('selected'));
-                    // 添加當前選項的selected類
-                    btn.classList.add('selected');
-                    // 記錄選擇
-                    selectedQ2 = btn.getAttribute('data-value');
-                    userSelection.q2 = selectedQ2;
-                    console.log('问题2确认:', selectedQ2);
-
-                    // 直接進入NFC等待頁面
-                    showView('waiting-nfc-view');
-
-                    // 传递用户选择给NFC管理器
-                    if (window.nfcManager) {
-                        nfcManager.userSelection = userSelection;
-                    }
-                });
-            });
-
-            // 初始化 WebSocket
-            console.log('檢查 nfcManager:', window.nfcManager);
-            console.log('檢查 CONFIG:', window.CONFIG);
-
-            if (window.nfcManager) {
-                console.log('準備連接 WebSocket...');
-                nfcManager.connect();
-            } else {
-                console.error('錯誤：nfcManager 未定義！');
-            }
-        });
-
-    </script>
+    <script src="js/main.js"></script>
 </body>
 </html>
