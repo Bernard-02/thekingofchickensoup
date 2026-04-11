@@ -69,7 +69,7 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+        const models = ['gemini-2.5-flash', 'gemini-2.5-pro'];
         const requestBody = JSON.stringify({
             contents: [
                 { role: 'user', parts: [{ text: userContext }] }
@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
             systemInstruction: { parts: [{ text: systemPrompt }] },
             generationConfig: {
                 temperature: 0.9,
-                maxOutputTokens: 512,
+                maxOutputTokens: 2048,
             }
         });
 
