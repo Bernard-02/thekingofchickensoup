@@ -763,6 +763,7 @@ const MOCK_AI_RESPONSES = [
 ];
 
 let chatAIResult = null; // 儲存 AI 生成的結果
+let lastChatMessage = ''; // 儲存最後一次輸入的文字
 
 // API 端點：Vercel 上用相對路徑，本地用完整網址
 const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -784,23 +785,20 @@ function showChatResult() {
 // 開始 loading 動畫（持續循環直到 API 回應）
 let loadingTimeline = null;
 
-function startLoadingAnim() {
+function startLoadingAnim(zhText = '雞湯生成中...', enText = 'Your chicken soup is brewing...') {
     const zhEl = document.getElementById('chat-loading-zh');
     const enEl = document.getElementById('chat-loading-en');
     zhEl.textContent = '';
     enEl.textContent = '';
 
-    const zhText = '雞湯生成中...';
-    const enText = 'Your chicken soup is brewing...';
-
     loadingTimeline = gsap.timeline({ repeat: -1 });
     loadingTimeline
         .to(zhEl, { duration: zhText.length * 0.08, text: zhText, ease: 'none' })
         .to(enEl, { duration: enText.length * 0.04, text: enText, ease: 'none' }, `>0.3`)
-        .to({}, { duration: 0.5 }) // 停留
+        .to({}, { duration: 0.5 })
         .to(zhEl, { duration: 0.2, text: '', ease: 'none' })
         .to(enEl, { duration: 0.2, text: '', ease: 'none' }, '<')
-        .to({}, { duration: 0.3 }); // 間隔再重複
+        .to({}, { duration: 0.3 });
 }
 
 function stopLoadingAnim() {
@@ -815,6 +813,7 @@ window.submitChat = async function() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text) return;
+    lastChatMessage = text;
 
     // 進入 loading
     showView('chat-loading-view');
@@ -933,6 +932,69 @@ window.retryChatInput = function() {
     showView('chat-view');
 };
 
+// 參數調整後重新生成
+let paramDebounceTimer = null;
+
+async function regenerateWithParams() {
+    if (!lastChatMessage) return;
+
+    // 顯示調味中 loading
+    showView('chat-loading-view');
+    startLoadingAnim('雞湯正在調味中...', 'Seasoning your chicken soup...');
+
+    const tone = document.getElementById('param-tone')?.value || 50;
+    const enToggle = document.getElementById('param-en-toggle')?.checked || false;
+    const englishStyle = document.getElementById('param-english')?.value || 50;
+    const length = document.getElementById('param-length')?.value || 30;
+
+    const scores = {};
+    userAnswers.forEach(opt => {
+        if (opt && opt.scores) {
+            Object.entries(opt.scores).forEach(([k, v]) => {
+                scores[k] = (scores[k] || 0) + v;
+            });
+        }
+    });
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userMessage: lastChatMessage,
+                scores,
+                tone: Number(tone),
+                english: enToggle,
+                englishStyle: Number(englishStyle),
+                length: Number(length),
+            })
+        });
+
+        const result = await response.json();
+        stopLoadingAnim();
+
+        if (!response.ok || result.error || !result.valid) {
+            // 失敗就回到原本的結果頁
+            showChatResult();
+            return;
+        }
+
+        chatAIResult = result;
+        // 直接顯示原句（已經解碼過，不需要再掃 NFC）
+        document.getElementById('chat-translation-text').textContent = chatAIResult.textCN;
+        document.getElementById('chat-result-hint').style.display = 'none';
+        const mockBtn = document.getElementById('chat-mock-scan-btn');
+        if (mockBtn) mockBtn.style.display = 'none';
+        document.getElementById('chat-result-actions').style.display = 'flex';
+        document.getElementById('chat-params-panel').style.display = 'flex';
+        showView('chat-result-view');
+
+    } catch (err) {
+        console.error('Regenerate error:', err);
+        stopLoadingAnim();
+        showChatResult();
+    }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 載入問題與資訊資料
@@ -942,13 +1004,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 確定按鈕
     document.getElementById('confirm-question').addEventListener('click', confirmQuestion);
 
-    // English toggle → 顯示/隱藏 Manglish↔Formal slider
+    // 參數變動 → debounce 重新生成
+    function onParamChange() {
+        clearTimeout(paramDebounceTimer);
+        paramDebounceTimer = setTimeout(() => {
+            if (chatAIResult && lastChatMessage) regenerateWithParams();
+        }, 800);
+    }
+
+    // English toggle → 顯示/隱藏 Manglish↔Formal slider + 觸發重新生成
     const enToggle = document.getElementById('param-en-toggle');
     if (enToggle) {
         enToggle.addEventListener('change', () => {
             document.getElementById('param-en-style-wrapper').style.display = enToggle.checked ? 'flex' : 'none';
+            onParamChange();
         });
     }
+
+    // Slider 變動觸發重新生成
+    ['param-tone', 'param-english', 'param-length'].forEach(id => {
+        const slider = document.getElementById(id);
+        if (slider) slider.addEventListener('change', onParamChange);
+    });
 
     // 聊天輸入框邏輯
     const chatInput = document.getElementById('chat-input');
