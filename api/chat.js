@@ -1,7 +1,7 @@
 // Vercel Serverless Function — Gemini API proxy
 // API key 存在 Vercel 環境變數 GEMINI_API_KEY，不會暴露給前端
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
