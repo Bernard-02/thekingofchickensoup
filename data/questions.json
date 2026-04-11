@@ -86,8 +86,8 @@
   },
   {
     "id": "q7",
-    "text": "面對生活和未來，有些人會不自覺給自己很大的壓力。你對自己算嚴格嗎？還是那種表面沒事、私下卻一直在檢討自己的人？",
-    "textEN": "Some people unknowingly put a lot of pressure on themselves. Are you strict with yourself? Or are you the type who seems fine on the surface but keeps reviewing every mistake in private?",
+    "text": "面對生活和未來，你對自己算嚴格嗎？還是那種表面沒事、私下卻一直在檢討自己的人？",
+    "textEN": "Are you strict with yourself? Or the type who seems fine but keeps reviewing every mistake in private?",
     "type": "single",
     "tag": "strict",
     "options": [

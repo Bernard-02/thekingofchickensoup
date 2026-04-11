@@ -518,13 +518,25 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 
 /* Custom dropdown */
 .custom-select {
+    -webkit-appearance: none;
+    appearance: none;
     border: 1px solid #000;
     background: transparent;
-    padding: 4px 8px;
+    padding: 4px 24px 4px 8px;
     height: 32px;
     font-size: 0.75rem;
     cursor: pointer;
     outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23000' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+
+/* 參數面板禁用狀態 */
+.params-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 /* Chat input placeholder */

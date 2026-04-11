@@ -932,15 +932,44 @@ window.retryChatInput = function() {
     showView('chat-view');
 };
 
-// 參數調整後重新生成
+// 參數調整後重新生成（留在同一頁面）
 let paramDebounceTimer = null;
+
+function setParamsDisabled(disabled) {
+    const panel = document.getElementById('chat-params-panel');
+    if (disabled) {
+        panel.classList.add('params-disabled');
+    } else {
+        panel.classList.remove('params-disabled');
+    }
+}
 
 async function regenerateWithParams() {
     if (!lastChatMessage) return;
 
-    // 顯示調味中 loading
-    showView('chat-loading-view');
-    startLoadingAnim('雞湯正在調味中...', 'Seasoning your chicken soup...');
+    const textEl = document.getElementById('chat-translation-text');
+    const enEl = document.getElementById('chat-en-text');
+
+    // 禁用參數面板
+    setParamsDisabled(true);
+
+    // 文字切換成「調味中...」
+    gsap.to(textEl, {
+        opacity: 0, duration: 0.3, ease: 'power2.out',
+        onComplete: () => {
+            textEl.textContent = '雞湯正在調味中...';
+            gsap.to(textEl, { opacity: 1, duration: 0.3 });
+        }
+    });
+    if (enEl.style.display !== 'none') {
+        gsap.to(enEl, {
+            opacity: 0, duration: 0.3, ease: 'power2.out',
+            onComplete: () => {
+                enEl.textContent = 'Seasoning your chicken soup...';
+                gsap.to(enEl, { opacity: 1, duration: 0.3 });
+            }
+        });
+    }
 
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
@@ -971,28 +1000,42 @@ async function regenerateWithParams() {
         });
 
         const result = await response.json();
-        stopLoadingAnim();
 
         if (!response.ok || result.error || !result.valid) {
-            // 失敗就回到原本的結果頁
-            showChatResult();
+            // 失敗就恢復原本文字
+            textEl.textContent = chatAIResult.textCN;
+            if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
+            setParamsDisabled(false);
             return;
         }
 
         chatAIResult = result;
-        // 直接顯示原句（已經解碼過，不需要再掃 NFC）
-        document.getElementById('chat-translation-text').textContent = chatAIResult.textCN;
-        document.getElementById('chat-result-hint').style.display = 'none';
-        const mockBtn = document.getElementById('chat-mock-scan-btn');
-        if (mockBtn) mockBtn.style.display = 'none';
-        document.getElementById('chat-result-actions').style.display = 'flex';
-        document.getElementById('chat-params-panel').style.display = 'flex';
-        showView('chat-result-view');
+
+        // fade in 新文字
+        gsap.to(textEl, {
+            opacity: 0, duration: 0.3,
+            onComplete: () => {
+                textEl.textContent = chatAIResult.textCN;
+                gsap.to(textEl, { opacity: 1, duration: 0.4 });
+            }
+        });
+        if (enEl.style.display !== 'none') {
+            gsap.to(enEl, {
+                opacity: 0, duration: 0.3,
+                onComplete: () => {
+                    enEl.textContent = chatAIResult.textEN || '';
+                    gsap.to(enEl, { opacity: 1, duration: 0.4 });
+                }
+            });
+        }
+
+        setParamsDisabled(false);
 
     } catch (err) {
         console.error('Regenerate error:', err);
-        stopLoadingAnim();
-        showChatResult();
+        textEl.textContent = chatAIResult.textCN;
+        if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
+        setParamsDisabled(false);
     }
 }
 
@@ -1012,16 +1055,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 800);
     }
 
-    // English toggle → 顯示/隱藏 Manglish↔Formal slider + 觸發重新生成
+    // English toggle → 顯示/隱藏英文文字 + Manglish↔Formal slider
     const enToggle = document.getElementById('param-en-toggle');
     if (enToggle) {
         enToggle.addEventListener('change', () => {
-            document.getElementById('param-en-style-wrapper').style.display = enToggle.checked ? 'flex' : 'none';
-            onParamChange();
+            const enTextEl = document.getElementById('chat-en-text');
+            const enStyleWrapper = document.getElementById('param-en-style-wrapper');
+            enStyleWrapper.style.display = enToggle.checked ? 'flex' : 'none';
+
+            if (enToggle.checked) {
+                // 顯示英文（用已有的 AI 結果）
+                if (chatAIResult && chatAIResult.textEN) {
+                    enTextEl.textContent = chatAIResult.textEN;
+                    enTextEl.style.display = '';
+                    gsap.fromTo(enTextEl, { opacity: 0 }, { opacity: 1, duration: 0.4 });
+                }
+            } else {
+                enTextEl.style.display = 'none';
+            }
         });
     }
 
-    // Slider 變動觸發重新生成
+    // Slider 變動觸發重新生成（tone、english style、length）
     ['param-tone', 'param-english', 'param-length'].forEach(id => {
         const slider = document.getElementById(id);
         if (slider) slider.addEventListener('change', onParamChange);
