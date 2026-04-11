@@ -1078,6 +1078,67 @@ async function regenerateWithParams() {
     }
 }
 
+// 只重新翻譯英文（中文保持不變）
+async function retranslateEnglish() {
+    if (!chatAIResult || !lastChatMessage) return;
+
+    const enEl = document.getElementById('chat-en-text');
+    if (enEl.style.display === 'none') return;
+
+    setParamsDisabled(true);
+
+    // 英文部分顯示 loading
+    gsap.to(enEl, {
+        opacity: 0, duration: 0.2,
+        onComplete: () => {
+            enEl.textContent = 'Translating...';
+            gsap.to(enEl, { opacity: 1, duration: 0.2 });
+        }
+    });
+
+    const englishStyle = document.getElementById('param-english')?.value || 50;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+                userMessage: lastChatMessage,
+                scores: {},
+                tone: 50,
+                english: true,
+                englishStyle: Number(englishStyle),
+                length: 50,
+                retranslateOnly: true,
+                existingCN: chatAIResult.textCN,
+            })
+        });
+        clearTimeout(timeoutId);
+
+        const result = await response.json();
+        if (response.ok && result.textEN) {
+            chatAIResult.textEN = result.textEN;
+            gsap.to(enEl, {
+                opacity: 0, duration: 0.2,
+                onComplete: () => {
+                    enEl.textContent = result.textEN;
+                    gsap.to(enEl, { opacity: 1, duration: 0.3 });
+                }
+            });
+        } else {
+            enEl.textContent = chatAIResult.textEN || '';
+        }
+    } catch (err) {
+        clearTimeout(timeoutId);
+        enEl.textContent = chatAIResult.textEN || '';
+    }
+
+    setParamsDisabled(false);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 載入問題與資訊資料
     await loadQuestions();
@@ -1115,11 +1176,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Slider 變動觸發重新生成（tone、english style、length）
-    ['param-tone', 'param-english', 'param-length'].forEach(id => {
+    // Tone、Length slider 變動 → 中英文都重新生成
+    ['param-tone', 'param-length'].forEach(id => {
         const slider = document.getElementById(id);
         if (slider) slider.addEventListener('change', onParamChange);
     });
+
+    // English style slider 變動 → 只重新翻譯英文
+    const enStyleSlider = document.getElementById('param-english');
+    if (enStyleSlider) {
+        enStyleSlider.addEventListener('change', () => {
+            clearTimeout(paramDebounceTimer);
+            paramDebounceTimer = setTimeout(() => {
+                if (chatAIResult && lastChatMessage) retranslateEnglish();
+            }, 800);
+        });
+    }
 
     // 聊天輸入框邏輯
     const chatInput = document.getElementById('chat-input');

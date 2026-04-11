@@ -535,8 +535,12 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 /* 參數面板禁用狀態 */
 .params-disabled {
     opacity: 0.4;
-    pointer-events: none;
-    cursor: not-allowed;
+    cursor: not-allowed !important;
+}
+
+.params-disabled * {
+    pointer-events: none !important;
+    cursor: not-allowed !important;
 }
 
 /* Chat input placeholder */
