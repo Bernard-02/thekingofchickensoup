@@ -961,6 +961,8 @@ async function regenerateWithParams() {
     // 打字機動畫顯示「調味中...」
     const zhSeason = '雞湯正在調味中...';
 
+    const enSeason = 'Seasoning your chicken soup...';
+
     gsap.to(textEl, {
         opacity: 0, duration: 0.3, ease: 'power2.out',
         onComplete: () => {
@@ -970,8 +972,10 @@ async function regenerateWithParams() {
             seasoningTimeline = gsap.timeline({ repeat: -1 });
             seasoningTimeline
                 .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' })
+                .to(enEl.style.display !== 'none' ? enEl : {}, { duration: enSeason.length * 0.04, text: enSeason, ease: 'none' }, `>0.3`)
                 .to({}, { duration: 0.5 })
                 .to(textEl, { duration: 0.2, text: '', ease: 'none' })
+                .to(enEl.style.display !== 'none' ? enEl : {}, { duration: 0.2, text: '', ease: 'none' }, '<')
                 .to({}, { duration: 0.3 });
         }
     });
