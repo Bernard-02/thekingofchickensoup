@@ -100,11 +100,25 @@ module.exports = async function handler(req, res) {
             return res.status(502).json({ error: 'Empty response from Gemini' });
         }
 
-        // 嘗試解析 JSON（Gemini 有時會加 markdown code block）
-        const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        const result = JSON.parse(cleaned);
+        // 嘗試解析 JSON（Gemini 有時會加 markdown code block 或思考過程）
+        let cleaned = text;
+        // 移除思考標籤
+        cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/g, '');
+        // 移除 code block
+        cleaned = cleaned.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        // 嘗試提取 JSON 物件
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            return res.status(502).json({ error: 'Cannot parse Gemini response', detail: text });
+        }
 
-        return res.status(200).json(result);
+        try {
+            const result = JSON.parse(jsonMatch[0]);
+            return res.status(200).json(result);
+        } catch (parseErr) {
+            // JSON 解析失敗，回傳原文讓前端處理
+            return res.status(502).json({ error: 'JSON parse failed', detail: text });
+        }
     } catch (err) {
         console.error('Server error:', err);
         return res.status(500).json({ error: 'Internal server error', detail: err.message });
