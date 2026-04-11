@@ -748,9 +748,6 @@ async function loadInfoData() {
         const aboutEnHtml = data.about.en.map(text => `<p>${text}</p>`).join('');
         document.getElementById('about-en').innerHTML = aboutEnHtml;
 
-        const researchHtml = data.research.content.map(text => `<p>${text}</p>`).join('');
-        document.getElementById('research-content').innerHTML = researchHtml;
-        
     } catch (error) {
         console.error('載入資訊資料失敗:', error);
     }

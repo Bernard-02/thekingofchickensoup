@@ -69,27 +69,35 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [
-                        { role: 'user', parts: [{ text: userContext }] }
-                    ],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: {
-                        temperature: 0.9,
-                        maxOutputTokens: 512,
-                    }
-                })
+        const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'];
+        const requestBody = JSON.stringify({
+            contents: [
+                { role: 'user', parts: [{ text: userContext }] }
+            ],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            generationConfig: {
+                temperature: 0.9,
+                maxOutputTokens: 512,
             }
-        );
+        });
+
+        let response;
+        for (const model of models) {
+            response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: requestBody,
+                }
+            );
+            if (response.ok) break;
+            console.log(`Model ${model} failed, trying next...`);
+        }
 
         if (!response.ok) {
             const err = await response.text();
-            console.error('Gemini API error:', err);
+            console.error('All Gemini models failed:', err);
             return res.status(502).json({ error: 'Gemini API error', detail: err });
         }
 
