@@ -237,6 +237,20 @@ window.scrollToResearchPart = function(event, partId) {
 // 導航
 function goToGuide() {
     showView('guide-view');
+
+    // 步驟 1、2、3 依序 fade in，CTA 最後往上 fade in
+    const steps = document.querySelectorAll('#guide-view .step-card');
+    const cta = document.querySelector('#guide-view .primary-btn');
+
+    gsap.set([...steps, cta], { opacity: 0 });
+    gsap.set(cta, { y: 20, pointerEvents: 'none' });
+
+    steps.forEach((step, i) => {
+        gsap.to(step, { opacity: 1, duration: 1, ease: 'power2.out', delay: 0.3 + i * 0.4 });
+    });
+
+    const ctaDelay = 0.3 + steps.length * 0.4 + 0.3;
+    gsap.to(cta, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.6, ease: 'power2.out', delay: ctaDelay });
 }
 
 function goToQuestions() {
@@ -266,8 +280,18 @@ function renderQuestion(index) {
     const q = questions[index];
     if (!q) return;
 
-    // 問題文字
-    document.getElementById('question-text').textContent = q.text;
+    // 問題文字（打字機效果）
+    const questionEl = document.getElementById('question-text');
+    questionEl.textContent = '';
+    gsap.to(questionEl, { duration: q.text.length * 0.05, text: q.text, ease: 'none' });
+
+    // 英文題目
+    const questionEnEl = document.getElementById('question-text-en');
+    questionEnEl.textContent = '';
+    if (q.textEN) {
+        const enDelay = q.text.length * 0.05 + 0.3;
+        gsap.to(questionEnEl, { duration: q.textEN.length * 0.03, text: q.textEN, ease: 'none', delay: enDelay });
+    }
 
     // 進度
     document.getElementById('question-progress').textContent = `${index + 1} / ${questions.length}`;
@@ -282,6 +306,11 @@ function renderQuestion(index) {
     const confirmBtn = document.getElementById('confirm-question');
     confirmBtn.classList.remove('visible');
 
+    // 打字機結束後，選項依序從下往上 fade in
+    const cnDuration = q.text.length * 0.05;
+    const enDuration = q.textEN ? (cnDuration + 0.3 + q.textEN.length * 0.03) : cnDuration;
+    const typewriterDuration = Math.max(cnDuration, enDuration);
+
     q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -295,12 +324,16 @@ function renderQuestion(index) {
         btn.appendChild(document.createTextNode(opt.text));
         optionsContainer.appendChild(btn);
 
-        // 綁定點擊事件 (移到迴圈內，這樣才能正確抓到 opt 物件)
+        // 初始隱藏且不可互動，打字機結束後依序進場
+        gsap.set(btn, { opacity: 0, y: 20, pointerEvents: 'none' });
+        gsap.to(btn, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out', delay: typewriterDuration + 0.5 + i * 0.1 });
+
+        // 綁定點擊事件
         btn.addEventListener('click', () => {
             optionsContainer.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             currentSelectedValue = opt.value;
-            currentSelectedOption = opt; // 這裡就不會再報錯了！
+            currentSelectedOption = opt;
             confirmBtn.classList.add('visible');
         });
     });
@@ -393,13 +426,27 @@ async function buildQuotesList(highlightNumber) {
     // 每個 list item scroll into view 才 fade in（一條條進場）
     initQuotesScrollAnim(Array.from(container.children));
 
-    // scroll 到抽中的那句
+    // scroll 到抽中的那句，並閃爍提示
     if (highlightNumber) {
         setTimeout(() => {
             const target = document.getElementById(`quote-item-${highlightNumber}`);
             const scrollParent = document.querySelector('#info-pane-quotes').parentElement;
             if (target && scrollParent) {
-                scrollParent.scrollTo({ top: target.offsetTop - 96, behavior: 'smooth' });
+                // 對齊到 quotes 按鈕那一行的高度
+                const navBtn = document.getElementById('tab-btn-quotes');
+                const navTop = navBtn ? navBtn.getBoundingClientRect().top - scrollParent.getBoundingClientRect().top : 96;
+                scrollParent.scrollTo({ top: target.offsetTop - navTop, behavior: 'smooth' });
+                // 確保 item 可見後閃一下
+                gsap.to(target, { opacity: 1, y: 0, duration: 0 });
+                setTimeout(() => {
+                    // 先設定黑底白字
+                    gsap.set(target, { backgroundColor: '#000', color: '#fff' });
+                    // 停留 1s 後 fade out
+                    gsap.to(target, {
+                        backgroundColor: 'transparent', color: '#000', duration: 0.6, ease: 'power2.out', delay: 1,
+                        onComplete: () => { target.style.removeProperty('background-color'); target.style.removeProperty('color'); }
+                    });
+                }, 600);
             }
         }, 300);
     }
@@ -709,6 +756,186 @@ async function loadInfoData() {
     }
 }
 
+// ============ AI 聊天路線 ============
+
+// Mock AI 回應（之後替換成真正的 Gemini API）
+const MOCK_AI_RESPONSES = [
+    { translation: '一隻貓坐在窗邊，看著外面的雨，牠沒有想出去。', textCN: '有些事情你放不下，不是因為重要，是因為你還沒找到下一個東西可以拿。', textEN: 'You hold on not because it matters, but because your hands aren\'t full yet.' },
+    { translation: '水龍頭關不緊，一直滴，但水費其實沒多少。', textCN: '你以為自己在崩潰，其實只是在漏氣。沒事的，補起來就好了。', textEN: 'You think you\'re falling apart. You\'re just leaking air. Patch it up.' },
+    { translation: '種了一棵樹，每天看，覺得它都沒長，但其實根已經很深了。', textCN: '你覺得自己沒有在進步，但你已經不是去年那個你了。', textEN: 'You feel stuck, but you\'re not who you were last year.' },
+];
+
+let chatAIResult = null; // 儲存 AI 生成的結果
+
+// API 端點（Vercel 部署後自動對應 /api/chat）
+const API_URL = '/api/chat';
+
+// 顯示結果頁面
+function showChatResult() {
+    document.getElementById('chat-translation-text').textContent = chatAIResult.translation;
+    document.getElementById('chat-result-hint').style.opacity = '0.5';
+    document.getElementById('chat-result-hint').textContent = '掃描裝置以解讀這句雞湯';
+    document.getElementById('chat-result-hint').style.display = '';
+    document.getElementById('chat-result-actions').style.display = 'none';
+    document.getElementById('chat-params-panel').style.display = 'none';
+    const mockBtn = document.getElementById('chat-mock-scan-btn');
+    if (mockBtn) mockBtn.style.display = '';
+    showView('chat-result-view');
+}
+
+// 開始 loading 動畫（持續循環直到 API 回應）
+let loadingTimeline = null;
+
+function startLoadingAnim() {
+    const zhEl = document.getElementById('chat-loading-zh');
+    const enEl = document.getElementById('chat-loading-en');
+    zhEl.textContent = '';
+    enEl.textContent = '';
+
+    const zhText = '雞湯生成中...';
+    const enText = 'Your chicken soup is brewing...';
+
+    loadingTimeline = gsap.timeline({ repeat: -1 });
+    loadingTimeline
+        .to(zhEl, { duration: zhText.length * 0.08, text: zhText, ease: 'none' })
+        .to(enEl, { duration: enText.length * 0.04, text: enText, ease: 'none' }, `>0.3`)
+        .to({}, { duration: 0.5 }) // 停留
+        .to(zhEl, { duration: 0.2, text: '', ease: 'none' })
+        .to(enEl, { duration: 0.2, text: '', ease: 'none' }, '<')
+        .to({}, { duration: 0.3 }); // 間隔再重複
+}
+
+function stopLoadingAnim() {
+    if (loadingTimeline) {
+        loadingTimeline.kill();
+        loadingTimeline = null;
+    }
+}
+
+// 送出自由輸入
+window.submitChat = async function() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // 進入 loading
+    showView('chat-loading-view');
+    startLoadingAnim();
+
+    // 收集參數
+    const tone = document.getElementById('param-tone')?.value || 50;
+    const enToggle = document.getElementById('param-en-toggle')?.checked || false;
+    const englishStyle = document.getElementById('param-english')?.value || 50;
+    const length = document.getElementById('param-length')?.value || 30;
+
+    // 收集問答 scores
+    const scores = {};
+    userAnswers.forEach(opt => {
+        if (opt && opt.scores) {
+            Object.entries(opt.scores).forEach(([k, v]) => {
+                scores[k] = (scores[k] || 0) + v;
+            });
+        }
+    });
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userMessage: text,
+                scores,
+                tone: Number(tone),
+                english: enToggle,
+                englishStyle: Number(englishStyle),
+                length: Number(length),
+            })
+        });
+
+        const result = await response.json();
+        stopLoadingAnim();
+
+        if (!response.ok || result.error) {
+            console.error('API error:', result.error);
+            // fallback to mock
+            chatAIResult = MOCK_AI_RESPONSES[Math.floor(Math.random() * MOCK_AI_RESPONSES.length)];
+            showChatResult();
+            return;
+        }
+
+        if (!result.valid) {
+            // AI 說輸入無意義，引導觀眾再說一點
+            stopLoadingAnim();
+            alert(result.retry_message || '可以再多說一點嗎？');
+            showView('chat-view');
+            return;
+        }
+
+        chatAIResult = result;
+        showChatResult();
+
+    } catch (err) {
+        console.error('Fetch error:', err);
+        stopLoadingAnim();
+        // fallback to mock
+        chatAIResult = MOCK_AI_RESPONSES[Math.floor(Math.random() * MOCK_AI_RESPONSES.length)];
+        showChatResult();
+    }
+};
+
+// NFC 解碼 AI 生成的原句
+window.revealChatQuote = function() {
+    if (!chatAIResult) return;
+
+    // 隱藏模擬掃描按鈕
+    const mockBtn = document.getElementById('chat-mock-scan-btn');
+    if (mockBtn) mockBtn.style.display = 'none';
+
+    const translationEl = document.getElementById('chat-translation-text');
+    const hint = document.getElementById('chat-result-hint');
+    const actions = document.getElementById('chat-result-actions');
+
+    // 轉譯 fade out → 換成原句 fade in
+    gsap.to(translationEl, {
+        opacity: 0, duration: 0.4, ease: 'power2.out',
+        onComplete: () => {
+            translationEl.textContent = chatAIResult.textCN;
+            gsap.to(translationEl, { opacity: 1, duration: 0.6, ease: 'power2.out' });
+        }
+    });
+
+    // hint fade out → 換字 → fade in
+    gsap.to(hint, {
+        opacity: 0, duration: 0.4, ease: 'power2.out',
+        onComplete: () => {
+            hint.textContent = '';
+            hint.style.display = 'none';
+        }
+    });
+
+    // 顯示左下角按鈕 + 右下角參數
+    const paramsPanel = document.getElementById('chat-params-panel');
+    gsap.fromTo(actions,
+        { display: 'flex', opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 1.5, ease: 'power2.out' }
+    );
+    gsap.fromTo(paramsPanel,
+        { display: 'flex', opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 1.8, ease: 'power2.out' }
+    );
+};
+
+// 再回答一次
+window.retryChatInput = function() {
+    const input = document.getElementById('chat-input');
+    input.value = '';
+    input.style.height = 'auto';
+    input.style.overflow = 'hidden';
+    chatAIResult = null;
+    showView('chat-view');
+};
+
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 載入問題與資訊資料
     await loadQuestions();
@@ -716,6 +943,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 確定按鈕
     document.getElementById('confirm-question').addEventListener('click', confirmQuestion);
+
+    // English toggle → 顯示/隱藏 Manglish↔Formal slider
+    const enToggle = document.getElementById('param-en-toggle');
+    if (enToggle) {
+        enToggle.addEventListener('change', () => {
+            document.getElementById('param-en-style-wrapper').style.display = enToggle.checked ? 'flex' : 'none';
+        });
+    }
+
+    // 聊天輸入框邏輯
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        const lineHeight = parseFloat(getComputedStyle(chatInput).lineHeight) || 28;
+        const maxLines = 4;
+        const maxScrollHeight = lineHeight * maxLines + 16; // pt padding
+
+        chatInput.addEventListener('input', () => {
+            // 過濾：只允許中文、英文、基本標點、空格（連續空格壓成一個）
+            let val = chatInput.value;
+            val = val.replace(/[^\u4e00-\u9fff\u3000-\u303fa-zA-Z0-9\s，。？！、；：「」''""—…·,.?!;:'"()\-\n]/g, '');
+            val = val.replace(/ {2,}/g, ' ');
+            if (val !== chatInput.value) chatInput.value = val;
+
+            // 自動調整高度：先重置再量
+            chatInput.style.height = 'auto';
+            chatInput.style.overflow = 'hidden';
+            const scrollH = chatInput.scrollHeight;
+            if (scrollH > maxScrollHeight) {
+                chatInput.style.height = maxScrollHeight + 'px';
+                chatInput.style.overflow = 'auto';
+            } else {
+                chatInput.style.height = scrollH + 'px';
+            }
+
+        });
+
+        // Enter 送出，Shift+Enter 換行
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (chatInput.value.trim().length > 0) submitChat();
+            }
+        });
+    }
 
     // 初始化 WebSocket
     console.log('檢查 nfcManager:', window.nfcManager);
@@ -728,14 +999,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('錯誤：nfcManager 未定義！');
     }
 
-    // ==========================================
-    // 🛠️ 快速測試專用：直接跳轉到解籤與資訊頁面
-    // (測試完畢後，記得把這段註解掉或刪除)
-    // ==========================================
-    try {
-        const res = await fetch('data/quotes-selected.json');
-        const mockQuotes = await res.json();
-        finalQuizResult = { quote: mockQuotes[0], userCombo: ['測試用'] }; // 隨便塞第一句雞湯當假資料
-        decodeQuote(); 
-    } catch (e) { console.error(e); }
+    // 🛠️ 測試用：直接跳到 chat-view
+    showView('chat-view');
 });

@@ -2,6 +2,7 @@
   {
     "id": "q1",
     "text": "嗨，其實也沒什麼大道理，只是看你剛好點進來，想問問你最近過得好嗎？",
+    "textEN": "Hey, no big reason — just saw you here and wanted to ask: how have you been lately?",
     "type": "single",
     "tag": "mood",
     "options": [
@@ -15,6 +16,7 @@
   {
     "id": "q2",
     "text": "原來如此。那如果順著這個感覺，要你更具體形容一下，現在腦子裡最常冒出來的念頭是什麼？",
+    "textEN": "I see. If you follow that feeling, what thought keeps popping up in your head the most?",
     "type": "single",
     "tag": "thought",
     "options": [
@@ -28,6 +30,7 @@
   {
     "id": "q3",
     "text": "當這些念頭讓你覺得累了或煩了的時候，你通常會怎麼讓自己好過一點？",
+    "textEN": "When those thoughts wear you out, what do you usually do to feel a little better?",
     "type": "single",
     "tag": "coping",
     "options": [
@@ -41,6 +44,7 @@
   {
     "id": "q4",
     "text": "在這些尋找出口的過程裡，你覺得你跟自己的關係怎麼樣？有好好關注自己內心的狀態嗎？",
+    "textEN": "In the process of finding your way, how's your relationship with yourself? Have you been checking in with how you actually feel?",
     "type": "single",
     "tag": "self",
     "options": [
@@ -54,6 +58,7 @@
   {
     "id": "q5",
     "text": "有時候我們失去自己的節奏，是因為外界的聲音太吵。別人怎麼看你，對現在的你來說有多重要？",
+    "textEN": "Sometimes we lose our rhythm because the noise around us is too loud. How much does other people's opinion of you matter right now?",
     "type": "single",
     "tag": "social",
     "options": [
@@ -68,6 +73,7 @@
   {
     "id": "q6",
     "text": "那如果不看別人，只看自己的前方呢？講到「未來」或「以後」，你現在的直覺反應是哪種感覺？",
+    "textEN": "What if you stop looking at others and just look ahead? When you hear \"the future,\" what's your gut feeling?",
     "type": "single",
     "tag": "future",
     "options": [
@@ -81,6 +87,7 @@
   {
     "id": "q7",
     "text": "面對生活和未來，有些人會不自覺給自己很大的壓力。你對自己算嚴格嗎？還是那種表面沒事、私下卻一直在檢討自己的人？",
+    "textEN": "Some people unknowingly put a lot of pressure on themselves. Are you strict with yourself? Or are you the type who seems fine on the surface but keeps reviewing every mistake in private?",
     "type": "single",
     "tag": "strict",
     "options": [
@@ -95,6 +102,7 @@
   {
     "id": "q8",
     "text": "不知不覺聊到了最後。今天來這裡，你還有什麼想說的嗎？",
+    "textEN": "We've reached the end before I even noticed. Is there anything else you'd like to say?",
     "type": "single",
     "tag": "chat",
     "options": [

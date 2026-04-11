@@ -46,11 +46,11 @@
                     </div>
                     <div class="step-card">
                         <div class="step-number">②</div>
-                        <p class="step-text">將裝置放在紅色的 NFC 讀取平台以抽取雞湯</p>
+                        <p class="step-text">將對應編號的玻璃瓶子放在紅色的 NFC 裝置以解碼雞湯</p>
                     </div>
                     <div class="step-card">
                         <div class="step-number">③</div>
-                        <p class="step-text">用對應編號的裝置查看脈絡</p>
+                        <p class="step-text">翻閱書本以查看雞湯的脈絡，或更多內容</p>
                     </div>
                 </div>
                 <button class="primary-btn" onclick="goToQuestions()">ok，我已了解</button>
@@ -63,19 +63,113 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center w-full">
                 <p id="question-progress" class="en font-normal mb-6">1 / 8</p>
-                <h2 id="question-text" class="font-medium mb-12"></h2>
+                <h2 id="question-text" class="font-medium mb-4"></h2>
+                <h4 id="question-text-en" class="en font-normal mb-12"></h4>
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
             </div>
         </div>
     </div>
 
-    <!-- 聊天（佔位） -->
+    <!-- 聊天：自由輸入 -->
     <div id="chat-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-2xl mx-auto w-full text-center">
+                <h2 class="font-medium mb-4">最近有什麼事讓你一直在想？</h2>
+                <h4 class="en font-normal mb-12">What's been on your mind lately?</h4>
+                <div class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
+                    <textarea id="chat-input"
+                        class="w-full text-lg leading-relaxed resize-none"
+                        style="background: transparent; border: none; outline: none; overflow: hidden; padding: 0;"
+                        rows="1"
+                        maxlength="400"
+                        placeholder="說些什麼吧"></textarea>
+                    <div class="flex justify-end">
+                        <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center" style="width: 32px; height: 32px; background: #000; border: none; cursor: pointer;">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14V2M8 2L2 8M8 2L14 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 聊天：AI 生成中 -->
+    <div id="chat-loading-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center">
-                <h2 class="font-medium mb-6">聊聊吧</h2>
-                <p class="text-lg">（聊天功能開發中）</p>
+                <h2 id="chat-loading-zh" class="font-medium mb-4"></h2>
+                <h4 id="chat-loading-en" class="en font-normal"></h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- 聊天：AI 轉譯結果 -->
+    <div id="chat-result-view" class="view-container">
+        <div class="relative min-h-screen flex flex-col items-center justify-center p-8">
+            <!-- 左上角：導航 -->
+            <div id="chat-result-actions" class="absolute top-8 left-8 flex flex-col items-start gap-2" style="display: none;">
+                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="restart()">← Start Over</button>
+                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="retryChatInput()">← Try Again</button>
+            </div>
+
+            <!-- 中央：雞湯文字 -->
+            <div class="max-w-2xl mx-auto text-center w-full">
+                <h2 id="chat-translation-text" class="font-medium text-black mb-8"></h2>
+                <p id="chat-result-hint" class="mb-4 opacity-50" style="font-size: 1rem;">掃描裝置以解讀這句雞湯</p>
+                <button id="chat-mock-scan-btn" onclick="revealChatQuote()" class="px-4 py-2 border border-black text-sm hover:bg-black hover:text-white transition-colors" style="font-size:0.875rem;">模擬掃描</button>
+            </div>
+
+            <!-- 右下角：參數調整 -->
+            <div id="chat-params-panel" class="absolute bottom-8 right-8 border border-black p-5 flex flex-col gap-5" style="display: none; width: 300px;">
+                <!-- 語氣 -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between">
+                        <span class="text-xs">更說教</span>
+                        <span class="text-xs">更雞湯</span>
+                    </div>
+                    <input id="param-tone" type="range" min="0" max="100" value="50" class="param-slider">
+                </div>
+                <!-- 英文開關 -->
+                <div class="flex flex-col gap-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input id="param-en-toggle" type="checkbox" class="custom-checkbox">
+                        <span class="en text-xs">English</span>
+                    </label>
+                    <!-- Manglish ↔ Formal slider（預設隱藏） -->
+                    <div id="param-en-style-wrapper" class="flex flex-col gap-3" style="display: none;">
+                        <div class="flex justify-between">
+                            <span class="en text-xs">Manglish</span>
+                            <span class="en text-xs">Formal</span>
+                        </div>
+                        <input id="param-english" type="range" min="0" max="100" value="50" class="param-slider">
+                    </div>
+                </div>
+                <!-- 長度 -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between">
+                        <span class="text-xs">更短</span>
+                        <span class="text-xs">更長</span>
+                    </div>
+                    <input id="param-length" type="range" min="0" max="100" value="30" class="param-slider">
+                </div>
+                <!-- 字體選擇 -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex gap-4">
+                        <div class="flex-1 flex flex-col gap-1">
+                            <span class="text-xs">中文字體</span>
+                            <select id="param-font-zh" class="custom-select">
+                                <option value="noto-sans-tc">Noto Sans TC</option>
+                            </select>
+                        </div>
+                        <div class="flex-1 flex flex-col gap-1">
+                            <span class="en text-xs">English Font</span>
+                            <select id="param-font-en" class="en custom-select">
+                                <option value="helvetica">Helvetica</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -95,9 +189,9 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center w-full">
                 <p class="font-normal text-black mb-6 text-lg">以下是你的結果...</p>
-                <h2 id="translation-text" class="font-medium text-black mb-12"></h2>
+                <h2 id="translation-text" class="font-medium text-black mb-12" style="text-wrap: balance;"></h2>
                 <div class="flex flex-row items-center justify-center gap-4">
-                    <button class="primary-btn" style="background-color: transparent; color: #000; border: 1px solid #000;" onclick="restart()">再來一次</button>
+                    <button class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'" onclick="restart()">再來一次</button>
                     <button class="primary-btn" style="background-color: #000; color: #fff; border: 1px solid #000;" onclick="decodeQuote()">查看更多 / 解籤</button>
                 </div>
             </div>
@@ -110,9 +204,7 @@
             <!-- 左半邊：導航區塊 -->
             <div class="w-1/2 h-full relative flex flex-col justify-start p-8">
                 <!-- 返回按鈕 -->
-                <button onclick="restart()" class="en absolute top-8 left-8 flex items-center text-black opacity-40 hover:opacity-100 text-base font-normal">
-                    <span>← Back</span>
-                </button>
+                <button onclick="showView('home-view')" class="en hover-underline absolute top-8 left-8 text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;">← Back</button>
 
                 <!-- 選單按鈕 -->
                 <div class="flex flex-col gap-2 mt-16" id="info-nav">
