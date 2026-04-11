@@ -755,13 +755,6 @@ async function loadInfoData() {
 
 // ============ AI 聊天路線 ============
 
-// Mock AI 回應（之後替換成真正的 Gemini API）
-const MOCK_AI_RESPONSES = [
-    { translation: '一隻貓坐在窗邊，看著外面的雨，牠沒有想出去。', textCN: '有些事情你放不下，不是因為重要，是因為你還沒找到下一個東西可以拿。', textEN: 'You hold on not because it matters, but because your hands aren\'t full yet.' },
-    { translation: '水龍頭關不緊，一直滴，但水費其實沒多少。', textCN: '你以為自己在崩潰，其實只是在漏氣。沒事的，補起來就好了。', textEN: 'You think you\'re falling apart. You\'re just leaking air. Patch it up.' },
-    { translation: '種了一棵樹，每天看，覺得它都沒長，但其實根已經很深了。', textCN: '你覺得自己沒有在進步，但你已經不是去年那個你了。', textEN: 'You feel stuck, but you\'re not who you were last year.' },
-];
-
 let chatAIResult = null; // 儲存 AI 生成的結果
 let lastChatMessage = ''; // 儲存最後一次輸入的文字
 
@@ -835,10 +828,15 @@ window.submitChat = async function() {
         }
     });
 
+    // 30 秒超時
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
                 userMessage: text,
                 scores,
@@ -848,20 +846,18 @@ window.submitChat = async function() {
                 length: Number(length),
             })
         });
+        clearTimeout(timeoutId);
 
         const result = await response.json();
         stopLoadingAnim();
 
         if (!response.ok || result.error) {
             console.error('API error:', result.error);
-            // fallback to mock
-            chatAIResult = MOCK_AI_RESPONSES[Math.floor(Math.random() * MOCK_AI_RESPONSES.length)];
-            showChatResult();
+            showRetryPrompt();
             return;
         }
 
         if (!result.valid) {
-            // AI 說輸入無意義，引導觀眾再說一點
             stopLoadingAnim();
             alert(result.retry_message || '可以再多說一點嗎？');
             showView('chat-view');
@@ -872,12 +868,28 @@ window.submitChat = async function() {
         showChatResult();
 
     } catch (err) {
+        clearTimeout(timeoutId);
         console.error('Fetch error:', err);
         stopLoadingAnim();
-        // fallback to mock
-        chatAIResult = MOCK_AI_RESPONSES[Math.floor(Math.random() * MOCK_AI_RESPONSES.length)];
-        showChatResult();
+        showRetryPrompt();
     }
+};
+
+// 顯示重試提示（在 loading 頁面）
+function showRetryPrompt() {
+    stopLoadingAnim();
+    const zhEl = document.getElementById('chat-loading-zh');
+    const enEl = document.getElementById('chat-loading-en');
+    zhEl.textContent = '雞湯熬太久了';
+    enEl.textContent = 'The soup took too long...';
+    document.getElementById('chat-retry-section').style.display = '';
+}
+
+// 重試上一次的輸入
+window.retryLastChat = function() {
+    document.getElementById('chat-retry-section').style.display = 'none';
+    document.getElementById('chat-input').value = lastChatMessage;
+    submitChat();
 };
 
 // NFC 解碼 AI 生成的原句
@@ -1003,10 +1015,14 @@ async function regenerateWithParams() {
         }
     });
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
             body: JSON.stringify({
                 userMessage: lastChatMessage,
                 scores,
@@ -1016,6 +1032,7 @@ async function regenerateWithParams() {
                 length: Number(length),
             })
         });
+        clearTimeout(timeoutId);
 
         const result = await response.json();
 
@@ -1051,8 +1068,10 @@ async function regenerateWithParams() {
         setParamsDisabled(false);
 
     } catch (err) {
+        clearTimeout(timeoutId);
         console.error('Regenerate error:', err);
         if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
+        // 調味失敗，恢復原本文字
         textEl.textContent = chatAIResult.textCN;
         if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
         setParamsDisabled(false);
