@@ -90,7 +90,7 @@ module.exports = async function handler(req, res) {
         if (!response.ok) {
             const err = await response.text();
             console.error('Gemini API error:', err);
-            return res.status(502).json({ error: 'Gemini API error' });
+            return res.status(502).json({ error: 'Gemini API error', detail: err });
         }
 
         const data = await response.json();
@@ -107,6 +107,6 @@ module.exports = async function handler(req, res) {
         return res.status(200).json(result);
     } catch (err) {
         console.error('Server error:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error', detail: err.message });
     }
 }
