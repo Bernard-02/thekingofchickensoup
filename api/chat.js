@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
     const toneDesc = tone > 70 ? '更溫暖、更雞湯、更鼓勵' : tone < 30 ? '更直接、更說教、更一針見血' : '平衡的，直接但不失溫度';
     const lengthDesc = length > 70 ? '可以寫長一點，一小段話（2-3句）' : length < 30 ? '精簡到一句話就好' : '1-2句話';
 
-    const styleDesc = englishStyle > 70 ? 'formal, proper English' : englishStyle < 30 ? 'casual Manglish (Malaysian English with local flavour)' : 'natural conversational English';
+    const styleDesc = englishStyle > 70 ? 'formal, proper English' : englishStyle < 30 ? 'Manglish (Malaysian English) — use lah, mah, lor, walao, aiyo, can or not, etc. Mix in some Malay/Chinese words naturally. Keep the grammar casual and Malaysian.' : 'natural conversational English';
     const englishInstruction = `\n\n同時提供英文翻譯，風格是 ${styleDesc}。`;
 
     const systemPrompt = `你是 Bernard Liew，一個寫雞湯語錄的作者。你的風格是：直接、不繞彎、帶點幽默，不說教、不哄人，像一個稍微走在對方前面的朋友說的話。你的語錄讓人感到「被說中」而不是「被建議」。

@@ -935,12 +935,17 @@ window.retryChatInput = function() {
 // 參數調整後重新生成（留在同一頁面）
 let paramDebounceTimer = null;
 
+let seasoningTimeline = null;
+
 function setParamsDisabled(disabled) {
     const panel = document.getElementById('chat-params-panel');
+    const actions = document.getElementById('chat-result-actions');
     if (disabled) {
         panel.classList.add('params-disabled');
+        actions.classList.add('params-disabled');
     } else {
         panel.classList.remove('params-disabled');
+        actions.classList.remove('params-disabled');
     }
 }
 
@@ -950,23 +955,32 @@ async function regenerateWithParams() {
     const textEl = document.getElementById('chat-translation-text');
     const enEl = document.getElementById('chat-en-text');
 
-    // 禁用參數面板
+    // 禁用參數面板 + 左上按鈕
     setParamsDisabled(true);
 
-    // 文字切換成「調味中...」
+    // 打字機動畫顯示「調味中...」
+    const zhSeason = '雞湯正在調味中...';
+
     gsap.to(textEl, {
         opacity: 0, duration: 0.3, ease: 'power2.out',
         onComplete: () => {
-            textEl.textContent = '雞湯正在調味中...';
-            gsap.to(textEl, { opacity: 1, duration: 0.3 });
+            textEl.textContent = '';
+            gsap.to(textEl, { opacity: 1, duration: 0.1 });
+            if (seasoningTimeline) seasoningTimeline.kill();
+            seasoningTimeline = gsap.timeline({ repeat: -1 });
+            seasoningTimeline
+                .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' })
+                .to({}, { duration: 0.5 })
+                .to(textEl, { duration: 0.2, text: '', ease: 'none' })
+                .to({}, { duration: 0.3 });
         }
     });
     if (enEl.style.display !== 'none') {
         gsap.to(enEl, {
             opacity: 0, duration: 0.3, ease: 'power2.out',
             onComplete: () => {
-                enEl.textContent = 'Seasoning your chicken soup...';
-                gsap.to(enEl, { opacity: 1, duration: 0.3 });
+                enEl.textContent = '';
+                gsap.to(enEl, { opacity: 1, duration: 0.1 });
             }
         });
     }
@@ -1002,7 +1016,7 @@ async function regenerateWithParams() {
         const result = await response.json();
 
         if (!response.ok || result.error || !result.valid) {
-            // 失敗就恢復原本文字
+            if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
             textEl.textContent = chatAIResult.textCN;
             if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
             setParamsDisabled(false);
@@ -1010,6 +1024,7 @@ async function regenerateWithParams() {
         }
 
         chatAIResult = result;
+        if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
 
         // fade in 新文字
         gsap.to(textEl, {
@@ -1033,6 +1048,7 @@ async function regenerateWithParams() {
 
     } catch (err) {
         console.error('Regenerate error:', err);
+        if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
         textEl.textContent = chatAIResult.textCN;
         if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
         setParamsDisabled(false);
