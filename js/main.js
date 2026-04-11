@@ -290,7 +290,7 @@ function renderQuestion(index) {
     questionEnEl.textContent = '';
     if (q.textEN) {
         const enDelay = q.text.length * 0.05 + 0.3;
-        gsap.to(questionEnEl, { duration: q.textEN.length * 0.03, text: q.textEN, ease: 'none', delay: enDelay });
+        gsap.to(questionEnEl, { duration: q.textEN.length * 0.015, text: q.textEN, ease: 'none', delay: enDelay });
     }
 
     // 進度
@@ -308,7 +308,7 @@ function renderQuestion(index) {
 
     // 打字機結束後，選項依序從下往上 fade in
     const cnDuration = q.text.length * 0.05;
-    const enDuration = q.textEN ? (cnDuration + 0.3 + q.textEN.length * 0.03) : cnDuration;
+    const enDuration = q.textEN ? (cnDuration + 0.3 + q.textEN.length * 0.015) : cnDuration;
     const typewriterDuration = Math.max(cnDuration, enDuration);
 
     q.options.forEach((opt, i) => {
@@ -767,8 +767,9 @@ const MOCK_AI_RESPONSES = [
 
 let chatAIResult = null; // 儲存 AI 生成的結果
 
-// API 端點（Vercel 部署後自動對應 /api/chat）
-const API_URL = '/api/chat';
+// API 端點：Vercel 上用相對路徑，本地用完整網址
+const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+const API_URL = IS_LOCAL ? 'https://chicken-soup-quote.vercel.app/api/chat' : '/api/chat';
 
 // 顯示結果頁面
 function showChatResult() {
@@ -999,6 +1000,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('錯誤：nfcManager 未定義！');
     }
 
-    // 🛠️ 測試用：直接跳到 chat-view
-    showView('chat-view');
 });
