@@ -41,22 +41,37 @@ module.exports = async function handler(req, res) {
     const enStyleSnap = snap(englishStyle);
     const toneIdx = toneSnap / 25; // 0..4
 
+    // Manglish / English 風格 SOP：等級越小 → 越 Manglish
+    // 每個等級都給具體規則，讓 Gemini 有明確的操作依據
+    const MANGLISH_SOP = `Manglish (馬式英文) 轉換規則參考：
+- 句末語氣詞：can → can lah / can or not、yes → yes lah、ok → ok lor、sure → sure one、good → good mah
+- 驚嘆：Oh my god → walao、Oh no → aiyo、wow → wah、really → really ah / really meh
+- 強調：very tired → damn tired / tired die、a lot → got a lot
+- 疑問：Don't you think? → izzit?、Do you know? → you know or not?
+- 代名詞省略：I am tired → tired lah / so tired lah
+- 直接的 Chinglish 結構：because + 逗號、mix 一點 Malay/粵語詞（kaya, kopi, makan, sudah, aiya）
+- 允許破碎/省略語法（像口語），不要太工整`;
+
     const styleDescByLevel = {
-        0: 'full Manglish (Malaysian English) — heavy use of lah, mah, lor, walao, aiyo, can or not. Mix Malay/Chinese words. Casual grammar.',
-        25: 'casual Manglish-flavored English — sprinkle some lah/lor but stay mostly understandable',
-        50: 'natural conversational English',
-        75: 'polished, lightly formal English',
-        100: 'fully formal, proper English'
+        0: `FULL MANGLISH — 大量使用 Manglish。必須至少符合 3 項以上規則：句末加 lah/lor/mah/meh、用 aiyo/walao/wah、可加 Malay 詞、用破碎口語語法。不要寫成標準英文。\n${MANGLISH_SOP}`,
+        25: `Manglish-flavored — 用 1-2 個 Manglish 特徵（例如：句末加一次 lah / 用一次 walao），整體仍可懂，但一眼看出是馬來西亞人在講話。\n${MANGLISH_SOP}`,
+        50: `Natural conversational English — 不 Manglish，也不正式。像朋友間平常聊天的英文。可以用縮寫 (you're, don't, it's)。`,
+        75: `Polished conversational English — 輕微偏正式。減少縮寫，句子結構完整，但不會太書面。`,
+        100: `FULLY FORMAL English — 完全正式書面英文。不用縮寫，句子完整，像寫文章或演講稿那樣。避免 slang、語氣詞。`
     };
     const styleDesc = styleDescByLevel[enStyleSnap];
 
     // 模式一：只重新翻譯英文
     if (retranslateOnly && existingCN) {
-        const translatePrompt = `將以下中文語錄翻譯成英文。翻譯風格：${styleDesc}。
+        const translatePrompt = `將以下中文語錄翻譯成英文。
 
 中文原句：${existingCN}
 
-注意：
+⚠ 英文風格硬性要求：${styleDesc}
+
+寫完後**請自己檢查**是否符合上述風格等級，不符合就重寫。
+
+其他注意：
 - 不要改變原意
 - 中文的語氣和口吻不會影響英文翻譯的風格
 - 只回傳英文翻譯，不要加任何其他文字或格式`;
@@ -74,12 +89,13 @@ module.exports = async function handler(req, res) {
     const shuffled = [...quotes].sort(() => Math.random() - 0.5);
     const examples = shuffled.slice(0, 30).map(q => `- ${q.textCN}`).join('\n');
 
+    // 長度規則：字數硬性限制，避免 Gemini 忽略長度指令
     const lengthDescByLevel = {
-        0: '一句最短，10 字內',
-        25: '一句話，20 字內',
-        50: '1-2 句話',
-        75: '2-3 句話',
-        100: '一小段，3-4 句'
+        0: '**極短**：一句話，總共 8-15 個中文字（含標點）。必須是一行就講完。',
+        25: '**短**：一句話，總共 16-25 個中文字（含標點）。',
+        50: '**中**：1-2 句話，總共 26-45 個中文字（含標點）。',
+        75: '**長**：2-3 句話，總共 46-70 個中文字（含標點）。',
+        100: '**很長**：3-4 句話，一小段，總共 71-100 個中文字（含標點）。'
     };
     const lengthDesc = lengthDescByLevel[lengthSnap];
 
@@ -88,22 +104,51 @@ module.exports = async function handler(req, res) {
 以下是你寫過的語錄，請仔細學習這個風格和語感，然後模仿：
 ${examples}
 
-現在有一個觀眾跟你分享了一些事情。請根據他說的內容，用你的風格寫**5 個版本**的雞湯語錄，對應 5 個語氣層次（由直接到溫暖）：
+現在有一個觀眾跟你分享了一些事情。請根據他說的內容，用你的風格寫**5 個版本**的雞湯語錄，對應 5 個語氣層次（由直接到溫暖）。
 
-1. 最直接、最一針見血（像甩你一巴掌的那種）
-2. 偏直接、不繞彎（但留一點喘息）
-3. 平衡的，直接但有溫度
-4. 偏溫暖、帶點鼓勵
-5. 最溫暖、最像在哄你打氣（仍保有你的風格，不能變成空話）
+⚠ 每個等級有明確的 SOP，請嚴格遵守：
 
-所有 5 句的長度：${lengthDesc}
+**Level 1｜最說教、最一針見血**（像甩一巴掌）
+- 結構：直接指出事實 / 反問挑戰（例："你在等什麼？"、"那不是累，是你不想面對。"）
+- 不加鋪墊（不要 "其實"、"你可以"、"或許" 這類開頭）
+- 不加溫柔包裝（不寫 "知道你累"、"你已經很努力了"）
+- 語氣是冷的、切的，但不是罵人。是「朋友直接戳破你」那種
+- 可以短、可以反問、可以用否定句
+
+**Level 2｜偏直接、不繞彎**
+- 像 Level 1 但留一點喘息：指出事實 + 一句觀察
+- 仍不哄人、不鋪墊
+- 允許用輕微的自嘲或幽默
+
+**Level 3｜平衡的，直接但有溫度**
+- 結構：一句觀察 + 一句提醒（例："你已經累了，別再跟自己講道理。"）
+- 承認事實但不冷酷
+- 可以有比喻，但要精準
+
+**Level 4｜偏溫暖、帶點鼓勵**
+- 可以用「知道你...」「你不是...」這類承認開頭
+- 給一個小方向或小希望，但不能空泛
+- 像朋友拍肩膀說話
+
+**Level 5｜最雞湯、最像在哄你打氣**
+- 完全溫暖、有希望感
+- 可以用比喻、意象去包裝（星辰、光、河流這類）
+- **但仍然不能用「加油」「相信自己」「一切都會好的」這種空話**
+- 要有具體的圖像或動作，不是空洞鼓勵
+
+⚠ 長度硬性要求（5 句都必須遵守）：${lengthDesc}
+寫完每一句後，**請自己數字數**，不在範圍內就重寫，直到符合為止。
 
 要求：
 - 5 句的意思核心一致（都在回應觀眾說的事），只差語氣
 - 不要用「加油」「相信自己」「一切都會好的」這種空泛的話
 - 要像說話一樣自然，不要太文藝
 
-另外，請把**第 ${toneIdx + 1} 個版本**翻譯成英文，風格：${styleDesc}
+另外，請把**第 ${toneIdx + 1} 個版本**翻譯成英文。
+
+⚠ 英文風格硬性要求：${styleDesc}
+
+寫完英文後，**請自己檢查**是否符合上述風格等級，不符合就重寫。
 
 ${Array.isArray(avoidCN) && avoidCN.length > 0 ? `⚠ 重要：你之前已經寫過這些版本，請**不要重複**（連相似的意思、相似的結構都避開，換新的角度或比喻）：
 ${avoidCN.filter(Boolean).map((s, i) => `${i + 1}. ${s}`).join('\n')}
