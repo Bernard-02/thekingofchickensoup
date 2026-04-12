@@ -164,15 +164,43 @@ ${avoidCN.filter(Boolean).map((s, i) => `${i + 1}. ${s}`).join('\n')}
   "retry_message": ""
 }`;
 
-    // 如果有問答 scores，加到 context 裡
+    // 12 個維度字典：狀態描述 + 寫作方向 + 避免事項
+    const DIMENSION_DICT = {
+        'confused':      { label: '迷失 / 沒方向感', write: '幫他看清現在站在哪',          avoid: '給具體建議' },
+        'tired':         { label: '耗盡 / 沒力氣',   write: '允許他停下來，不用更努力',    avoid: '叫他再撐' },
+        'hurt':          { label: '受傷 / 被辜負',   write: '承認那件事真的痛',            avoid: '正能量式「都是為你好」' },
+        'action':        { label: '卡住沒動 / 拖延', write: '直接戳破他在等什麼',          avoid: '溫柔安慰' },
+        'courage':       { label: '要跨出去但怕',    write: '承認怕，同時提醒邁出一步的重量', avoid: '空話加油' },
+        'let-go':        { label: '放不下 / 太用力抓', write: '讓他看到鬆手的輕盈',          avoid: '講「人生無常」大道理' },
+        'perspective':   { label: '鑽牛角尖 / 看不到全貌', write: '換一個視角或比喻',       avoid: '說教式講理' },
+        'patience':      { label: '急 / 等不及結果', write: '把節奏拉慢，講「現在」的價值', avoid: '叫他耐心' },
+        'relationships': { label: '人際困擾 / 跟人拉扯', write: '聚焦在他跟自己的關係',     avoid: '教他怎麼處理對方' },
+        'self-worth':    { label: '不夠好 / 自我懷疑', write: '不要證明他夠好，直接把前提打掉', avoid: '說「你很棒」' },
+        'overthinking':  { label: '想太多 / 在腦袋裡打架', write: '戳破「想」跟「做」的差距', avoid: '叫他別想' },
+        'setback':       { label: '挫折 / 走得比想像累', write: '承認路難走，別假裝沒事',    avoid: '勵志雞湯' }
+    };
+
+    // 如果有問答 scores，取前 3 高的維度，查字典並加到 context 裡
     let userContext = userMessage;
     if (scores && Object.keys(scores).length > 0) {
-        const topScores = Object.entries(scores)
+        const top = Object.entries(scores)
             .sort((a, b) => b[1] - a[1])
             .slice(0, 3)
-            .map(([k, v]) => `${k}: ${v}`)
-            .join(', ');
-        userContext = `[觀眾的問答結果顯示他目前的狀態偏向：${topScores}]\n\n觀眾說：${userMessage}`;
+            .filter(([k]) => DIMENSION_DICT[k]);
+
+        if (top.length > 0) {
+            const profile = top.map(([k, v], i) => {
+                const d = DIMENSION_DICT[k];
+                return `${i + 1}. ${d.label}（分數 ${v}）\n   寫作方向：${d.write}\n   避免：${d.avoid}`;
+            }).join('\n');
+
+            userContext = `[觀眾問答結果顯示他目前的狀態特徵（由強到弱）：
+${profile}
+
+請在寫 5 個版本時，把這些特徵當成理解觀眾的背景。不是要直接把關鍵字塞進句子，而是用這些切入角度去回應他接下來說的話。]
+
+觀眾說：${userMessage}`;
+        }
     }
 
     try {
