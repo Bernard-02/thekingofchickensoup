@@ -134,6 +134,14 @@
                     </div>
                     <input id="param-tone" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                 </div>
+                <!-- 長度 -->
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between">
+                        <span class="text-xs">更短</span>
+                        <span class="text-xs">更長</span>
+                    </div>
+                    <input id="param-length" type="range" min="0" max="100" step="25" value="50" class="param-slider">
+                </div>
                 <!-- 英文開關 -->
                 <div class="flex flex-col gap-3">
                     <label class="flex items-center gap-2 cursor-pointer">
@@ -149,27 +157,21 @@
                         <input id="param-english" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                     </div>
                 </div>
-                <!-- 長度 -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between">
-                        <span class="text-xs">更短</span>
-                        <span class="text-xs">更長</span>
-                    </div>
-                    <input id="param-length" type="range" min="0" max="100" step="25" value="50" class="param-slider">
-                </div>
-                <!-- 字體選擇 -->
+                <!-- 字體選擇（最下面）-->
                 <div class="flex flex-col gap-2">
                     <div class="flex gap-4">
                         <div class="flex-1 flex flex-col gap-1">
                             <span class="text-xs">中文字體</span>
                             <select id="param-font-zh" class="custom-select">
                                 <option value="noto-sans-tc">Noto Sans TC</option>
+                                <option value="noto-serif-tc">思源宋體 TW</option>
                             </select>
                         </div>
                         <div class="flex-1 flex flex-col gap-1">
                             <span class="en text-xs">English Font</span>
                             <select id="param-font-en" class="en custom-select">
                                 <option value="helvetica">Helvetica</option>
+                                <option value="times-new-roman">Times New Roman</option>
                             </select>
                         </div>
                     </div>

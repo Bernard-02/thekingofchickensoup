@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
 
-    const { userMessage, scores, tone, english, englishStyle, length, retranslateOnly, existingCN } = req.body;
+    const { userMessage, scores, tone, english, englishStyle, length, retranslateOnly, existingCN, avoidCN } = req.body;
     if (!userMessage || !userMessage.trim()) {
         return res.status(400).json({ error: 'Empty message' });
     }
@@ -105,7 +105,10 @@ ${examples}
 
 另外，請把**第 ${toneIdx + 1} 個版本**翻譯成英文，風格：${styleDesc}
 
-如果觀眾說的內容太短、沒有意義、或是亂打的文字，valid 設 false，只填 retry_message（用你的風格引導他再多說一點），tonesCN/textEN 可以空字串。
+${Array.isArray(avoidCN) && avoidCN.length > 0 ? `⚠ 重要：你之前已經寫過這些版本，請**不要重複**（連相似的意思、相似的結構都避開，換新的角度或比喻）：
+${avoidCN.filter(Boolean).map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+` : ''}如果觀眾說的內容太短、沒有意義、或是亂打的文字，valid 設 false，只填 retry_message（用你的風格引導他再多說一點），tonesCN/textEN 可以空字串。
 
 請用以下 JSON 格式回覆（不要加 markdown code block）：
 {

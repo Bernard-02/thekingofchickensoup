@@ -1,5 +1,13 @@
 /* 字體設定 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@300;400;500;700&display=swap');
+
+/* 中文字體切換 */
+.font-noto-sans-tc { font-family: 'Noto Sans TC', sans-serif !important; }
+.font-noto-serif-tc { font-family: 'Noto Serif TC', serif !important; }
+
+/* 英文字體切換（system fonts）*/
+.font-helvetica { font-family: 'Helvetica', 'Arial', sans-serif !important; }
+.font-times-new-roman { font-family: 'Times New Roman', Times, serif !important; }
 
 * {
     margin: 0;

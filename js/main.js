@@ -1048,6 +1048,7 @@ async function regenerateWithParams() {
                 english: enToggle,
                 englishStyle: Number(englishStyle),
                 length: Number(length),
+                avoidCN: (chatAIResult && Array.isArray(chatAIResult.tonesCN)) ? chatAIResult.tonesCN : [],
             })
         });
         clearTimeout(timeoutId);
@@ -1238,6 +1239,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Length slider → 中英文都重新生成（會拿到新的 5 版 tonesCN）
     const lengthSlider = document.getElementById('param-length');
     if (lengthSlider) lengthSlider.addEventListener('change', onParamChange);
+
+    // 中文字體切換
+    const fontZhSelect = document.getElementById('param-font-zh');
+    if (fontZhSelect) {
+        fontZhSelect.addEventListener('change', () => {
+            const textEl = document.getElementById('chat-translation-text');
+            if (!textEl) return;
+            textEl.classList.remove('font-noto-sans-tc', 'font-noto-serif-tc');
+            textEl.classList.add(`font-${fontZhSelect.value}`);
+        });
+    }
+
+    // 英文字體切換
+    const fontEnSelect = document.getElementById('param-font-en');
+    if (fontEnSelect) {
+        fontEnSelect.addEventListener('change', () => {
+            const enEl = document.getElementById('chat-en-text');
+            if (!enEl) return;
+            enEl.classList.remove('font-helvetica', 'font-times-new-roman');
+            enEl.classList.add(`font-${fontEnSelect.value}`);
+        });
+    }
 
     // English style slider 變動 → 只重新翻譯英文
     const enStyleSlider = document.getElementById('param-english');
