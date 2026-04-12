@@ -534,8 +534,9 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 
 /* 參數面板禁用狀態 */
 .params-disabled {
-    opacity: 0.4;
+    opacity: 0.4 !important;
     cursor: not-allowed !important;
+    transition: opacity 0.3s ease;
 }
 
 .params-disabled * {

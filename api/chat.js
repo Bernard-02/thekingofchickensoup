@@ -34,7 +34,21 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Empty message' });
     }
 
-    const styleDesc = englishStyle > 70 ? 'formal, proper English' : englishStyle < 30 ? 'Manglish (Malaysian English) — use lah, mah, lor, walao, aiyo, can or not, etc. Mix in some Malay/Chinese words naturally. Keep the grammar casual and Malaysian.' : 'natural conversational English';
+    // 將 0-100 的值對應到 5 個等級（0/25/50/75/100）
+    const snap = v => Math.round(Number(v ?? 50) / 25) * 25;
+    const toneSnap = snap(tone);
+    const lengthSnap = snap(length);
+    const enStyleSnap = snap(englishStyle);
+    const toneIdx = toneSnap / 25; // 0..4
+
+    const styleDescByLevel = {
+        0: 'full Manglish (Malaysian English) — heavy use of lah, mah, lor, walao, aiyo, can or not. Mix Malay/Chinese words. Casual grammar.',
+        25: 'casual Manglish-flavored English — sprinkle some lah/lor but stay mostly understandable',
+        50: 'natural conversational English',
+        75: 'polished, lightly formal English',
+        100: 'fully formal, proper English'
+    };
+    const styleDesc = styleDescByLevel[enStyleSnap];
 
     // 模式一：只重新翻譯英文
     if (retranslateOnly && existingCN) {
@@ -55,39 +69,51 @@ module.exports = async function handler(req, res) {
         }
     }
 
-    // 模式二：完整生成雞湯
+    // 模式二：完整生成雞湯（一次產出 5 個語氣版本）
     const quotes = loadQuotes();
-    // 隨機挑 30 句作為 few-shot（避免 prompt 太長）
     const shuffled = [...quotes].sort(() => Math.random() - 0.5);
     const examples = shuffled.slice(0, 30).map(q => `- ${q.textCN}`).join('\n');
 
-    const toneDesc = tone > 70 ? '更溫暖、更雞湯、更鼓勵' : tone < 30 ? '更直接、更說教、更一針見血' : '平衡的，直接但不失溫度';
-    const lengthDesc = length > 70 ? '可以寫長一點，一小段話（2-3句）' : length < 30 ? '精簡到一句話就好' : '1-2句話';
+    const lengthDescByLevel = {
+        0: '一句最短，10 字內',
+        25: '一句話，20 字內',
+        50: '1-2 句話',
+        75: '2-3 句話',
+        100: '一小段，3-4 句'
+    };
+    const lengthDesc = lengthDescByLevel[lengthSnap];
 
     const systemPrompt = `你是 Bernard Liew，一個寫雞湯語錄的作者。你的風格是：直接、不繞彎、帶點幽默，不說教、不哄人，像一個稍微走在對方前面的朋友說的話。你的語錄讓人感到「被說中」而不是「被建議」。
 
 以下是你寫過的語錄，請仔細學習這個風格和語感，然後模仿：
 ${examples}
 
-現在有一個觀眾跟你分享了一些事情。請根據他說的內容，用你的風格寫一句雞湯語錄給他。
+現在有一個觀眾跟你分享了一些事情。請根據他說的內容，用你的風格寫**5 個版本**的雞湯語錄，對應 5 個語氣層次（由直接到溫暖）：
+
+1. 最直接、最一針見血（像甩你一巴掌的那種）
+2. 偏直接、不繞彎（但留一點喘息）
+3. 平衡的，直接但有溫度
+4. 偏溫暖、帶點鼓勵
+5. 最溫暖、最像在哄你打氣（仍保有你的風格，不能變成空話）
+
+所有 5 句的長度：${lengthDesc}
 
 要求：
-- 語氣：${toneDesc}
-- 長度：${lengthDesc}
+- 5 句的意思核心一致（都在回應觀眾說的事），只差語氣
 - 不要用「加油」「相信自己」「一切都會好的」這種空泛的話
 - 要像說話一樣自然，不要太文藝
-- 中文語錄是核心，必須完全用你（Bernard）的風格寫
-- 英文翻譯是獨立的，風格是 ${styleDesc}，不會影響中文的口吻
 
-如果觀眾說的內容太短、沒有意義、或是亂打的文字，請回覆一句引導他再多說一點的話（用你的風格），不要硬生成雞湯。
+另外，請把**第 ${toneIdx + 1} 個版本**翻譯成英文，風格：${styleDesc}
+
+如果觀眾說的內容太短、沒有意義、或是亂打的文字，valid 設 false，只填 retry_message（用你的風格引導他再多說一點），tonesCN/textEN 可以空字串。
 
 請用以下 JSON 格式回覆（不要加 markdown code block）：
 {
   "valid": true/false,
-  "translation": "轉譯版本（像籤文一樣，用客觀場景描述，不直接說道理）",
-  "textCN": "中文語錄原句",
-  "textEN": "英文翻譯",
-  "retry_message": "如果 valid 是 false，這裡放引導觀眾再多說一點的話"
+  "translation": "籤文式的轉譯（客觀描述一個場景或意象，不直接說道理）",
+  "tonesCN": ["第1級最直接", "第2級", "第3級平衡", "第4級", "第5級最溫暖"],
+  "textEN": "第 ${toneIdx + 1} 個版本的英文翻譯",
+  "retry_message": ""
 }`;
 
     // 如果有問答 scores，加到 context 裡
@@ -115,6 +141,14 @@ ${examples}
 
         try {
             const result = JSON.parse(jsonMatch[0]);
+            // 保底：確保 tonesCN 是長度 5 的陣列
+            if (result.valid) {
+                if (!Array.isArray(result.tonesCN) || result.tonesCN.length !== 5) {
+                    const fallback = result.textCN || (Array.isArray(result.tonesCN) ? result.tonesCN[0] : '') || '';
+                    result.tonesCN = new Array(5).fill(fallback);
+                }
+                result.textCN = result.tonesCN[toneIdx] || result.tonesCN[2];
+            }
             return res.status(200).json(result);
         } catch (parseErr) {
             return res.status(502).json({ error: 'JSON parse failed', detail: text });

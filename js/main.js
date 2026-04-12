@@ -755,8 +755,11 @@ async function loadInfoData() {
 
 // ============ AI 聊天路線 ============
 
-let chatAIResult = null; // 儲存 AI 生成的結果
+let chatAIResult = null; // 儲存 AI 生成的結果（含 tonesCN 陣列）
 let lastChatMessage = ''; // 儲存最後一次輸入的文字
+
+// 把 slider 0-100 值對應到 5 個等級 index 0..4
+function snapToneIdx(v) { return Math.round(Number(v ?? 50) / 25); }
 
 // API 端點：Vercel 上用相對路徑，本地用完整網址
 const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -770,8 +773,6 @@ function showChatResult() {
     document.getElementById('chat-result-hint').style.display = '';
     document.getElementById('chat-result-actions').style.display = 'none';
     document.getElementById('chat-params-panel').style.display = 'none';
-    const mockBtn = document.getElementById('chat-mock-scan-btn');
-    if (mockBtn) mockBtn.style.display = '';
     showView('chat-result-view');
 }
 
@@ -816,7 +817,7 @@ window.submitChat = async function() {
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
     const englishStyle = document.getElementById('param-english')?.value || 50;
-    const length = document.getElementById('param-length')?.value || 30;
+    const length = document.getElementById('param-length')?.value || 50;
 
     // 收集問答 scores
     const scores = {};
@@ -896,19 +897,24 @@ window.retryLastChat = function() {
 window.revealChatQuote = function() {
     if (!chatAIResult) return;
 
-    // 隱藏模擬掃描按鈕
-    const mockBtn = document.getElementById('chat-mock-scan-btn');
-    if (mockBtn) mockBtn.style.display = 'none';
+    // 已經解析過就不再重播動畫
+    const hintEl = document.getElementById('chat-result-hint');
+    if (hintEl && hintEl.style.display === 'none') return;
 
     const translationEl = document.getElementById('chat-translation-text');
     const hint = document.getElementById('chat-result-hint');
     const actions = document.getElementById('chat-result-actions');
 
+    // 依當前語氣 slider 選對應版本
+    const idx = snapToneIdx(document.getElementById('param-tone')?.value);
+    const currentCN = (chatAIResult.tonesCN && chatAIResult.tonesCN[idx]) || chatAIResult.textCN;
+    chatAIResult.textCN = currentCN;
+
     // 轉譯 fade out → 換成原句 fade in
     gsap.to(translationEl, {
         opacity: 0, duration: 0.4, ease: 'power2.out',
         onComplete: () => {
-            translationEl.textContent = chatAIResult.textCN;
+            translationEl.textContent = currentCN;
             gsap.to(translationEl, { opacity: 1, duration: 0.6, ease: 'power2.out' });
         }
     });
@@ -949,6 +955,12 @@ let paramDebounceTimer = null;
 
 let seasoningTimeline = null;
 
+function stopSeasoning(textEl, enEl) {
+    if (textEl) gsap.killTweensOf(textEl);
+    if (enEl) gsap.killTweensOf(enEl);
+    if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
+}
+
 function setParamsDisabled(disabled) {
     const panel = document.getElementById('chat-params-panel');
     const actions = document.getElementById('chat-result-actions');
@@ -981,14 +993,20 @@ async function regenerateWithParams() {
             textEl.textContent = '';
             gsap.to(textEl, { opacity: 1, duration: 0.1 });
             if (seasoningTimeline) seasoningTimeline.kill();
+            const enVisible = enEl.style.display !== 'none';
             seasoningTimeline = gsap.timeline({ repeat: -1 });
             seasoningTimeline
-                .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' })
-                .to(enEl.style.display !== 'none' ? enEl : {}, { duration: enSeason.length * 0.04, text: enSeason, ease: 'none' }, `>0.3`)
+                .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' });
+            if (enVisible) {
+                seasoningTimeline.to(enEl, { duration: enSeason.length * 0.04, text: enSeason, ease: 'none' }, `>0.3`);
+            }
+            seasoningTimeline
                 .to({}, { duration: 0.5 })
-                .to(textEl, { duration: 0.2, text: '', ease: 'none' })
-                .to(enEl.style.display !== 'none' ? enEl : {}, { duration: 0.2, text: '', ease: 'none' }, '<')
-                .to({}, { duration: 0.3 });
+                .to(textEl, { duration: 0.2, text: '', ease: 'none' });
+            if (enVisible) {
+                seasoningTimeline.to(enEl, { duration: 0.2, text: '', ease: 'none' }, '<');
+            }
+            seasoningTimeline.to({}, { duration: 0.3 });
         }
     });
     if (enEl.style.display !== 'none') {
@@ -1004,7 +1022,7 @@ async function regenerateWithParams() {
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
     const englishStyle = document.getElementById('param-english')?.value || 50;
-    const length = document.getElementById('param-length')?.value || 30;
+    const length = document.getElementById('param-length')?.value || 50;
 
     const scores = {};
     userAnswers.forEach(opt => {
@@ -1037,15 +1055,19 @@ async function regenerateWithParams() {
         const result = await response.json();
 
         if (!response.ok || result.error || !result.valid) {
-            if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
+            stopSeasoning(textEl, enEl);
+            textEl.style.opacity = 1;
             textEl.textContent = chatAIResult.textCN;
-            if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
+            if (enEl.style.display !== 'none') {
+                enEl.style.opacity = 1;
+                enEl.textContent = chatAIResult.textEN || '';
+            }
             setParamsDisabled(false);
             return;
         }
 
         chatAIResult = result;
-        if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
+        stopSeasoning(textEl, enEl);
 
         // fade in 新文字
         gsap.to(textEl, {
@@ -1070,10 +1092,14 @@ async function regenerateWithParams() {
     } catch (err) {
         clearTimeout(timeoutId);
         console.error('Regenerate error:', err);
-        if (seasoningTimeline) { seasoningTimeline.kill(); seasoningTimeline = null; }
+        stopSeasoning(textEl, enEl);
         // 調味失敗，恢復原本文字
+        textEl.style.opacity = 1;
         textEl.textContent = chatAIResult.textCN;
-        if (enEl.style.display !== 'none') enEl.textContent = chatAIResult.textEN || '';
+        if (enEl.style.display !== 'none') {
+            enEl.style.opacity = 1;
+            enEl.textContent = chatAIResult.textEN || '';
+        }
         setParamsDisabled(false);
     }
 }
@@ -1176,11 +1202,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Tone、Length slider 變動 → 中英文都重新生成
-    ['param-tone', 'param-length'].forEach(id => {
-        const slider = document.getElementById(id);
-        if (slider) slider.addEventListener('change', onParamChange);
-    });
+    // Tone slider → 即時切換已預生成的版本（不打 API），並 lazy 更新英文翻譯
+    const toneSlider = document.getElementById('param-tone');
+    if (toneSlider) {
+        toneSlider.addEventListener('change', () => {
+            if (!chatAIResult || !Array.isArray(chatAIResult.tonesCN)) return;
+            const idx = snapToneIdx(toneSlider.value);
+            const newCN = chatAIResult.tonesCN[idx] || chatAIResult.textCN;
+            if (newCN === chatAIResult.textCN) return;
+            chatAIResult.textCN = newCN;
+
+            // 只有在已經 reveal（hint 已隱藏）後才需要視覺切換
+            const hint = document.getElementById('chat-result-hint');
+            const revealed = hint && hint.style.display === 'none';
+            if (!revealed) return;
+
+            const textEl = document.getElementById('chat-translation-text');
+            const enEl = document.getElementById('chat-en-text');
+            stopSeasoning(textEl, enEl);
+            textEl.style.opacity = 1;
+            gsap.to(textEl, {
+                opacity: 0, duration: 0.2, ease: 'power2.out',
+                onComplete: () => {
+                    textEl.textContent = newCN;
+                    gsap.to(textEl, { opacity: 1, duration: 0.35 });
+                }
+            });
+            // 英文若開著，重新翻譯配合新中文
+            if (enEl && enEl.style.display !== 'none') {
+                retranslateEnglish();
+            }
+        });
+    }
+
+    // Length slider → 中英文都重新生成（會拿到新的 5 版 tonesCN）
+    const lengthSlider = document.getElementById('param-length');
+    if (lengthSlider) lengthSlider.addEventListener('change', onParamChange);
 
     // English style slider 變動 → 只重新翻譯英文
     const enStyleSlider = document.getElementById('param-english');
@@ -1240,4 +1297,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('錯誤：nfcManager 未定義！');
     }
 
+    // 首頁動畫
+    startHomeAnimation();
 });
+
+// 首頁打字機動畫（循環）
+let homeTimeline = null;
+
+function startHomeAnimation() {
+    const zhEl = document.getElementById('home-title-zh');
+    const enEl = document.getElementById('home-title-en');
+    const cta = document.getElementById('home-cta');
+    const logo = document.getElementById('logo');
+
+    const zhText = '這個人超會寫雞湯';
+    const enText = 'The King of Chicken Soup';
+
+    // 初始隱藏 logo
+    gsap.set(logo, { opacity: 0 });
+
+    // 第一輪：打字 → btn fade in → logo fade in
+    const zhDur = zhText.length * 0.1;
+    const enDur = enText.length * 0.04;
+    const enStart = zhDur + 0.3;
+    const firstRoundEnd = enStart + enDur;
+
+    gsap.to(zhEl, { duration: zhDur, text: zhText, ease: 'none' });
+    gsap.to(enEl, { duration: enDur, text: enText, ease: 'none', delay: enStart });
+
+    // btn float up fade in
+    gsap.to(cta, {
+        opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out',
+        delay: firstRoundEnd + 0.3
+    });
+    gsap.set(cta, { y: 20 });
+
+    // logo fade in
+    gsap.to(logo, {
+        opacity: 1, duration: 0.8, ease: 'power2.out',
+        delay: firstRoundEnd + 0.8,
+        onComplete: () => startHomeTitleLoop(zhEl, enEl, zhText, enText)
+    });
+}
+
+function startHomeTitleLoop(zhEl, enEl, zhText, enText) {
+    const zhDur = zhText.length * 0.1;
+    const enDur = enText.length * 0.04;
+
+    homeTimeline = gsap.timeline({ repeat: -1, delay: 2 });
+    homeTimeline
+        // 清空
+        .to(zhEl, { duration: 0.3, text: '', ease: 'none' })
+        .to(enEl, { duration: 0.3, text: '', ease: 'none' }, '<')
+        .to({}, { duration: 0.5 })
+        // 重新打字
+        .to(zhEl, { duration: zhDur, text: zhText, ease: 'none' })
+        .to(enEl, { duration: enDur, text: enText, ease: 'none' }, `>0.3`)
+        .to({}, { duration: 2 }); // 停留 2 秒再循環
+}

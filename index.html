@@ -28,9 +28,9 @@
     <!-- 首页 -->
     <div id="home-view" class="view-container active">
         <div class="flex flex-col items-center justify-center min-h-screen pb-16">
-            <h1 class="font-bold">這個人超會寫雞湯</h1>
-            <h2 class="en mb-16">The King of Chicken Soup</h2>
-            <button class="experience-btn" onclick="goToGuide()">點我開始</button>
+            <h1 id="home-title-zh" class="font-bold"></h1>
+            <h2 id="home-title-en" class="en mb-16"></h2>
+            <button id="home-cta" class="experience-btn" onclick="goToGuide()" style="opacity: 0; pointer-events: none;">點我開始</button>
         </div>
     </div>
 
@@ -112,7 +112,7 @@
     <div id="chat-result-view" class="view-container">
         <div class="relative min-h-screen flex flex-col items-center justify-center p-8">
             <!-- 左上角：導航 -->
-            <div id="chat-result-actions" class="absolute top-8 left-8 flex flex-col items-start gap-2" style="display: none;">
+            <div id="chat-result-actions" class="absolute flex flex-col items-start gap-2" style="display: none; top: clamp(12px, 3vw, 32px); left: clamp(12px, 3vw, 32px);">
                 <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="restart()">← Start Over</button>
                 <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="retryChatInput()">← Try Again</button>
             </div>
@@ -122,18 +122,17 @@
                 <h2 id="chat-translation-text" class="font-medium text-black mb-4"></h2>
                 <h4 id="chat-en-text" class="en font-normal text-black mb-8" style="display: none;"></h4>
                 <p id="chat-result-hint" class="mb-4 opacity-50" style="font-size: 1rem;">掃描裝置以解讀這句雞湯</p>
-                <button id="chat-mock-scan-btn" onclick="revealChatQuote()" class="px-4 py-2 border border-black text-sm hover:bg-black hover:text-white transition-colors" style="font-size:0.875rem;">模擬掃描</button>
             </div>
 
             <!-- 右下角：參數調整 -->
-            <div id="chat-params-panel" class="absolute bottom-8 right-8 border border-black p-5 flex flex-col gap-5" style="display: none; width: 300px;">
+            <div id="chat-params-panel" class="absolute border border-black p-5 flex flex-col gap-5" style="display: none; bottom: clamp(12px, 3vw, 32px); right: clamp(12px, 3vw, 32px); width: min(300px, calc(100vw - 24px));">
                 <!-- 語氣 -->
                 <div class="flex flex-col gap-3">
                     <div class="flex justify-between">
                         <span class="text-xs">更說教</span>
                         <span class="text-xs">更雞湯</span>
                     </div>
-                    <input id="param-tone" type="range" min="0" max="100" value="50" class="param-slider">
+                    <input id="param-tone" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                 </div>
                 <!-- 英文開關 -->
                 <div class="flex flex-col gap-3">
@@ -147,7 +146,7 @@
                             <span class="en text-xs">Manglish</span>
                             <span class="en text-xs">Formal</span>
                         </div>
-                        <input id="param-english" type="range" min="0" max="100" value="50" class="param-slider">
+                        <input id="param-english" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                     </div>
                 </div>
                 <!-- 長度 -->
@@ -156,7 +155,7 @@
                         <span class="text-xs">更短</span>
                         <span class="text-xs">更長</span>
                     </div>
-                    <input id="param-length" type="range" min="0" max="100" value="30" class="param-slider">
+                    <input id="param-length" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                 </div>
                 <!-- 字體選擇 -->
                 <div class="flex flex-col gap-2">

@@ -124,6 +124,18 @@ class NFCManager {
     async handleRandomQuote(message = {}) {
         log('收到隨機抽雞湯指令（唯一抽籤卡）', 'info');
 
+        // AI 路線：在 chat-result-view 時，改成解碼 AI 原句
+        const chatResultView = document.getElementById('chat-result-view');
+        if (chatResultView && chatResultView.classList.contains('active')) {
+            log('在 AI 結果頁，觸發解碼 AI 原句', 'info');
+            if (typeof window.revealChatQuote === 'function') {
+                window.revealChatQuote();
+            } else {
+                log('警告：revealChatQuote 函數未定義', 'warn');
+            }
+            return;
+        }
+
         // 檢查當前是否在 waiting-nfc-view 頁面
         const waitingView = document.getElementById('waiting-nfc-view');
         if (!waitingView || !waitingView.classList.contains('active')) {

@@ -116,6 +116,9 @@ void setupWiFi() {
     Serial.println("========================================");
 
     WiFi.mode(WIFI_STA);
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);  // 關閉省電模式 → WebSocket 延遲大幅降低
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(false);
     WiFi.disconnect();  // 先斷開之前的連線
     delay(100);
 
@@ -203,6 +206,13 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       // 解析 JSON 訊息
       String msg = String((char*)payload);
 
+      // 處理心跳訊息（保持連線活躍）
+      if (msg.indexOf("\"type\":\"heartbeat\"") >= 0) {
+        // 心跳訊息不需要特別處理，只是保持連線
+        // Serial.println("收到心跳");
+        return;
+      }
+
       // 處理前端發送的當前雞湯編號更新
       // 格式: {"type":"update_current_quote","quoteNumber":1}
       if (msg.indexOf("\"type\":\"update_current_quote\"") >= 0) {
@@ -217,15 +227,50 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
       }
       break;
     }
+
+    default:
+      // 其他 WebSocket 事件類型（忽略）
+      break;
   }
 }
 
 // ===== 主迴圈 =====
 void loop() {
-  webSocket.loop();  // 處理 WebSocket 連線
-
-  // 取得當前時間（在外層作用域，讓整個 loop 都能使用）
   unsigned long currentTime = millis();
+
+  // 檢查 WiFi 連線狀態（Station 模式，非阻塞）
+  #if !USE_AP_MODE
+  static unsigned long lastWiFiCheck = 0;
+  static bool reconnecting = false;
+  static wl_status_t lastStatus = WL_IDLE_STATUS;
+
+  wl_status_t status = WiFi.status();
+  if (status != lastStatus) {
+    if (status == WL_CONNECTED) {
+      Serial.printf("✓ WiFi 已連線：%s\n", WiFi.localIP().toString().c_str());
+      reconnecting = false;
+    } else if (lastStatus == WL_CONNECTED) {
+      Serial.println("✗ WiFi 斷線");
+    }
+    lastStatus = status;
+  }
+
+  if (status != WL_CONNECTED) {
+    // 每 3 秒嘗試重連一次（不阻塞 loop）
+    if (currentTime - lastWiFiCheck >= 3000) {
+      lastWiFiCheck = currentTime;
+      if (!reconnecting) {
+        Serial.println("嘗試重新連線 WiFi...");
+        WiFi.begin(sta_ssid, sta_password);
+        reconnecting = true;
+      } else {
+        Serial.print(".");
+      }
+    }
+  }
+  #endif
+
+  webSocket.loop();  // 處理 WebSocket 連線
 
   if (nfc.tagPresent()) {
     // 快速讀取 UID（不讀取完整 NDEF 資料，避免 "Failed read page" 錯誤）
@@ -233,6 +278,7 @@ void loop() {
 
     // 檢查讀取是否成功
     if (tag.getUidLength() == 0) {
+      Serial.println("[DEBUG] UID 長度為 0，讀取失敗");
       delay(50);  // 短暫延遲後重試
       return;
     }
@@ -245,8 +291,14 @@ void loop() {
 
     // 檢查 UID 是否有效
     if (currentUID.length() < 10) {
+      Serial.printf("[DEBUG] UID 太短: %s (長度: %d)\n", currentUID.c_str(), currentUID.length());
       delay(50);
       return;
+    }
+
+    // 除錯：顯示偵測到的 UID（即使重複）
+    if (currentUID != lastUID) {
+      Serial.printf("[DEBUG] 偵測到新卡片 UID: %s (上次: %s)\n", currentUID.c_str(), lastUID.c_str());
     }
 
     // 偵測 NFC 類型
