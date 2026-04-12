@@ -87,7 +87,7 @@ module.exports = async function handler(req, res) {
     // 模式二：完整生成雞湯（一次產出 5 個語氣版本）
     const quotes = loadQuotes();
     const shuffled = [...quotes].sort(() => Math.random() - 0.5);
-    const examples = shuffled.slice(0, 30).map(q => `- ${q.textCN}`).join('\n');
+    const examples = shuffled.slice(0, 15).map(q => `- ${q.textCN}`).join('\n');
 
     // 長度規則：字數硬性限制，避免 Gemini 忽略長度指令
     const lengthDescByLevel = {
@@ -236,7 +236,7 @@ ${profile}
 
 // 呼叫 Gemini API（自動 fallback 不同模型）
 async function callGemini(apiKey, userText, systemText) {
-    const models = ['gemini-2.5-flash', 'gemini-2.5-pro'];
+    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
     const requestBody = JSON.stringify({
         contents: [
             { role: 'user', parts: [{ text: userText }] }
