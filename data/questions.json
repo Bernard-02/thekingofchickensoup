@@ -24,7 +24,8 @@
       { "value": "relationships", "text": "「這個人到底在想什麼？」", "scores": { "overthinking": 1, "relationships": 1 } },
       { "value": "doubt", "text": "「我這樣做對嗎？」", "scores": { "overthinking": 1, "self-worth": 1 } },
       { "value": "action", "text": "「我什麼時候才要開始？」", "scores": { "action": 1, "courage": 1 } },
-      { "value": "random", "text": "也沒什麼特別，腦子還好", "scores": { "let-go": 1 } }
+      { "value": "random", "text": "也沒什麼特別，腦子還好", "scores": { "let-go": 1 } },
+      { "value": "none", "text": "以上都不是，我的念頭不在這裡面", "scores": {} }
     ]
   },
   {
@@ -38,25 +39,12 @@
       { "value": "outside", "text": "出去走走，換個地方透透氣", "scores": { "perspective": 1 } },
       { "value": "talk", "text": "找個人說說話，不一定要建議，有人聽就好", "scores": { "relationships": 1, "perspective": 1 } },
       { "value": "change", "text": "做一件平常不會做的事，換個感覺", "scores": { "action": 1, "courage": 1 } },
-      { "value": "none", "text": "說實話，我還沒找到什麼真的有效的方法", "scores": { "confused": 1, "patience": 1 } }
+      { "value": "unknown", "text": "說實話，我還沒找到什麼真的有效的方法", "scores": { "confused": 1, "patience": 1 } },
+      { "value": "none", "text": "以上都不太像我的方式", "scores": {} }
     ]
   },
   {
     "id": "q4",
-    "text": "在這些尋找出口的過程裡，你覺得你跟自己的關係怎麼樣？有好好關注自己內心的狀態嗎？",
-    "textEN": "In the process of finding your way, how's your relationship with yourself? Have you been checking in with how you actually feel?",
-    "type": "single",
-    "tag": "self",
-    "options": [
-      { "value": "lost", "text": "有點失聯，不太清楚自己在幹嘛", "scores": { "confused": 1, "self-worth": 1 } },
-      { "value": "avoid", "text": "刻意不去深究，習慣先用別的事把注意力填滿", "scores": { "tired": 1, "courage": 1 } },
-      { "value": "overthink", "text": "關注得有點過頭了，常常在心裡跟自己打架", "scores": { "overthinking": 1, "let-go": 1 } },
-      { "value": "ok", "text": "還算和平，偶爾才會停下來想一想", "scores": { "perspective": 1, "patience": 1 } },
-      { "value": "clear", "text": "其實很清楚，只是現階段有點無力，需要被接住", "scores": { "tired": 1, "relationships": 1 } }
-    ]
-  },
-  {
-    "id": "q5",
     "text": "有時候我們失去自己的節奏，是因為外界的聲音太吵。別人怎麼看你，對現在的你來說有多重要？",
     "textEN": "Sometimes we lose our rhythm because the noise around us is too loud. How much does other people's opinion of you matter right now?",
     "type": "single",
@@ -67,11 +55,12 @@
       { "value": "know_but_cant", "text": "道理上知道不該在意，但心裡還是會", "scores": { "overthinking": 1, "self-worth": 1 } },
       { "value": "annoyed", "text": "覺得很煩，只想叫那些指指點點的聲音閉嘴", "scores": { "tired": 1, "let-go": 1 } },
       { "value": "less_now", "text": "已經沒那麼放在心上了，大概", "scores": { "let-go": 1, "perspective": 1 } },
-      { "value": "dont_care", "text": "不太在乎，活自己的就好", "scores": { "courage": 1, "self-worth": 1 } }
+      { "value": "dont_care", "text": "不太在乎，活自己的就好", "scores": { "courage": 1, "self-worth": 1 } },
+      { "value": "none", "text": "以上都不是，我的感受比這些更複雜", "scores": {} }
     ]
   },
   {
-    "id": "q6",
+    "id": "q5",
     "text": "那如果不看別人，只看自己的前方呢？講到「未來」或「以後」，你現在的直覺反應是哪種感覺？",
     "textEN": "What if you stop looking at others and just look ahead? When you hear \"the future,\" what's your gut feeling?",
     "type": "single",
@@ -81,26 +70,12 @@
       { "value": "tired", "text": "有方向，但走起來比想像中累", "scores": { "tired": 1, "setback": 1 } },
       { "value": "present", "text": "不太想想那麼遠，先把今天過好就好", "scores": { "let-go": 1, "perspective": 1 } },
       { "value": "excited", "text": "還滿期待的，甚至有點想快進", "scores": { "action": 1, "courage": 1 } },
-      { "value": "anxious", "text": "其實滿焦慮的，總會忍不住去想最壞的狀況", "scores": { "overthinking": 1, "let-go": 1 } }
+      { "value": "anxious", "text": "其實滿焦慮的，總會忍不住去想最壞的狀況", "scores": { "overthinking": 1, "let-go": 1 } },
+      { "value": "none", "text": "以上都不是，我對未來的感覺不在這裡", "scores": {} }
     ]
   },
   {
-    "id": "q7",
-    "text": "面對生活和未來，你對自己算嚴格嗎？還是那種表面沒事、私下卻一直在檢討自己的人？",
-    "textEN": "Are you strict with yourself? Or the type who seems fine but keeps reviewing every mistake in private?",
-    "type": "single",
-    "tag": "strict",
-    "options": [
-      { "value": "very", "text": "很嚴，有時候連我自己都覺得太苛了", "scores": { "overthinking": 1, "let-go": 1 } },
-      { "value": "hidden", "text": "對，就是那種表面沒事但其實一直在檢討的", "scores": { "overthinking": 1, "hurt": 1 } },
-      { "value": "normal", "text": "普通吧，會犯錯但不太會一直糾結", "scores": { "perspective": 1, "courage": 1 } },
-      { "value": "easy", "text": "比較寬鬆，我覺得對自己好一點比較重要", "scores": { "let-go": 1 } },
-      { "value": "compare", "text": "與其說嚴格，不如說常常覺得自己比不上別人", "scores": { "self-worth": 1, "perspective": 1 } },
-      { "value": "procrastinate", "text": "想做到最好，反而因為怕搞砸而遲遲不敢開始", "scores": { "action": 1, "courage": 1 } }
-    ]
-  },
-  {
-    "id": "q8",
+    "id": "q6",
     "text": "不知不覺聊到了最後。今天來這裡，你還有什麼想說的嗎？",
     "textEN": "We've reached the end before I even noticed. Is there anything else you'd like to say?",
     "type": "single",

@@ -122,6 +122,14 @@ void setupWiFi() {
     WiFi.disconnect();  // 先斷開之前的連線
     delay(100);
 
+    // 固定 IP（配合 Windows 行動熱點 192.168.137.x 網段）
+    // 前端 js/config.js 寫 ws://192.168.137.200:81 就永遠對上
+    IPAddress staticIP(192, 168, 137, 200);
+    IPAddress gateway(192, 168, 137, 1);
+    IPAddress subnet(255, 255, 255, 0);
+    IPAddress dns(8, 8, 8, 8);
+    WiFi.config(staticIP, gateway, subnet, dns);
+
     Serial.printf("正在連接到: %s\n", sta_ssid);
     Serial.printf("密碼長度: %d\n", strlen(sta_password));
     Serial.print("連線中");

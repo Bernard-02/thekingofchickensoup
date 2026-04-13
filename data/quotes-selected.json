@@ -7,7 +7,11 @@
     "textEN": "Instead of wishing for the sky to never rain, you can learn to dance in the rain.",
     "nfcUID": "04:8D:D5:22:BF:2A:81",
     "contextId": "001",
-    "tags": ["tired", "setback", "perspective"],
+    "tags": [
+      "tired",
+      "setback",
+      "perspective"
+    ],
     "translation": "雨還在下，有人撐傘，有人開始踩水坑。"
   },
   {
@@ -18,7 +22,10 @@
     "textEN": "Every point in life is connected.",
     "nfcUID": "04:82:D5:22:BF:2A:81",
     "contextId": "002",
-    "tags": ["confused", "patience"],
+    "tags": [
+      "confused",
+      "patience"
+    ],
     "translation": "現在看不出來的線，之後都會接上。"
   },
   {
@@ -29,7 +36,11 @@
     "textEN": "Look forward — let bygones be bygones.",
     "nfcUID": "04:F2:D5:22:BF:2A:81",
     "contextId": "003",
-    "tags": ["overthinking", "let-go", "perspective"],
+    "tags": [
+      "overthinking",
+      "let-go",
+      "perspective"
+    ],
     "translation": "後視鏡是用來參考的，不是用來開車的。"
   },
   {
@@ -40,7 +51,11 @@
     "textEN": "Everything that happens has its own meaning.",
     "nfcUID": "04:8C:D5:22:BF:2A:81",
     "contextId": "004",
-    "tags": ["confused", "setback", "perspective"],
+    "tags": [
+      "confused",
+      "setback",
+      "perspective"
+    ],
     "translation": "石頭落進水裡，水紋是不會說謊的。"
   },
   {
@@ -51,7 +66,10 @@
     "textEN": "Time is one of the standards by which relationships are measured.",
     "nfcUID": "04:8B:D5:22:BF:2A:81",
     "contextId": "005",
-    "tags": ["relationships", "patience"],
+    "tags": [
+      "relationships",
+      "patience"
+    ],
     "translation": "放了很久的東西，你還記得它在哪嗎？"
   },
   {
@@ -60,9 +78,12 @@
     "category": "人際關係",
     "textCN": "相遇即是一種緣分，珍惜出現在你生命裡的人。",
     "textEN": "Every encounter is a kind of fate — cherish the people who appear in your life.",
-    "nfcUID": "04:96:D5:22:BF:2A:81",
+    "nfcUID": "04:8A:D5:22:BF:2A:81",
     "contextId": "007",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "同一班車，卻剛好坐在一起。"
   },
   {
@@ -71,9 +92,13 @@
     "category": "人生哲理",
     "textCN": "人生也許就該像蘇軾一樣，也無風雨也無晴。",
     "textEN": "Perhaps life, like Su Shi wrote, is neither stormy nor sunny.",
-    "nfcUID": "04:95:D5:22:BF:2A:81",
+    "nfcUID": "04:96:D5:22:BF:2A:81",
     "contextId": "008",
-    "tags": ["tired", "overthinking", "let-go"],
+    "tags": [
+      "tired",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "天氣預報說有雨，但他沒帶傘，也沒淋濕。"
   },
   {
@@ -82,9 +107,12 @@
     "category": "人生哲理",
     "textCN": "你最該認識且了解的人，是你自己。",
     "textEN": "The person you should know and understand the most is yourself.",
-    "nfcUID": "04:93:D5:22:BF:2A:81",
+    "nfcUID": "04:95:D5:22:BF:2A:81",
     "contextId": "010",
-    "tags": ["confused", "self-worth"],
+    "tags": [
+      "confused",
+      "self-worth"
+    ],
     "translation": "鏡子裡那個人，你們熟嗎？"
   },
   {
@@ -93,9 +121,13 @@
     "category": "人生哲理",
     "textCN": "自己選擇的路，不一定要跪著走，也可以站起來走，或者換個舒服的方式走。",
     "textEN": "The path you chose doesn't have to be walked on your knees — you can stand and walk, or choose a more comfortable way to walk it.",
-    "nfcUID": "04:9E:D5:22:BF:2A:81",
+    "nfcUID": "04:94:D5:22:BF:2A:81",
     "contextId": "011",
-    "tags": ["tired", "setback", "let-go"],
+    "tags": [
+      "tired",
+      "setback",
+      "let-go"
+    ],
     "translation": "同一條路，有人跑，有人慢慢晃，都到了。"
   },
   {
@@ -104,9 +136,13 @@
     "category": "人生哲理",
     "textCN": "人生是拿來體驗的，不一定要拿來完美。",
     "textEN": "Life is meant to be experienced — it doesn't need to be perfect.",
-    "nfcUID": "04:9D:D5:22:BF:2A:81",
+    "nfcUID": "04:93:D5:22:BF:2A:81",
     "contextId": "012",
-    "tags": ["overthinking", "self-worth", "let-go"],
+    "tags": [
+      "overthinking",
+      "self-worth",
+      "let-go"
+    ],
     "translation": "第一次煮的菜，有點鹹，但還是吃完了。"
   },
   {
@@ -115,9 +151,13 @@
     "category": "人生哲理",
     "textCN": "我們應該要做好接受任何結果的準備。",
     "textEN": "We should be prepared to accept any outcome.",
-    "nfcUID": "04:9C:D5:22:BF:2A:81",
+    "nfcUID": "04:9E:D5:22:BF:2A:81",
     "contextId": "013",
-    "tags": ["overthinking", "setback", "perspective"],
+    "tags": [
+      "overthinking",
+      "setback",
+      "perspective"
+    ],
     "translation": "信封還沒拆開，先深呼吸一下。"
   },
   {
@@ -126,9 +166,12 @@
     "category": "處世態度",
     "textCN": "想要的東西就自己去爭取，你不再是個嗷嗷待哺的小孩了。",
     "textEN": "Go after the things you want — you're no longer a child waiting to be fed.",
-    "nfcUID": "04:A5:D5:22:BF:2A:81",
+    "nfcUID": "04:9D:D5:22:BF:2A:81",
     "contextId": "017",
-    "tags": ["action", "courage"],
+    "tags": [
+      "action",
+      "courage"
+    ],
     "translation": "餓了就自己去開冰箱，沒人會幫你送過來。"
   },
   {
@@ -137,9 +180,13 @@
     "category": "人生哲理",
     "textCN": "這世界上有兩種事：不關我的事及不關你的事。",
     "textEN": "In this world, there are two kinds of matters: those that don't concern me, and those that don't concern you.",
-    "nfcUID": "04:A4:D5:22:BF:2A:81",
+    "nfcUID": "04:9C:D5:22:BF:2A:81",
     "contextId": "018",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "隔壁桌在聊什麼，跟你沒關係。"
   },
   {
@@ -148,9 +195,13 @@
     "category": "人際關係",
     "textCN": "人生像是一班列車，每個階段上車的人都不一樣：有的可以陪你到終點站，有的則會在幾站就下車了，所以珍惜在車上的時間吧。",
     "textEN": "Life is like a train — the people who get on at each phase are different. Some will stay with you until the final stop, and some will get off after just a few stations. So cherish the time shared on the train.",
-    "nfcUID": "04:AF:D5:22:BF:2A:81",
+    "nfcUID": "04:9B:D5:22:BF:2A:81",
     "contextId": "019",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "月台上的人來了又走，列車繼續往前開。"
   },
   {
@@ -159,9 +210,13 @@
     "category": "人生哲理",
     "textCN": "好運跟厄運本來就各佔50%，不需要刻意放大不開心的事情。",
     "textEN": "Good luck and bad luck are each naturally 50% — there's no need to magnify unhappy things.",
-    "nfcUID": "04:AD:D5:22:BF:2A:81",
+    "nfcUID": "04:A7:D5:22:BF:2A:81",
     "contextId": "021",
-    "tags": ["tired", "setback", "perspective"],
+    "tags": [
+      "tired",
+      "setback",
+      "perspective"
+    ],
     "translation": "硬幣拋出去，正反各一半，沒什麼好驚訝的。"
   },
   {
@@ -170,9 +225,13 @@
     "category": "人際關係",
     "textCN": "對在乎的人及在乎你的人好就可以了。",
     "textEN": "Just be good to the people you care about, and the people who care about you.",
-    "nfcUID": "04:AC:D5:22:BF:2A:81",
+    "nfcUID": "04:A6:D5:22:BF:2A:81",
     "contextId": "022",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "不是所有人都需要澆水，找對了再澆。"
   },
   {
@@ -181,9 +240,12 @@
     "category": "處世態度",
     "textCN": "有些事情需要開始做才會有進展，不是等準備好了才開始。",
     "textEN": "Some things only make progress after you begin — don't wait until you think you're fully ready.",
-    "nfcUID": "04:B6:D5:22:BF:2A:81",
+    "nfcUID": "04:A5:D5:22:BF:2A:81",
     "contextId": "025",
-    "tags": ["action", "courage"],
+    "tags": [
+      "action",
+      "courage"
+    ],
     "translation": "筆還沒碰紙，什麼都不會發生。"
   },
   {
@@ -192,9 +254,13 @@
     "category": "人際關係",
     "textCN": "我們的時間很寶貴，不要浪費在不重要的人身上。",
     "textEN": "Our time is precious — don't waste it on people who don't matter.",
-    "nfcUID": "04:B5:D5:22:BF:2A:81",
+    "nfcUID": "04:A4:D5:22:BF:2A:81",
     "contextId": "026",
-    "tags": ["relationships", "self-worth", "let-go"],
+    "tags": [
+      "relationships",
+      "self-worth",
+      "let-go"
+    ],
     "translation": "行事曆上的格子就那麼多，填進去的名字要想清楚。"
   },
   {
@@ -203,9 +269,12 @@
     "category": "人際關係",
     "textCN": "有些事情是沒有答案的，不要太過於執著，那樣會很累。",
     "textEN": "Some things simply have no answers — don't cling too tightly, or you'll exhaust yourself.",
-    "nfcUID": "04:BF:D5:22:BF:2A:81",
+    "nfcUID": "04:AF:D5:22:BF:2A:81",
     "contextId": "028",
-    "tags": ["overthinking", "let-go"],
+    "tags": [
+      "overthinking",
+      "let-go"
+    ],
     "translation": "那道題沒有標準答案，翻到最後一頁也找不到。"
   },
   {
@@ -214,9 +283,12 @@
     "category": "人生哲理",
     "textCN": "沒有什麽東西是永恆不變的，唯一不變的東西就是改變本身。",
     "textEN": "Nothing is truly permanent — the only thing that never changes is change itself.",
-    "nfcUID": "04:BE:D5:22:BF:2A:81",
+    "nfcUID": "04:AE:D5:22:BF:2A:81",
     "contextId": "029",
-    "tags": ["confused", "perspective"],
+    "tags": [
+      "confused",
+      "perspective"
+    ],
     "translation": "昨天的天氣預報，今天不一定準。"
   },
   {
@@ -225,9 +297,13 @@
     "category": "人際關係",
     "textCN": "無論你做的再好，總會有人討厭你。你要做的不是討好他們，而是把重心放在那些支持你的人。",
     "textEN": "No matter how well you do, there will always be people who dislike you. What you should do is not please them, but put your focus on those who support you.",
-    "nfcUID": "04:BD:D5:22:BF:2A:81",
+    "nfcUID": "04:AD:D5:22:BF:2A:81",
     "contextId": "030",
-    "tags": ["hurt", "relationships", "self-worth"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "self-worth"
+    ],
     "translation": "有人覺得太甜，有人覺得剛好，是同一塊蛋糕。"
   },
   {
@@ -236,9 +312,12 @@
     "category": "處世態度",
     "textCN": "保持善良，那不需要花你半毛錢。",
     "textEN": "Be kind. It costs nothing.",
-    "nfcUID": "04:C8:D5:22:BF:2A:81",
+    "nfcUID": "04:AC:D5:22:BF:2A:81",
     "contextId": "032",
-    "tags": ["action", "perspective"],
+    "tags": [
+      "action",
+      "perspective"
+    ],
     "translation": "多做一些好事，錢包沒有少任何東西。"
   },
   {
@@ -247,9 +326,13 @@
     "category": "人際關係",
     "textCN": "處在不適合的群體，不是想著要怎麽變成像他們一樣，而是去尋找下一個更合適的群體。",
     "textEN": "When you're in a group that doesn't suit you, don't think about becoming like them — instead, look for a group that fits you better.",
-    "nfcUID": "04:C7:D5:22:BF:2A:81",
+    "nfcUID": "04:B8:D5:22:BF:2A:81",
     "contextId": "033",
-    "tags": ["hurt", "relationships", "courage"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "courage"
+    ],
     "translation": "穿錯鞋去爬山，換鞋就好，不用練腳皮。"
   },
   {
@@ -258,9 +341,12 @@
     "category": "人生哲理",
     "textCN": "我們不需要每天都很正向，請允許自己擁有各式各樣的情緒。",
     "textEN": "We don't need to be positive every day — allow yourself to have all kinds of emotions.",
-    "nfcUID": "04:CE:D5:22:BF:2A:81",
+    "nfcUID": "04:B7:D5:22:BF:2A:81",
     "contextId": "037",
-    "tags": ["tired", "let-go"],
+    "tags": [
+      "tired",
+      "let-go"
+    ],
     "translation": "今天天氣陰，也是天氣的一種。"
   },
   {
@@ -269,9 +355,12 @@
     "category": "人生哲理",
     "textCN": "人生本來就是不公平的。",
     "textEN": "Life is inherently unfair. If you want fair, then go funfair.",
-    "nfcUID": "04:D9:D5:22:BF:2A:81",
+    "nfcUID": "04:B6:D5:22:BF:2A:81",
     "contextId": "039",
-    "tags": ["setback", "perspective"],
+    "tags": [
+      "setback",
+      "perspective"
+    ],
     "translation": "有人一出生手裡就握著金湯匙，有人是銀的，有人則需要用手吃飯。"
   },
   {
@@ -280,9 +369,12 @@
     "category": "人際關係",
     "textCN": "有誤解就要說出來，沒有人會讀心術。",
     "textEN": "If there's misunderstanding, speak it out — no one can read minds.",
-    "nfcUID": "04:D8:D5:22:BF:2A:81",
+    "nfcUID": "04:B5:D5:22:BF:2A:81",
     "contextId": "040",
-    "tags": ["relationships", "courage"],
+    "tags": [
+      "relationships",
+      "courage"
+    ],
     "translation": "你看我，我看你。彼此都等了很久，但沒有人想要先說話。"
   },
   {
@@ -291,9 +383,12 @@
     "category": "人生哲理",
     "textCN": "記錄一天中認為開心或幸運的事情，這一天過得也不算太糟。",
     "textEN": "Record the things that made you happy or lucky today — then the day won't feel so bad after all.",
-    "nfcUID": "04:E1:D5:22:BF:2A:81",
+    "nfcUID": "04:C1:D5:22:BF:2A:81",
     "contextId": "042",
-    "tags": ["tired", "perspective"],
+    "tags": [
+      "tired",
+      "perspective"
+    ],
     "translation": "睡前翻開小本子，今天有什麼值得寫的？"
   },
   {
@@ -302,9 +397,12 @@
     "category": "處世態度",
     "textCN": "對待重要的人事物，要用心。",
     "textEN": "Treat the people and things that matter with heart.",
-    "nfcUID": "04:DF:D5:22:BF:2A:81",
+    "nfcUID": "04:BF:D5:22:BF:2A:81",
     "contextId": "043",
-    "tags": ["relationships", "action"],
+    "tags": [
+      "relationships",
+      "action"
+    ],
     "translation": "有人記得你上次說過的那件小事。"
   },
   {
@@ -313,9 +411,13 @@
     "category": "人際關係",
     "textCN": "改變自己比改變別人還要容易。",
     "textEN": "Changing yourself is easier than changing others.",
-    "nfcUID": "04:EA:D5:22:BF:2A:81",
+    "nfcUID": "04:BE:D5:22:BF:2A:81",
     "contextId": "045",
-    "tags": ["relationships", "overthinking", "let-go"],
+    "tags": [
+      "relationships",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "鞋子不合腳，有人換鞋，有人繼續磨。"
   },
   {
@@ -324,9 +426,13 @@
     "category": "人生哲理",
     "textCN": "道歉是承認自己的錯誤，而不是索取他人的原諒。",
     "textEN": "An apology is acknowledging your own mistake — not demanding forgiveness from others.",
-    "nfcUID": "04:E8:D5:22:BF:2A:81",
+    "nfcUID": "04:BD:D5:22:BF:2A:81",
     "contextId": "047",
-    "tags": ["relationships", "overthinking", "perspective"],
+    "tags": [
+      "relationships",
+      "overthinking",
+      "perspective"
+    ],
     "translation": "說完對不起，他轉身就走了。"
   },
   {
@@ -335,9 +441,12 @@
     "category": "處世態度",
     "textCN": "感激他人的付出，因為大家的時間都很寶貴。",
     "textEN": "Be grateful for others' efforts — because everyone's time is valuable.",
-    "nfcUID": "04:F4:D5:22:BF:2A:81",
+    "nfcUID": "04:C9:D5:22:BF:2A:81",
     "contextId": "048",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "他本來有別的事，但還是來了。"
   },
   {
@@ -346,9 +455,13 @@
     "category": "人生哲理",
     "textCN": "很私人的煩惱，傾訴給幾個人知道就好，沒有必要告知天下。",
     "textEN": "Private worries only need to be shared with a few close people — there's no need to announce them to the world.",
-    "nfcUID": "04:F3:D5:22:BF:2A:81",
+    "nfcUID": "04:C8:D5:22:BF:2A:81",
     "contextId": "049",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "有些話說給三個人聽就夠了，不用廣播。"
   },
   {
@@ -357,9 +470,13 @@
     "category": "人際關係",
     "textCN": "如果你身邊有沒事也會想起你的朋友，請你好好珍惜這樣的人。",
     "textEN": "If you have friends who think of you even when nothing is happening, treasure them well.",
-    "nfcUID": "04:56:6C:97:CC:2A:81",
+    "nfcUID": "04:C7:D5:22:BF:2A:81",
     "contextId": "050",
-    "tags": ["tired", "relationships", "perspective"],
+    "tags": [
+      "tired",
+      "relationships",
+      "perspective"
+    ],
     "translation": "深夜有人傳訊息：最近好嗎？"
   },
   {
@@ -368,9 +485,13 @@
     "category": "人生哲理",
     "textCN": "來日方長，美好的事情需要等待。",
     "textEN": "Good days are long ahead — beautiful things take time to arrive.",
-    "nfcUID": "",
+    "nfcUID": "04:C6:D5:22:BF:2A:81",
     "contextId": "051",
-    "tags": ["confused", "action", "patience"],
+    "tags": [
+      "confused",
+      "action",
+      "patience"
+    ],
     "translation": "麵包還在烤，時間到了自然會好。"
   },
   {
@@ -379,9 +500,13 @@
     "category": "處世態度",
     "textCN": "我們不能期待計劃能完美實現，有時候會趕不上變化，所以隨機應變的能力挺重要的。",
     "textEN": "We can't expect every plan to unfold perfectly. Sometimes reality changes faster than we expect, so adaptability is really important.",
-    "nfcUID": "",
+    "nfcUID": "04:B4:C6:23:BF:2A:81",
     "contextId": "052",
-    "tags": ["setback", "overthinking", "let-go"],
+    "tags": [
+      "setback",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "地圖上的路是直的，實際走起來有幾個彎。"
   },
   {
@@ -390,9 +515,13 @@
     "category": "人生哲理",
     "textCN": "强者從不抱怨環境，是金子總會發光，你其實沒那麽多藉口。",
     "textEN": "The strong never complain about their environment — if you're gold, you will shine. You actually don't have that many excuses.",
-    "nfcUID": "",
+    "nfcUID": "04:CF:D5:22:BF:2A:81",
     "contextId": "054",
-    "tags": ["setback", "action", "courage"],
+    "tags": [
+      "setback",
+      "action",
+      "courage"
+    ],
     "translation": "同一片土，有人種出花，有人說土不好。"
   },
   {
@@ -401,9 +530,13 @@
     "category": "處世態度",
     "textCN": "人比人是比不完的，要比就跟自己比。",
     "textEN": "Comparing yourself to others never ends — if you must compare, compare with your past self.",
-    "nfcUID": "",
+    "nfcUID": "04:CE:D5:22:BF:2A:81",
     "contextId": "057",
-    "tags": ["self-worth", "overthinking", "perspective"],
+    "tags": [
+      "self-worth",
+      "overthinking",
+      "perspective"
+    ],
     "translation": "跑道上只有一個你，跟昨天的你比就好。"
   },
   {
@@ -412,9 +545,13 @@
     "category": "人生哲理",
     "textCN": "轉念是個神奇的東西，有時候根深蒂固的念頭轉一下事情就順了。",
     "textEN": "A shift in thought is a magical thing — sometimes when a deeply rooted mindset switches, everything starts to flow.",
-    "nfcUID": "",
+    "nfcUID": "04:DA:D5:22:BF:2A:81",
     "contextId": "058",
-    "tags": ["overthinking", "setback", "perspective"],
+    "tags": [
+      "overthinking",
+      "setback",
+      "perspective"
+    ],
     "translation": "同一條路，有人看到終點，有人只看到坡。"
   },
   {
@@ -423,9 +560,13 @@
     "category": "處世態度",
     "textCN": "如果你對某件事情有很高的期待，請同時也要做好事情不如預期的準備。",
     "textEN": "If you have high expectations for something, you should also be prepared for the outcome to fall short.",
-    "nfcUID": "",
+    "nfcUID": "04:D9:D5:22:BF:2A:81",
     "contextId": "060",
-    "tags": ["overthinking", "setback", "let-go"],
+    "tags": [
+      "overthinking",
+      "setback",
+      "let-go"
+    ],
     "translation": "氣球吹得越大，破掉的聲音越響。先有個底。"
   },
   {
@@ -434,9 +575,13 @@
     "category": "人際關係",
     "textCN": "愛要及時，因為你無法預測你愛的人什麽時候會離開你。",
     "textEN": "Love needs to be timely, because you never know when the person you love might leave you.",
-    "nfcUID": "",
+    "nfcUID": "04:D8:D5:22:BF:2A:81",
     "contextId": "062",
-    "tags": ["relationships", "action", "courage"],
+    "tags": [
+      "relationships",
+      "action",
+      "courage"
+    ],
     "translation": "想說的話，今天說比明天說好。"
   },
   {
@@ -445,9 +590,13 @@
     "category": "處世態度",
     "textCN": "時刻培養我們的韌性，在面對挫折的時候才不會一折就斷。",
     "textEN": "Keep building your resilience, so you won't break easily when you face setbacks.",
-    "nfcUID": "",
+    "nfcUID": "04:E3:D5:22:BF:2A:81",
     "contextId": "063",
-    "tags": ["setback", "tired", "courage"],
+    "tags": [
+      "setback",
+      "tired",
+      "courage"
+    ],
     "translation": "竹子彎下去，風停了還是站回來。"
   },
   {
@@ -456,9 +605,12 @@
     "category": "人生哲理",
     "textCN": "很多東西講求剛剛好。太多不好，太少也不好，剛剛好就好。",
     "textEN": "Many things are about just right. Too much is bad, too little is bad — just right is best.",
-    "nfcUID": "",
+    "nfcUID": "04:E1:D5:22:BF:2A:81",
     "contextId": "064",
-    "tags": ["overthinking", "let-go"],
+    "tags": [
+      "overthinking",
+      "let-go"
+    ],
     "translation": "鹽放太多不行，太少也不行，嚐一口就知道。"
   },
   {
@@ -467,9 +619,12 @@
     "category": "處世態度",
     "textCN": "登高才能望遠，目光放遠一點，格局打開一點，不要局限在眼前的利益。",
     "textEN": "You can see farther only when you stand higher. Broaden your perspective; don't be limited by short-term gains.",
-    "nfcUID": "",
+    "nfcUID": "04:DF:D5:22:BF:2A:81",
     "contextId": "066",
-    "tags": ["confused", "perspective"],
+    "tags": [
+      "confused",
+      "perspective"
+    ],
     "translation": "站在一樓只看得到隔壁的牆。"
   },
   {
@@ -478,9 +633,12 @@
     "category": "人生哲理",
     "textCN": "真正厲害的人大多是很低調的，他們不會到處告訴別人自己有多厲害。",
     "textEN": "People who are truly capable tend to be low-key. They don't need to go around telling others how great they are.",
-    "nfcUID": "",
+    "nfcUID": "04:EB:D5:22:BF:2A:81",
     "contextId": "071",
-    "tags": ["self-worth", "perspective"],
+    "tags": [
+      "self-worth",
+      "perspective"
+    ],
     "translation": "最深的水，通常是最靜的那一段。"
   },
   {
@@ -489,9 +647,13 @@
     "category": "處世態度",
     "textCN": "犯錯哪會可恥？你最好不要犯兩次同樣的錯誤。",
     "textEN": "There's nothing shameful about making mistakes. Just don't make the exact same one twice.",
-    "nfcUID": "",
+    "nfcUID": "04:EA:D5:22:BF:2A:81",
     "contextId": "074",
-    "tags": ["setback", "overthinking", "let-go"],
+    "tags": [
+      "setback",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "第一次踩到坑，下次走這條路記得繞開。"
   },
   {
@@ -500,9 +662,13 @@
     "category": "處世態度",
     "textCN": "進度是可以慢慢累積的，每天一點點總比沒有來得好。",
     "textEN": "Progress can be built little by little. A tiny bit every day is still better than none.",
-    "nfcUID": "",
+    "nfcUID": "04:E9:D5:22:BF:2A:81",
     "contextId": "080",
-    "tags": ["action", "tired", "patience"],
+    "tags": [
+      "action",
+      "tired",
+      "patience"
+    ],
     "translation": "存錢筒每天丟一枚硬幣，不急，會滿的。"
   },
   {
@@ -511,9 +677,12 @@
     "category": "處世態度",
     "textCN": "勿忘初心，別忘記你為何而開始。",
     "textEN": "Don't forget your original intention — remember why you started.",
-    "nfcUID": "",
+    "nfcUID": "04:E8:D5:22:BF:2A:81",
     "contextId": "083",
-    "tags": ["confused", "perspective"],
+    "tags": [
+      "confused",
+      "perspective"
+    ],
     "translation": "跑了很遠，回頭看一下當初站在哪裡出發的。"
   },
   {
@@ -522,9 +691,13 @@
     "category": "處世態度",
     "textCN": "遇到不講理的人，繞過他就好了，畢竟吵贏他也不會讓你的戶頭多一萬塊。",
     "textEN": "When you meet unreasonable people, just walk around them — even if you win the argument, it won't magically put money into your bank account.",
-    "nfcUID": "",
+    "nfcUID": "04:F4:D5:22:BF:2A:81",
     "contextId": "087",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "路上有塊石頭，繞過去就好，不用跟它吵架。"
   },
   {
@@ -533,9 +706,12 @@
     "category": "人生哲理",
     "textCN": "勿以善小而不為，勿以惡小而為之。",
     "textEN": "Do not stop doing good deeds just because they seem small; do not commit bad deeds just because they seem small.",
-    "nfcUID": "",
+    "nfcUID": "04:F3:D5:22:BF:2A:81",
     "contextId": "088",
-    "tags": ["action", "perspective"],
+    "tags": [
+      "action",
+      "perspective"
+    ],
     "translation": "小小的火苗，可以點亮一根蠟燭，也可以燒掉一棟房子。"
   },
   {
@@ -544,9 +720,13 @@
     "category": "處世態度",
     "textCN": "沒有做過的事就不需要為它辯解，清者自清。",
     "textEN": "If you didn't do something, you don't have to defend yourself — the truth defends itself.",
-    "nfcUID": "",
+    "nfcUID": "04:56:6C:97:CC:2A:81",
     "contextId": "090",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "晚宴只喝開水，回家的路上不用怕路檢。"
   },
   {
@@ -557,7 +737,11 @@
     "textEN": "Your achievements should be built upon what you've actually done — not on what others say about you.",
     "nfcUID": "",
     "contextId": "091",
-    "tags": ["self-worth", "hurt", "perspective"],
+    "tags": [
+      "self-worth",
+      "hurt",
+      "perspective"
+    ],
     "translation": "獎盃是放在架子上的，不是掛在嘴上的。"
   },
   {
@@ -568,7 +752,11 @@
     "textEN": "Sometimes forgiveness isn't really given; it's just deciding to let things go.",
     "nfcUID": "",
     "contextId": "093",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "把那件事折好，放進抽屜最深處。沒有扔，只是不放在桌上了。"
   },
   {
@@ -579,7 +767,10 @@
     "textEN": "You should see people through your own eyes, not through someone else's words.",
     "nfcUID": "",
     "contextId": "094",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "別人說的那個人，跟你見到的是同一個嗎？"
   },
   {
@@ -590,7 +781,10 @@
     "textEN": "Obsessing over something you can't control will only make you suffer more.",
     "nfcUID": "",
     "contextId": "095",
-    "tags": ["overthinking", "let-go"],
+    "tags": [
+      "overthinking",
+      "let-go"
+    ],
     "translation": "抓著不放的東西，手會越來越痠。"
   },
   {
@@ -601,7 +795,11 @@
     "textEN": "You can't control what others say, but you can choose what to listen to.",
     "nfcUID": "",
     "contextId": "100",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "收音機播什麼你決定不了，但你可以換台。"
   },
   {
@@ -612,7 +810,11 @@
     "textEN": "When the road doesn't turn, you can — either carve a new path or take another route. There's always a way.",
     "nfcUID": "",
     "contextId": "103",
-    "tags": ["setback", "action", "perspective"],
+    "tags": [
+      "setback",
+      "action",
+      "perspective"
+    ],
     "translation": "前面施工，有人等，有人找別條路，有人直接穿過去。"
   },
   {
@@ -623,7 +825,11 @@
     "textEN": "Everyone carries labels, more or less.",
     "nfcUID": "",
     "contextId": "104",
-    "tags": ["self-worth", "hurt", "perspective"],
+    "tags": [
+      "self-worth",
+      "hurt",
+      "perspective"
+    ],
     "translation": "背包上貼滿了貼紙，有些是自己貼的，有些是別人貼的。"
   },
   {
@@ -634,7 +840,10 @@
     "textEN": "Money can buy happiness — a good meal, a nice drink, a great movie can all bring joy.",
     "nfcUID": "",
     "contextId": "109",
-    "tags": ["tired", "let-go"],
+    "tags": [
+      "tired",
+      "let-go"
+    ],
     "translation": "一碗熱湯，一張電影票，帳單上的數字不大，但夠了。"
   },
   {
@@ -645,7 +854,11 @@
     "textEN": "Do what's appropriate for the stage of the relationship you're in; don't overstep the line.",
     "nfcUID": "",
     "contextId": "112",
-    "tags": ["relationships", "overthinking", "patience"],
+    "tags": [
+      "relationships",
+      "overthinking",
+      "patience"
+    ],
     "translation": "第一次見面就把家裡的鑰匙給對方，有點太快了。"
   },
   {
@@ -656,7 +869,10 @@
     "textEN": "There's always someone better out there. Keep your confidence in check — not too much, not too little.",
     "nfcUID": "",
     "contextId": "115",
-    "tags": ["self-worth", "perspective"],
+    "tags": [
+      "self-worth",
+      "perspective"
+    ],
     "translation": "以為爬到頂了，抬頭一看，還有更高的地方。"
   },
   {
@@ -667,7 +883,11 @@
     "textEN": "Practice brings you closer to perfection.",
     "nfcUID": "",
     "contextId": "122",
-    "tags": ["action", "self-worth", "patience"],
+    "tags": [
+      "action",
+      "self-worth",
+      "patience"
+    ],
     "translation": "第一百次跟第一次，握筆的手感不一樣了。"
   },
   {
@@ -678,7 +898,10 @@
     "textEN": "Because you hold someone in your heart, you remember them, care about them, and think about them.",
     "nfcUID": "",
     "contextId": "123",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "他記得你說過不喜歡香菜，點餐的時候特別說了一聲。"
   },
   {
@@ -689,7 +912,11 @@
     "textEN": "It's truly hard for us to fully understand another person's pain or situation.",
     "nfcUID": "",
     "contextId": "125",
-    "tags": ["hurt", "relationships", "let-go"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "let-go"
+    ],
     "translation": "同一場雨，有人淋濕了很狼狽，有人站在屋簷下說：有那麼嚴重嗎？"
   },
   {
@@ -700,7 +927,10 @@
     "textEN": "Strike while the iron is hot — once the momentum fades, the meaning fades too.",
     "nfcUID": "",
     "contextId": "126",
-    "tags": ["action", "courage"],
+    "tags": [
+      "action",
+      "courage"
+    ],
     "translation": "那封信寫好了，但放了三個月還沒寄出去。"
   },
   {
@@ -711,7 +941,11 @@
     "textEN": "Slow makes steady, and steady makes fast.",
     "nfcUID": "",
     "contextId": "128",
-    "tags": ["action", "overthinking", "patience"],
+    "tags": [
+      "action",
+      "overthinking",
+      "patience"
+    ],
     "translation": "龜兔賽跑，贏的不是跑最快的那個。"
   },
   {
@@ -722,7 +956,11 @@
     "textEN": "Don't just work hard — work smart.",
     "nfcUID": "",
     "contextId": "130",
-    "tags": ["tired", "action", "perspective"],
+    "tags": [
+      "tired",
+      "action",
+      "perspective"
+    ],
     "translation": "同樣的木頭，有人用手鋸了三個小時，有人找來電鋸，十分鐘就好了。"
   },
   {
@@ -733,7 +971,11 @@
     "textEN": "Everyone has their own lessons to deal with.",
     "nfcUID": "",
     "contextId": "132",
-    "tags": ["self-worth", "setback", "perspective"],
+    "tags": [
+      "self-worth",
+      "setback",
+      "perspective"
+    ],
     "translation": "每個人桌上的考卷題目都不一樣。"
   },
   {
@@ -744,7 +986,10 @@
     "textEN": "Studying is good, but applying what you learn is even better.",
     "nfcUID": "",
     "contextId": "133",
-    "tags": ["action", "courage"],
+    "tags": [
+      "action",
+      "courage"
+    ],
     "translation": "食譜看了很多，但從來沒進過廚房。"
   },
   {
@@ -755,7 +1000,10 @@
     "textEN": "Treat others the way you want to be treated; people usually reflect what you give.",
     "nfcUID": "",
     "contextId": "141",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "牛頓說得很清楚：你推出去多少力，就會有多少力推回來。"
   },
   {
@@ -766,7 +1014,11 @@
     "textEN": "No matter how sad you are, you still need to eat when you're hungry and sleep when you're tired—life goes on.",
     "nfcUID": "",
     "contextId": "142",
-    "tags": ["tired", "setback", "let-go"],
+    "tags": [
+      "tired",
+      "setback",
+      "let-go"
+    ],
     "translation": "眼眶紅著，但還是把那碗飯吃完了。"
   },
   {
@@ -777,7 +1029,11 @@
     "textEN": "Everything feels strange the first time, but it gets easier the more you do it. Don't fear doing something poorly at the beginning.",
     "nfcUID": "",
     "contextId": "145",
-    "tags": ["action", "setback", "courage"],
+    "tags": [
+      "action",
+      "setback",
+      "courage"
+    ],
     "translation": "第一次騎腳踏車跌倒，第十次可以從台北騎到高雄。"
   },
   {
@@ -788,7 +1044,11 @@
     "textEN": "Imagine the life you want. When reality doesn't match that direction, you'll naturally want to adjust.",
     "nfcUID": "",
     "contextId": "146",
-    "tags": ["confused", "action", "perspective"],
+    "tags": [
+      "confused",
+      "action",
+      "perspective"
+    ],
     "translation": "沒有地址，導航要導去哪裡？"
   },
   {
@@ -799,7 +1059,11 @@
     "textEN": "Don't take your anger at one person out on someone else. It's unfair, confusing, and hurtful.",
     "nfcUID": "",
     "contextId": "150",
-    "tags": ["hurt", "relationships", "perspective"],
+    "tags": [
+      "hurt",
+      "relationships",
+      "perspective"
+    ],
     "translation": "有人在公司被罵了，回家把門關得很用力。門沒有做錯什麼。"
   },
   {
@@ -810,7 +1074,11 @@
     "textEN": "Do what you need to do, and don't let the outside world throw off your rhythm.",
     "nfcUID": "",
     "contextId": "151",
-    "tags": ["overthinking", "hurt", "courage"],
+    "tags": [
+      "overthinking",
+      "hurt",
+      "courage"
+    ],
     "translation": "耳機戴上，外面的聲音小了一點。"
   },
   {
@@ -821,7 +1089,11 @@
     "textEN": "While planning and preparing for the future, don't forget that living in the present matters just as much.",
     "nfcUID": "",
     "contextId": "152",
-    "tags": ["overthinking", "confused", "let-go"],
+    "tags": [
+      "overthinking",
+      "confused",
+      "let-go"
+    ],
     "translation": "一直在為明天澆水，今天的花快枯了。"
   },
   {
@@ -832,7 +1104,11 @@
     "textEN": "Break a big goal into smaller ones and tackle them one by one — that's how it stops feeling out of reach.",
     "nfcUID": "",
     "contextId": "153",
-    "tags": ["action", "overthinking", "patience"],
+    "tags": [
+      "action",
+      "overthinking",
+      "patience"
+    ],
     "translation": "整條麵包一口吃不下，買散裝的，或切開來就好了。"
   },
   {
@@ -843,7 +1119,10 @@
     "textEN": "Learning should be self-driven — and never-ending.",
     "nfcUID": "",
     "contextId": "156",
-    "tags": ["action", "perspective"],
+    "tags": [
+      "action",
+      "perspective"
+    ],
     "translation": "海綿吸到擰不出水來為止，然後繼續吸。"
   },
   {
@@ -854,7 +1133,11 @@
     "textEN": "Sometimes cutting your losses is one of the ways to deal with it.",
     "nfcUID": "",
     "contextId": "158",
-    "tags": ["setback", "overthinking", "let-go"],
+    "tags": [
+      "setback",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "鍋裡的東西燒焦了，早點關火，至少少點臭味。"
   },
   {
@@ -865,7 +1148,11 @@
     "textEN": "If life were scored out of ten, three would be fate, six would be hard work, and the last one would be luck.",
     "nfcUID": "",
     "contextId": "162",
-    "tags": ["setback", "tired", "let-go"],
+    "tags": [
+      "setback",
+      "tired",
+      "let-go"
+    ],
     "translation": "牌是發下來的，怎麼打是自己的事。但偶爾也需要等一張好牌從牌堆裡摸出來。"
   },
   {
@@ -876,7 +1163,11 @@
     "textEN": "I hope you can keep shining even when no one's watching.",
     "nfcUID": "",
     "contextId": "163",
-    "tags": ["self-worth", "tired", "courage"],
+    "tags": [
+      "self-worth",
+      "tired",
+      "courage"
+    ],
     "translation": "路燈亮著，不管底下有沒有人走過。"
   },
   {
@@ -887,7 +1178,11 @@
     "textEN": "I'm good to you because I am a good person—not because people label me as one.",
     "nfcUID": "",
     "contextId": "164",
-    "tags": ["relationships", "self-worth", "perspective"],
+    "tags": [
+      "relationships",
+      "self-worth",
+      "perspective"
+    ],
     "translation": "他請客，不是因為想讓人說他大方。"
   },
   {
@@ -898,7 +1193,10 @@
     "textEN": "Don't overthink everything. It's okay if your mind isn't always so delicate and precise.",
     "nfcUID": "",
     "contextId": "165",
-    "tags": ["overthinking", "let-go"],
+    "tags": [
+      "overthinking",
+      "let-go"
+    ],
     "translation": "想了三個小時，結果跟第一個念頭一樣。"
   },
   {
@@ -909,7 +1207,10 @@
     "textEN": "At home you rely on your parents; once you step outside, you rely on your friends. Connections matter, so keep expanding your circle.",
     "nfcUID": "",
     "contextId": "166",
-    "tags": ["relationships", "action"],
+    "tags": [
+      "relationships",
+      "action"
+    ],
     "translation": "一個人搬不動的東西，打一通電話就有人來了。"
   },
   {
@@ -920,7 +1221,11 @@
     "textEN": "If there's something you want to do, go for it. Regret often comes from not trying, not from trying and falling short.",
     "nfcUID": "",
     "contextId": "170",
-    "tags": ["action", "overthinking", "courage"],
+    "tags": [
+      "action",
+      "overthinking",
+      "courage"
+    ],
     "translation": "那趟旅行，兩個人說了好幾年要一起去。後來其中一個人先走了。"
   },
   {
@@ -931,7 +1236,11 @@
     "textEN": "If you fall, it's okay to lie down and rest for a bit. Once you've rested enough, stand back up.",
     "nfcUID": "",
     "contextId": "171",
-    "tags": ["tired", "setback", "let-go"],
+    "tags": [
+      "tired",
+      "setback",
+      "let-go"
+    ],
     "translation": "貓跌下來，舔舔腳，然後走掉了。"
   },
   {
@@ -942,7 +1251,11 @@
     "textEN": "Investing in yourself is always the best investment. That part never fails.",
     "nfcUID": "",
     "contextId": "174",
-    "tags": ["self-worth", "action", "perspective"],
+    "tags": [
+      "self-worth",
+      "action",
+      "perspective"
+    ],
     "translation": "花在自己身上的錢，利息最高。"
   },
   {
@@ -953,7 +1266,11 @@
     "textEN": "Be a little cockroach that refuses to die — keep pushing forward and cutting through the brambles ahead.",
     "nfcUID": "",
     "contextId": "175",
-    "tags": ["setback", "tired", "courage"],
+    "tags": [
+      "setback",
+      "tired",
+      "courage"
+    ],
     "translation": "被踩了一腳，過幾秒又爬起來了，繼續往前走。"
   },
   {
@@ -964,7 +1281,11 @@
     "textEN": "Read more and absorb more knowledge, if only to give yourself more choices in life.",
     "nfcUID": "",
     "contextId": "176",
-    "tags": ["action", "self-worth", "perspective"],
+    "tags": [
+      "action",
+      "self-worth",
+      "perspective"
+    ],
     "translation": "手裡的牌多一點，選擇就多一點。"
   },
   {
@@ -975,7 +1296,11 @@
     "textEN": "Health comes first. Only when you're alive and well can you do what you want, and experience the life you hope to live.",
     "nfcUID": "",
     "contextId": "180",
-    "tags": ["tired", "overthinking", "let-go"],
+    "tags": [
+      "tired",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "什麼都有，但沒有力氣享受，有點可惜。"
   },
   {
@@ -986,7 +1311,11 @@
     "textEN": "Everyone blooms at their own pace. You're not necessarily behind; when the time is right, you'll flourish too.",
     "nfcUID": "",
     "contextId": "182",
-    "tags": ["confused", "self-worth", "patience"],
+    "tags": [
+      "confused",
+      "self-worth",
+      "patience"
+    ],
     "translation": "有的花春天開，有的花要等到夏天才開。"
   },
   {
@@ -997,7 +1326,11 @@
     "textEN": "Your words and actions basically define the kind of person you are.",
     "nfcUID": "",
     "contextId": "183",
-    "tags": ["relationships", "self-worth", "perspective"],
+    "tags": [
+      "relationships",
+      "self-worth",
+      "perspective"
+    ],
     "translation": "沒有人的時候，收銀機多找了一百塊，他還是放回去了。"
   },
   {
@@ -1008,7 +1341,10 @@
     "textEN": "Opportunity favors the prepared. Stay ready, and when a chance comes, recognize it and go for it.",
     "nfcUID": "",
     "contextId": "185",
-    "tags": ["action", "patience"],
+    "tags": [
+      "action",
+      "patience"
+    ],
     "translation": "大家都在等同一班車，但只有他提前查好了時刻表。"
   },
   {
@@ -1019,7 +1355,11 @@
     "textEN": "Sometimes unexpected results come from things you did without intention—serendipity happens.",
     "nfcUID": "",
     "contextId": "188",
-    "tags": ["action", "overthinking", "let-go"],
+    "tags": [
+      "action",
+      "overthinking",
+      "let-go"
+    ],
     "translation": "隨手種下的東西，某天回來發現已經長大了。"
   },
   {
@@ -1030,7 +1370,10 @@
     "textEN": "Creating a win–win situation brings far more value than fighting to the bitter end.",
     "nfcUID": "",
     "contextId": "189",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "兩棵樹種在一起，根系交纏，反而都長得更好。"
   },
   {
@@ -1041,7 +1384,11 @@
     "textEN": "Everything happens for the best.",
     "nfcUID": "",
     "contextId": "191",
-    "tags": ["setback", "confused", "patience"],
+    "tags": [
+      "setback",
+      "confused",
+      "patience"
+    ],
     "translation": "錯過了那班車，卻在月台上遇到了一個人。"
   },
   {
@@ -1052,7 +1399,10 @@
     "textEN": "A setback may turn out to be a blessing in disguise; bad things sometimes come with unexpected good.",
     "nfcUID": "",
     "contextId": "194",
-    "tags": ["setback", "perspective"],
+    "tags": [
+      "setback",
+      "perspective"
+    ],
     "translation": "以為失去了什麼，後來發現空出來的位置，裝進了更多東西。"
   },
   {
@@ -1063,7 +1413,11 @@
     "textEN": "Find someone you admire, take them as a role model, and learn from them.",
     "nfcUID": "",
     "contextId": "195",
-    "tags": ["confused", "action", "courage"],
+    "tags": [
+      "confused",
+      "action",
+      "courage"
+    ],
     "translation": "雛鳥看著母鳥怎麼飛，試了幾次，後來飛得比母鳥還遠。"
   },
   {
@@ -1074,7 +1428,11 @@
     "textEN": "Sometimes, not knowing too much can also be a kind of happiness.",
     "nfcUID": "",
     "contextId": "196",
-    "tags": ["overthinking", "relationships", "let-go"],
+    "tags": [
+      "overthinking",
+      "relationships",
+      "let-go"
+    ],
     "translation": "有些事情知道了，就再也回不去了。"
   },
   {
@@ -1085,7 +1443,11 @@
     "textEN": "After hitting rock bottom, things can only go up; the lowest point may be the beginning of a turning point.",
     "nfcUID": "",
     "contextId": "198",
-    "tags": ["tired", "setback", "patience"],
+    "tags": [
+      "tired",
+      "setback",
+      "patience"
+    ],
     "translation": "最黑的時候，是天快亮之前。"
   },
   {
@@ -1096,7 +1458,10 @@
     "textEN": "There are so many things two people can talk about—there's no need to gossip about others.",
     "nfcUID": "",
     "contextId": "199",
-    "tags": ["relationships", "perspective"],
+    "tags": [
+      "relationships",
+      "perspective"
+    ],
     "translation": "聊了兩個小時，一次也沒提到別人的名字。"
   }
 ]

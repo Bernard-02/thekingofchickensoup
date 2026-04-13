@@ -17,6 +17,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- QR Code 產生器 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
     <!-- GSAP -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
@@ -251,7 +254,6 @@
                         <p id="quote-panel-zh" class="font-medium mb-3" style="font-size:2rem; line-height:1.3;"></p>
                         <p id="quote-panel-en" class="en font-normal" style="font-size:2rem; line-height:1.3;"></p>
                         <p id="quote-panel-hint" class="mt-8 opacity-50" style="font-size:1rem; line-height:1.5;">請掃描對應編號的瓶子以查看原句</p>
-                        <button onclick="revealQuoteInPanel()" class="mt-4 px-4 py-2 border border-black text-sm hover:bg-black hover:text-white transition-colors" style="font-size:0.875rem;">🧪 模擬掃描</button>
                     </div>
                 </div>
             </div>
@@ -275,8 +277,8 @@
                         </div>
                         <!-- 社群連結 -->
                         <div class="flex flex-col gap-2">
-                            <a href="https://www.instagram.com/thekingofchickensoup/" target="_blank" class="en hover-underline w-fit">Instagram</a>
-                            <a href="https://www.threads.com/@thekingofchickensoup" target="_blank" class="en hover-underline w-fit">Threads</a>
+                            <button type="button" onclick="showQRCode('https://www.instagram.com/thekingofchickensoup/', 'Instagram')" class="en hover-underline w-fit" style="background:none;border:none;padding:0;color:#000;cursor:pointer;font-size:inherit;">Instagram</button>
+                            <button type="button" onclick="showQRCode('https://www.threads.com/@thekingofchickensoup', 'Threads')" class="en hover-underline w-fit" style="background:none;border:none;padding:0;color:#000;cursor:pointer;font-size:inherit;">Threads</button>
                         </div>
                     </div>
                 </div>
@@ -533,6 +535,36 @@
     <script src="js/config.js"></script>
     <script src="js/context.js"></script>
     <script src="js/nfc.js"></script>
+    <!-- QR Code Overlay -->
+    <div id="qr-overlay" onclick="hideQRCode(event)" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.85); z-index:400; align-items:center; justify-content:center; cursor:pointer;">
+        <div onclick="event.stopPropagation()" style="background:#fff; padding:2rem; border:1px solid #000; display:flex; flex-direction:column; align-items:center; gap:1rem; cursor:default;">
+            <div id="qr-canvas"></div>
+        </div>
+    </div>
+
+    <script>
+    window.showQRCode = function(url, title) {
+        const overlay = document.getElementById('qr-overlay');
+        const canvas = document.getElementById('qr-canvas');
+        canvas.innerHTML = '';
+        new QRCode(canvas, {
+            text: url,
+            width: 240,
+            height: 240,
+            colorDark: '#000',
+            colorLight: '#fff',
+            correctLevel: QRCode.CorrectLevel.M
+        });
+        overlay.style.display = 'flex';
+    };
+    window.hideQRCode = function(e) {
+        // 只有點擊 overlay 本體才關（inner 用 stopPropagation 擋住）
+        if (!e || e.currentTarget === e.target) {
+            document.getElementById('qr-overlay').style.display = 'none';
+        }
+    };
+    </script>
+
     <script src="js/main.js"></script>
 </body>
 </html>

@@ -396,6 +396,12 @@ async function calculateAndShowTranslation() {
 let allQuotes = [];
 let selectedQuoteNumber = null;
 
+// 書本頁碼：第 1 句在 P10，每句 1 頁，每 50 句後有 2 頁其他內容
+function getQuotePage(quoteNumber) {
+    const gaps = Math.floor((quoteNumber - 1) / 50) * 2;
+    return 9 + quoteNumber + gaps;
+}
+
 async function buildQuotesList(highlightNumber) {
     if (allQuotes.length === 0) {
         const res = await fetch('data/quotes-selected.json');
@@ -410,11 +416,12 @@ async function buildQuotesList(highlightNumber) {
         const item = document.createElement('div');
         item.className = 'flex items-baseline gap-4 px-2 py-2 border-t-2 border-black cursor-pointer last:border-b-2';
         item.id = `quote-item-${q.number}`;
+        const pageNumber = getQuotePage(q.number);
         item.innerHTML = `
             <span class="en flex-shrink-0 text-lg tracking-tight" style="width: 3.5rem;">#${q.number}</span>
             <span class="flex-1 flex flex-col">
                 <span class="text-lg leading-relaxed">${q.translation}</span>
-                <span class="quote-page en text-lg text-right opacity-40 tracking-tight">P00</span>
+                <span class="quote-page en text-lg text-right opacity-40 tracking-tight">P${pageNumber}</span>
             </span>
         `;
 
@@ -573,6 +580,7 @@ function stopParticles() {
 
 // 開啟 slide panel
 function openQuotePanel(quote) {
+    window.currentOpenedQuoteNumber = quote.number;
     const panel = document.getElementById('quote-slide-panel');
     const nfcSection = document.getElementById('quote-panel-nfc');
     const revealSection = document.getElementById('quote-panel-reveal');
@@ -590,7 +598,7 @@ function openQuotePanel(quote) {
     // 立刻隱藏文字（避免閃爍），重置 hint
     zhEl.style.color = '#f2f2f2';
     enEl.style.color = '#f2f2f2';
-    document.getElementById('quote-panel-hint').textContent = '請掃描對應編號的瓶子以查看原句';
+    document.getElementById('quote-panel-hint').textContent = '雞湯的香味出來啦！';
 
     // 開啟 panel
     panel.classList.add('open');
@@ -602,6 +610,7 @@ function openQuotePanel(quote) {
 
 // 關閉 slide panel
 function closeQuotePanel() {
+    window.currentOpenedQuoteNumber = null;
     stopParticles();
     document.getElementById('quote-panel-zh').style.color = '';
     document.getElementById('quote-panel-en').style.color = '';
@@ -609,6 +618,8 @@ function closeQuotePanel() {
     document.getElementById('quote-slide-backdrop').classList.remove('open');
 }
 window.closeQuotePanel = closeQuotePanel;
+window.openQuotePanel = openQuotePanel;
+window.buildQuotesList = buildQuotesList;
 
 // NFC 掃描成功後，粒子 scatter 並 reveal（供 nfc.js 呼叫）
 window.revealQuoteInPanel = function() {
@@ -693,7 +704,8 @@ window.revealQuoteInPanel = function() {
             gsap.to(hint, {
                 opacity: 0, duration: 0.4, ease: 'power2.out',
                 onComplete: () => {
-                    hint.textContent = '翻閱書本以了解這句的脈絡';
+                    const page = window.currentOpenedQuoteNumber ? getQuotePage(window.currentOpenedQuoteNumber) : null;
+                    hint.textContent = page ? `翻閱書本第 ${page} 頁以了解這句的脈絡` : '翻閱書本以了解這句的脈絡';
                     gsap.to(hint, { opacity: 0.5, duration: 0.6, delay: 0.5, ease: 'power2.out' });
                 }
             });

@@ -174,31 +174,28 @@ class NFCManager {
                 log(`隨機選中: #${finalQuote.number}`, 'info');
             }
 
-            // 更新雞湯内容
-            document.getElementById('quote-number-text').textContent = `#${finalQuote.number}`;
-            document.getElementById('quote-zh-text').textContent = finalQuote.textCN;
-            document.getElementById('quote-en-text').textContent = finalQuote.textEN;
-
-            // *** 重要：發送當前雞湯編號給 ESP8266 ***
+            // 發送當前雞湯編號給 ESP8266
             this.updateCurrentQuote(finalQuote.number);
 
-            // 使用 showView 函數切換到雞湯頁面（帶淡入淡出效果）
+            // 切到 Quotes 頁、跑 list 入場動畫 + scroll 到抽中那句
             if (typeof window.showView === 'function') {
                 window.switchInfoTab('quotes');
                 window.showView('info-website-view');
-            } else {
-                // 降級方案：直接切換（如果 showView 不存在）
-                log('警告：showView 函數未定義，使用降級方案', 'warn');
-                document.querySelectorAll('.view-container').forEach(view => {
-                    view.classList.remove('active');
-                });
-                document.getElementById('info-website-view').classList.add('active');
-            }
+                if (typeof window.buildQuotesList === 'function') {
+                    await window.buildQuotesList(finalQuote.number);
+                }
 
-            // 2秒后显示底部提示（使用淡入效果）
-            setTimeout(() => {
-                document.getElementById('quote-actions')?.classList.add('visible');
-            }, 2000);
+                // list 動畫大約 2.5s 跑完（300ms 延遲 + scroll + 600ms flash + 1s hold + 0.6s fade）
+                // 動畫結束後自動 slide in 對應 quote panel
+                setTimeout(() => {
+                    if (typeof window.openQuotePanel === 'function') {
+                        log(`自動 slide in quote panel #${finalQuote.number}`, 'info');
+                        window.openQuotePanel(finalQuote);
+                    } else {
+                        log('警告：openQuotePanel 未定義，無法自動開啟 panel', 'warn');
+                    }
+                }, 2800);
+            }
 
         } catch (error) {
             log(`載入雞湯失敗: ${error}`, 'error');
@@ -240,101 +237,56 @@ class NFCManager {
     }
 
     // 處理切換脈絡顯示（新版）
+    // 新版：掃 NFC → 開 quote panel 並 reveal 原句
+    // （舊版的 contextManager 滿版脈絡已廢棄）
     async handleToggleContext(message) {
-        const { uid } = message;
-        log(`切換脈絡! 收到 UID: "${uid}"`, 'info');
-
-        try {
-            // 檢查脈絡是否已經顯示
-            if (window.contextManager && window.contextManager.isShowing()) {
-                // 已顯示 → 隱藏
-                log('脈絡已顯示，執行隱藏', 'info');
-                window.contextManager.hide();
-            } else {
-                // 未顯示 → 查找並顯示
-                const response = await fetch(CONFIG.dataFiles.quotes);
-                const quotes = await response.json();
-                const matchedQuote = quotes.find(q => q.nfcUID === uid);
-
-                if (matchedQuote) {
-                    // *** 新增：檢查當前顯示的雞湯編號 ***
-                    const currentQuote = this.currentQuoteNumber;
-
-                    if (currentQuote !== -1 && matchedQuote.number !== currentQuote) {
-                        log(`⚠ 錯誤的瓶子！當前雞湯是 #${currentQuote}，但掃描的是 #${matchedQuote.number} 的瓶子`, 'warn');
-                        log(`請使用編號 #${currentQuote} 的瓶子來查看脈絡`, 'warn');
-                        // 顯示錯誤提示
-                        this.showWrongBottleWarning(currentQuote, matchedQuote.number);
-                        return; // 不顯示脈絡
-                    }
-
-                    log(`✓ 找到匹配的雞湯: #${matchedQuote.number}`, 'info');
-                    if (window.contextManager) {
-                        window.contextManager.show(matchedQuote.number);
-                    } else {
-                        log('警告：contextManager 未定義', 'warn');
-                    }
-                } else {
-                    log(`找不到匹配的雞湯，UID: ${uid}`, 'warn');
-                }
-            }
-        } catch (error) {
-            log(`處理脈絡時發生錯誤: ${error}`, 'error');
-        }
+        return this.handleShowContext(message);
     }
 
-    // 處理顯示脈絡（舊版，保留相容性）
     async handleShowContext(message) {
         const { uid } = message;
-        log(`[DEBUG] 顯示脈絡! 收到 UID: "${uid}"`, 'info');
-        log(`[DEBUG] UID 類型: ${typeof uid}, 長度: ${uid ? uid.length : 'undefined'}`, 'info');
+        log(`掃描到 NFC UID: "${uid}"`, 'info');
 
         try {
-            // 根據 UID 查找對應的雞湯編號
             const response = await fetch(CONFIG.dataFiles.quotes);
             const quotes = await response.json();
-            log(`[DEBUG] 已載入 ${quotes.length} 筆雞湯資料`, 'info');
-
-            // 查找匹配的 nfcUID
             const matchedQuote = quotes.find(q => q.nfcUID === uid);
 
-            if (matchedQuote) {
-                log(`[DEBUG] ✓ 找到匹配的雞湯: #${matchedQuote.number} (UID: ${matchedQuote.nfcUID})`, 'info');
-
-                // *** 新增：檢查當前顯示的雞湯編號 ***
-                const currentQuote = this.currentQuoteNumber;
-
-                if (currentQuote !== -1 && matchedQuote.number !== currentQuote) {
-                    log(`⚠ 錯誤的瓶子！當前雞湯是 #${currentQuote}，但掃描的是 #${matchedQuote.number} 的瓶子`, 'warn');
-                    log(`請使用編號 #${currentQuote} 的瓶子來查看脈絡`, 'warn');
-                    // 顯示錯誤提示
-                    this.showWrongBottleWarning(currentQuote, matchedQuote.number);
-                    return; // 不顯示脈絡
-                }
-
-                // 使用覆蓋層顯示脈絡媒體
-                if (window.contextManager) {
-                    window.contextManager.show(matchedQuote.number);
-                } else {
-                    log('警告：contextManager 未定義', 'warn');
-                }
-            } else {
-                log(`[DEBUG] ✗ 找不到匹配的雞湯`, 'warn');
-                log(`[DEBUG] 搜尋的 UID: "${uid}"`, 'warn');
-
-                // 列出前3個和#30、#33的 UID 供參考
-                log(`[DEBUG] 資料庫中的 UID 範例:`, 'warn');
-                quotes.slice(0, 3).forEach(q => {
-                    log(`  #${q.number}: "${q.nfcUID}"`, 'warn');
-                });
-                const quote30 = quotes.find(q => q.number === 30);
-                const quote33 = quotes.find(q => q.number === 33);
-                if (quote30) log(`  #30: "${quote30.nfcUID}"`, 'warn');
-                if (quote33) log(`  #33: "${quote33.nfcUID}"`, 'warn');
+            if (!matchedQuote) {
+                log(`找不到匹配的雞湯，UID: ${uid}`, 'warn');
+                return;
             }
 
+            log(`✓ 找到匹配的雞湯: #${matchedQuote.number}`, 'info');
+
+            const panel = document.getElementById('quote-slide-panel');
+            const isOpen = panel && panel.classList.contains('open');
+
+            if (!isOpen) {
+                // panel 未開 → 開啟對應 quote，等粒子初始化後 reveal
+                if (typeof window.openQuotePanel === 'function') {
+                    window.openQuotePanel(matchedQuote);
+                    setTimeout(() => {
+                        if (typeof window.revealQuoteInPanel === 'function') {
+                            window.revealQuoteInPanel();
+                        }
+                    }, 600);
+                }
+            } else {
+                // panel 已開 → 只有 UID 完全對應才 reveal，否則一律 shake 錯誤提示
+                const openedNumber = window.currentOpenedQuoteNumber;
+
+                if (openedNumber === matchedQuote.number) {
+                    if (typeof window.revealQuoteInPanel === 'function') {
+                        window.revealQuoteInPanel();
+                    }
+                } else {
+                    log(`⚠ 錯誤的瓶子：面板是 #${openedNumber}，掃的是 #${matchedQuote.number}`, 'warn');
+                    this.shakeWrongBottleHint();
+                }
+            }
         } catch (error) {
-            log(`處理脈絡時發生錯誤: ${error}`, 'error');
+            log(`處理 NFC 掃描時發生錯誤: ${error}`, 'error');
         }
     }
 
@@ -582,7 +534,43 @@ class NFCManager {
         });
     }
 
-    // 顯示錯誤瓶子的警告提示
+    // 新版：在 quote panel 的 hint 文字上顯示錯誤提示 + 抖動
+    shakeWrongBottleHint() {
+        const hint = document.getElementById('quote-panel-hint');
+        const panelContent = document.getElementById('quote-panel-content');
+        if (!hint) return;
+
+        const originalText = hint.dataset.originalText || hint.textContent;
+        hint.dataset.originalText = originalText;
+
+        const prefixes = [
+            '人生難免會遇到一些挫折。',
+            '人非聖賢，孰能無過，拿錯瓶子也沒關係。',
+            '再用心檢查你手上的瓶子編號。'
+        ];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        hint.textContent = `${prefix}這不是對應的瓶子，請再試一次。`;
+        hint.style.color = '#c00';
+        hint.style.opacity = '1';
+
+        // 抖動：panel 左右來回 ~8px
+        if (panelContent && typeof gsap !== 'undefined') {
+            gsap.fromTo(panelContent,
+                { x: -8 },
+                { x: 0, duration: 0.45, ease: 'elastic.out(1.2, 0.3)', clearProps: 'x' }
+            );
+        }
+
+        // 2.5 秒後還原 hint
+        clearTimeout(this._wrongBottleTimer);
+        this._wrongBottleTimer = setTimeout(() => {
+            hint.style.color = '';
+            hint.style.opacity = '0.5';
+            hint.textContent = originalText;
+        }, 2500);
+    }
+
+    // 舊版：滿版警告（保留但不再使用）
     showWrongBottleWarning(correctNumber, scannedNumber) {
         const overlay = document.createElement('div');
         overlay.id = 'wrong-bottle-overlay';

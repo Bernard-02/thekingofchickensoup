@@ -4,7 +4,7 @@ window.CONFIG = {
     // WebSocket 設定
     websocket: {
         // ESP8266 的 IP 位址（連接到 BERNARD-LAPTOP）
-        url: 'ws://192.168.137.132:81',
+        url: 'ws://192.168.137.200:81',
         reconnectInterval: 2000, // 重連間隔（毫秒）
         heartbeatInterval: 5000, // 心跳間隔（毫秒）- 越短越快偵測斷線
         maxReconnectAttempts: 20 // 最多重連次數（之後暫停）
