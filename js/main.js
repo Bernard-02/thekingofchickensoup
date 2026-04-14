@@ -384,7 +384,15 @@ async function calculateAndShowTranslation() {
 
         console.log(`🎯 測驗匹配選中: #${finalQuizResult.quote.number} (痛點組合: ${finalQuizResult.userCombo.join(', ')})`);
 
-        // 更新並顯示轉譯畫面
+        // 上方提示：3 句雞湯味的招呼語隨機挑一個
+        const soupTeasers = [
+            '雞湯的香味出來啦！',
+            '你聞到雞湯的味道了嗎？',
+            '是不是有什麼東西滾了？'
+        ];
+        const teaser = soupTeasers[Math.floor(Math.random() * soupTeasers.length)];
+        document.getElementById('translation-hint').textContent = teaser;
+        // 下方仍顯示該句雞湯的籤文轉譯
         document.getElementById('translation-text').textContent = finalQuizResult.quote.translation;
         showView('translation-view');
     } catch (error) {
@@ -716,7 +724,7 @@ window.revealQuoteInPanel = function() {
 };
 
 // 進入解籤畫面
-window.decodeQuote = function() {
+window.decodeQuote = async function() {
     if (!finalQuizResult) return;
 
     const finalQuote = finalQuizResult.quote;
@@ -726,13 +734,19 @@ window.decodeQuote = function() {
         window.nfcManager.updateCurrentQuote(finalQuote.number);
     }
 
-    // 建立 list 並 scroll 到抽中的句子
-    buildQuotesList(finalQuote.number);
-
     // 確保一進來是顯示 Quotes 畫面
     switchInfoTab('quotes');
-
     showView('info-website-view');
+
+    // 建立 list 並 scroll 到抽中的句子
+    await buildQuotesList(finalQuote.number);
+
+    // list 動畫 ~2.5s 跑完後自動 slide in 對應 quote panel
+    setTimeout(() => {
+        if (typeof openQuotePanel === 'function') {
+            openQuotePanel(finalQuote);
+        }
+    }, 2800);
 };
 
 // 載入問題資料
@@ -865,7 +879,7 @@ window.submitChat = async function() {
         stopLoadingAnim();
 
         if (!response.ok || result.error) {
-            console.error('API error:', result.error);
+            console.error('API error:', result.error, 'detail:', result.detail);
             showRetryPrompt();
             return;
         }
@@ -1292,10 +1306,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const maxLines = 4;
         const maxScrollHeight = lineHeight * maxLines + 16; // pt padding
 
+        // IME 組字中不過濾（避免把注音符號吃掉）
+        let isComposing = false;
+        chatInput.addEventListener('compositionstart', () => { isComposing = true; });
+        chatInput.addEventListener('compositionend', () => {
+            isComposing = false;
+            chatInput.dispatchEvent(new Event('input'));
+        });
+
         chatInput.addEventListener('input', () => {
-            // 過濾：只允許中文、英文、基本標點、空格（連續空格壓成一個）
+            if (isComposing) return; // 組字中不過濾
+            // 過濾：只允許中文、注音、英文、基本標點、空格（連續空格壓成一個）
             let val = chatInput.value;
-            val = val.replace(/[^\u4e00-\u9fff\u3000-\u303fa-zA-Z0-9\s，。？！、；：「」''""—…·,.?!;:'"()\-\n]/g, '');
+            val = val.replace(/[^\u4e00-\u9fff\u3000-\u303f\u3100-\u312f\u31a0-\u31bfa-zA-Z0-9\s，。？！、；：「」''""—…·,.?!;:'"()\-\n]/g, '');
             val = val.replace(/ {2,}/g, ' ');
             if (val !== chatInput.value) chatInput.value = val;
 

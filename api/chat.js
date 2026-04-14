@@ -212,14 +212,15 @@ ${profile}
     }
 
     try {
-        const text = await callGemini(apiKey, userContext, systemPrompt);
+        const text = await callGemini(apiKey, userContext, systemPrompt, true);
 
-        // 嘗試解析 JSON
+        // 嘗試解析 JSON（jsonMode 已經要求 Gemini 直接回 JSON，但保留清理邏輯做保底）
         let cleaned = text;
         cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/g, '');
         cleaned = cleaned.replace(/```json\n?/g, '').replace(/```\n?/g, '');
         const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
+            console.error('[chat] Cannot parse Gemini response. Raw text:', text);
             return res.status(502).json({ error: 'Cannot parse Gemini response', detail: text });
         }
 
@@ -243,17 +244,21 @@ ${profile}
 }
 
 // 呼叫 Gemini API（自動 fallback 不同模型）
-async function callGemini(apiKey, userText, systemText) {
+async function callGemini(apiKey, userText, systemText, jsonMode = false) {
     const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    const generationConfig = {
+        temperature: 0.9,
+        maxOutputTokens: 4096,
+    };
+    if (jsonMode) {
+        generationConfig.responseMimeType = 'application/json';
+    }
     const requestBody = JSON.stringify({
         contents: [
             { role: 'user', parts: [{ text: userText }] }
         ],
         systemInstruction: { parts: [{ text: systemText }] },
-        generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 2048,
-        }
+        generationConfig,
     });
 
     let response;

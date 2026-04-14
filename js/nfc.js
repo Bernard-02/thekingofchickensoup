@@ -262,28 +262,21 @@ class NFCManager {
             const panel = document.getElementById('quote-slide-panel');
             const isOpen = panel && panel.classList.contains('open');
 
+            // panel 沒開就忽略（不自動開）
             if (!isOpen) {
-                // panel 未開 → 開啟對應 quote，等粒子初始化後 reveal
-                if (typeof window.openQuotePanel === 'function') {
-                    window.openQuotePanel(matchedQuote);
-                    setTimeout(() => {
-                        if (typeof window.revealQuoteInPanel === 'function') {
-                            window.revealQuoteInPanel();
-                        }
-                    }, 600);
+                log('panel 未開啟，忽略 NFC 掃描', 'info');
+                return;
+            }
+
+            // panel 已開 → UID 完全對應才 reveal，否則 shake 錯誤提示
+            const openedNumber = window.currentOpenedQuoteNumber;
+            if (openedNumber === matchedQuote.number) {
+                if (typeof window.revealQuoteInPanel === 'function') {
+                    window.revealQuoteInPanel();
                 }
             } else {
-                // panel 已開 → 只有 UID 完全對應才 reveal，否則一律 shake 錯誤提示
-                const openedNumber = window.currentOpenedQuoteNumber;
-
-                if (openedNumber === matchedQuote.number) {
-                    if (typeof window.revealQuoteInPanel === 'function') {
-                        window.revealQuoteInPanel();
-                    }
-                } else {
-                    log(`⚠ 錯誤的瓶子：面板是 #${openedNumber}，掃的是 #${matchedQuote.number}`, 'warn');
-                    this.shakeWrongBottleHint();
-                }
+                log(`⚠ 錯誤的瓶子：面板是 #${openedNumber}，掃的是 #${matchedQuote.number}`, 'warn');
+                this.shakeWrongBottleHint();
             }
         } catch (error) {
             log(`處理 NFC 掃描時發生錯誤: ${error}`, 'error');
