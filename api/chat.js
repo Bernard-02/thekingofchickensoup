@@ -30,11 +30,14 @@ module.exports = async function handler(req, res) {
     // Gemini：支援多把 key（逗號分隔），失敗會自動輪替
     const apiKeys = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
         .split(',').map(s => s.trim()).filter(Boolean);
-    // Claude：當 Gemini 全部失敗時的 backup
+    // Claude：當另一方全部失敗時的 backup
     const claudeKey = process.env.ANTHROPIC_API_KEY || '';
     if (apiKeys.length === 0 && !claudeKey) {
         return res.status(500).json({ error: 'No API keys configured' });
     }
+
+    // 嘗試順序：AI_PROVIDER=claude 代表 Claude 優先，否則 Gemini 優先
+    const claudeFirst = (process.env.AI_PROVIDER || '').toLowerCase() === 'claude';
 
     const { userMessage, scores, tone, length, retranslateOnly, existingCN, avoidCN } = req.body;
     if (!userMessage || !userMessage.trim()) {
@@ -59,14 +62,14 @@ module.exports = async function handler(req, res) {
 - 只回傳英文翻譯，不要加任何其他文字或格式`;
 
         try {
-            let result;
-            try {
-                result = await callGemini(apiKeys, translatePrompt, '你是一個翻譯專家。');
-            } catch (geminiErr) {
-                console.log('[chat] Gemini translate failed, falling back to Claude:', geminiErr.message);
-                if (!claudeKey) throw geminiErr;
-                result = await callClaude(claudeKey, translatePrompt, '你是一個翻譯專家。');
-            }
+            const result = await tryBothProviders(
+                claudeFirst,
+                () => callGemini(apiKeys, translatePrompt, '你是一個翻譯專家。'),
+                () => callClaude(claudeKey, translatePrompt, '你是一個翻譯專家。'),
+                apiKeys.length > 0,
+                !!claudeKey,
+                'translate'
+            );
             return res.status(200).json({ textEN: result.trim() });
         } catch (err) {
             return res.status(502).json({ error: err.message });
@@ -197,14 +200,14 @@ ${profile}
     }
 
     try {
-        let text;
-        try {
-            text = await callGemini(apiKeys, userContext, systemPrompt, true);
-        } catch (geminiErr) {
-            console.log('[chat] Gemini full-gen failed, falling back to Claude:', geminiErr.message);
-            if (!claudeKey) throw geminiErr;
-            text = await callClaude(claudeKey, userContext, systemPrompt, true);
-        }
+        const text = await tryBothProviders(
+            claudeFirst,
+            () => callGemini(apiKeys, userContext, systemPrompt, true),
+            () => callClaude(claudeKey, userContext, systemPrompt, true),
+            apiKeys.length > 0,
+            !!claudeKey,
+            'full-gen'
+        );
 
         // 嘗試解析 JSON（jsonMode 已經要求 Gemini 直接回 JSON，但保留清理邏輯做保底）
         let cleaned = text;
@@ -309,6 +312,31 @@ async function callGemini(apiKeys, userText, systemText, jsonMode = false) {
     }
 
     throw new Error(`All Gemini keys/models failed. Last error: ${lastErr}`);
+}
+
+// 依 claudeFirst 決定先試誰，前者失敗才試後者
+async function tryBothProviders(claudeFirst, geminiFn, claudeFn, geminiAvailable, claudeAvailable, label) {
+    const primary = claudeFirst ? 'claude' : 'gemini';
+    const backup = claudeFirst ? 'gemini' : 'claude';
+    const primaryFn = claudeFirst ? claudeFn : geminiFn;
+    const backupFn = claudeFirst ? geminiFn : claudeFn;
+    const primaryAvailable = claudeFirst ? claudeAvailable : geminiAvailable;
+    const backupAvailable = claudeFirst ? geminiAvailable : claudeAvailable;
+
+    if (primaryAvailable) {
+        try {
+            return await primaryFn();
+        } catch (err) {
+            console.log(`[chat][${label}] ${primary} failed, falling back to ${backup}:`, err.message);
+            if (!backupAvailable) throw err;
+            return await backupFn();
+        }
+    }
+    if (backupAvailable) {
+        console.log(`[chat][${label}] ${primary} not configured, using ${backup} directly`);
+        return await backupFn();
+    }
+    throw new Error('No provider available');
 }
 
 // 呼叫 Claude API（Haiku 4.5，當 Gemini 全部失敗時的 backup）
