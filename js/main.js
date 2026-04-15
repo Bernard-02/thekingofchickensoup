@@ -401,8 +401,8 @@ async function calculateAndShowTranslation() {
         const response = await fetch('data/quotes-selected.json');
         let quotes = await response.json();
         
-        // 只從前 50 句中選擇 (唯一抽籤卡專用限制)
-        quotes = quotes.filter(q => q.number <= 50);
+        // 只從 selected 的前 50 筆中選（= 有實體 NFC 卡的那 50 句）
+        quotes = quotes.slice(0, 50);
 
         // 動態載入 3D 計分大腦
         const { getQuizResult } = await import('./quizLogic.js');

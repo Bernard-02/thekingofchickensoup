@@ -1,88 +1,72 @@
 [
   {
     "id": "q1",
-    "text": "嗨，其實也沒什麼大道理，只是看你剛好點進來，想問你最近過得好嗎？",
-    "textEN": "Hey, no big reason — just saw you here and wanted to ask: how have you been lately?",
+    "text": "嗨，其實也沒什麼大道理，只是想問你最近過得怎麼樣？",
     "type": "single",
     "tag": "mood",
     "options": [
-      { "value": "confused", "text": "總覺得哪裡怪怪的，不太確定現在的方向", "scores": { "confused": 1, "action": 1 } },
-      { "value": "relationships", "text": "感覺「人」比我想像中複雜了一點", "scores": { "hurt": 1, "relationships": 1 } },
-      { "value": "tired", "text": "有點疲憊，想喘口氣", "scores": { "tired": 1, "let-go": 1 } },
-      { "value": "motivated", "text": "可能需要點新的想法", "scores": { "action": 1, "courage": 1 } },
-      { "value": "random", "text": "就那樣吧，日子還算滋潤", "scores": { "perspective": 1, "patience": 1 } }
+      { "value": "ip", "text": "在衝一些事情，整個人都在動",                 "scores": { "IP": 1 } },
+      { "value": "ir", "text": "有點累，想喘口氣",                               "scores": { "IR": 1 } },
+      { "value": "sp", "text": "有些人際的事想好好經營",                         "scores": { "SP": 1 } },
+      { "value": "sr", "text": "被一些人際煩到，想清靜一下",                     "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q2",
-    "text": "原來如此。那如果順著這個感覺，要你更具體形容一下，現在腦子裡最常冒出來的念頭是什麼？",
-    "textEN": "I see. If you follow that feeling, what thought keeps popping up in your head the most?",
+    "text": "原來如此。如果順著這個感覺，要你具體形容一下，腦海裡一直出現的念頭是什麼？",
     "type": "single",
     "tag": "thought",
     "options": [
-      { "value": "self", "text": "「我到底想要什麼？」", "scores": { "confused": 1, "self-worth": 1 } },
-      { "value": "relationships", "text": "「這個人到底在想什麼？」", "scores": { "overthinking": 1, "relationships": 1 } },
-      { "value": "doubt", "text": "「我這樣做對嗎？」", "scores": { "overthinking": 1, "self-worth": 1 } },
-      { "value": "action", "text": "「我什麼時候才要開始？」", "scores": { "action": 1, "courage": 1 } },
-      { "value": "random", "text": "也沒什麼特別，腦子還好", "scores": { "let-go": 1 } },
-      { "value": "none", "text": "以上都不是，我的念頭不在這裡面", "scores": {} }
+      { "value": "ip", "text": "「我到底做得夠不夠？」",                           "scores": { "IP": 1 } },
+      { "value": "ir", "text": "「好像該讓自己休息了」",                           "scores": { "IR": 1 } },
+      { "value": "sp", "text": "「那個人最近還好嗎？」",                           "scores": { "SP": 1 } },
+      { "value": "sr", "text": "「為什麼要一直在意那些聲音？」",                   "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q3",
-    "text": "當這些念頭讓你覺得累了或煩了的時候，你通常會怎麼讓自己好過一點？",
-    "textEN": "When those thoughts wear you out, what do you usually do to feel a little better?",
+    "text": "當這些念頭讓你累了或煩了的時候，你通常會怎麼讓自己好過一點？",
     "type": "single",
     "tag": "coping",
     "options": [
-      { "value": "alone", "text": "一個人待著，什麼都不做，讓腦子放空", "scores": { "tired": 1, "let-go": 1 } },
-      { "value": "outside", "text": "出去走走，換個地方透透氣", "scores": { "perspective": 1 } },
-      { "value": "talk", "text": "找個人說說話，不一定要建議，有人聽就好", "scores": { "relationships": 1, "perspective": 1 } },
-      { "value": "change", "text": "做一件平常不會做的事，換個感覺", "scores": { "action": 1, "courage": 1 } },
-      { "value": "unknown", "text": "說實話，我還沒找到什麼真的有效的方法", "scores": { "confused": 1, "patience": 1 } },
-      { "value": "none", "text": "以上都不太像我的方式", "scores": {} }
+      { "value": "ip", "text": "動起來，做點什麼新的事",                           "scores": { "IP": 1 } },
+      { "value": "ir", "text": "什麼都不做，讓腦袋放空",                           "scores": { "IR": 1 } },
+      { "value": "sp", "text": "找個人聊聊，不一定要建議",                         "scores": { "SP": 1 } },
+      { "value": "sr", "text": "把外界聲音靜音，自己待著",                         "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q4",
-    "text": "有時候我們失去自己的節奏，是因為外界的聲音太吵。別人怎麼看你，對現在的你來說有多重要？",
-    "textEN": "Sometimes we lose our rhythm because the noise around us is too loud. How much does other people's opinion of you matter right now?",
+    "text": "那遇到別人對你的評價時，你通常會怎麼消化？",
     "type": "single",
-    "tag": "social",
+    "tag": "evaluation",
     "options": [
-      { "value": "please_others", "text": "很怕讓別人失望，常常不自覺地去配合大家", "scores": { "hurt": 1, "self-worth": 1 } },
-      { "value": "care_a_lot", "text": "還是會在意，沒辦法完全不管", "scores": { "hurt": 1, "relationships": 1 } },
-      { "value": "know_but_cant", "text": "道理上知道不該在意，但心裡還是會", "scores": { "overthinking": 1, "self-worth": 1 } },
-      { "value": "annoyed", "text": "覺得很煩，只想叫那些指指點點的聲音閉嘴", "scores": { "tired": 1, "let-go": 1 } },
-      { "value": "less_now", "text": "已經沒那麼放在心上了，大概", "scores": { "let-go": 1, "perspective": 1 } },
-      { "value": "dont_care", "text": "不太在乎，活自己的就好", "scores": { "courage": 1, "self-worth": 1 } },
-      { "value": "none", "text": "以上都不是，我的感受比這些更複雜", "scores": {} }
+      { "value": "ip", "text": "會在乎，但會拿來督促自己",                         "scores": { "IP": 1 } },
+      { "value": "ir", "text": "會想，但會提醒自己別太糾結",                       "scores": { "IR": 1 } },
+      { "value": "sp", "text": "對我重要的人的看法才算數",                         "scores": { "SP": 1 } },
+      { "value": "sr", "text": "沒那麼重要了，活自己的就好",                       "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q5",
-    "text": "那如果不看別人，只看自己的前方呢？講到「未來」或「以後」，你現在的直覺反應是哪種感覺？",
-    "textEN": "What if you stop looking at others and just look ahead? When you hear \"the future,\" what's your gut feeling?",
+    "text": "那如果講到「未來」或「以後」，你的感覺是？",
     "type": "single",
     "tag": "future",
     "options": [
-      { "value": "lost", "text": "有點茫，看不太到前面的樣子", "scores": { "confused": 1, "patience": 1 } },
-      { "value": "tired", "text": "有方向，但走起來比想像中累", "scores": { "tired": 1, "setback": 1 } },
-      { "value": "present", "text": "不太想想那麼遠，先把今天過好就好", "scores": { "let-go": 1, "perspective": 1 } },
-      { "value": "excited", "text": "還滿期待的，甚至有點想快進", "scores": { "action": 1, "courage": 1 } },
-      { "value": "anxious", "text": "其實滿焦慮的，總會忍不住去想最壞的狀況", "scores": { "overthinking": 1, "let-go": 1 } },
-      { "value": "none", "text": "以上都不是，我對未來的感覺不在這裡", "scores": {} }
+      { "value": "ip", "text": "有些目標在跑，充滿幹勁",                           "scores": { "IP": 1 } },
+      { "value": "ir", "text": "別想太多，先把今天過好",                           "scores": { "IR": 1 } },
+      { "value": "sp", "text": "想跟重要的人一起走下去",                           "scores": { "SP": 1 } },
+      { "value": "sr", "text": "有點焦慮，不太想面對",                             "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q6",
     "text": "不知不覺聊到了最後。今天來這裡，你還有什麼想說的嗎？",
-    "textEN": "We've reached the end before I even noticed. Is there anything else you'd like to say?",
     "type": "single",
     "tag": "chat",
     "options": [
-      { "value": "chat", "text": "有，我想多說一點", "scores": { "action": 1, "courage": 1 } },
-      { "value": "skip", "text": "沒有，我想說的都說完了", "scores": { "let-go": 1, "patience": 1 } }
+      { "value": "chat", "text": "有，我想多說一點",                               "scores": {} },
+      { "value": "skip", "text": "沒有，我想說的都說完了",                         "scores": {} }
     ]
   }
 ]

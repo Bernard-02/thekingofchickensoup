@@ -12,7 +12,9 @@
       "setback",
       "perspective"
     ],
-    "translation": "雨還在下，有人撐傘，有人開始踩水坑。"
+    "translation": "雨還在下，有人撐傘，有人開始踩水坑。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "002",
@@ -26,7 +28,9 @@
       "confused",
       "patience"
     ],
-    "translation": "現在看不出來的線，之後都會接上。"
+    "translation": "現在看不出來的線，之後都會接上。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "003",
@@ -41,7 +45,8 @@
       "let-go",
       "perspective"
     ],
-    "translation": "後視鏡是用來參考的，不是用來開車的。"
+    "translation": "後視鏡是用來參考的，不是用來開車的。",
+    "quadrant": "IR"
   },
   {
     "id": "004",
@@ -56,7 +61,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "石頭落進水裡，水紋是不會說謊的。"
+    "translation": "石頭落進水裡，水紋是不會說謊的。",
+    "quadrant": "IR"
   },
   {
     "id": "005",
@@ -70,7 +76,8 @@
       "relationships",
       "patience"
     ],
-    "translation": "放了很久的東西，你還記得它在哪嗎？"
+    "translation": "放了很久的東西，你還記得它在哪嗎？",
+    "quadrant": "SP"
   },
   {
     "id": "007",
@@ -84,7 +91,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "同一班車，卻剛好坐在一起。"
+    "translation": "同一班車，卻剛好坐在一起。",
+    "quadrant": "SP"
   },
   {
     "id": "008",
@@ -99,7 +107,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "天氣預報說有雨，但他沒帶傘，也沒淋濕。"
+    "translation": "天氣預報說有雨，但他沒帶傘，也沒淋濕。",
+    "quadrant": "IR"
   },
   {
     "id": "010",
@@ -113,7 +122,8 @@
       "confused",
       "self-worth"
     ],
-    "translation": "鏡子裡那個人，你們熟嗎？"
+    "translation": "鏡子裡那個人，你們熟嗎？",
+    "quadrant": "IP"
   },
   {
     "id": "011",
@@ -128,7 +138,9 @@
       "setback",
       "let-go"
     ],
-    "translation": "同一條路，有人跑，有人慢慢晃，都到了。"
+    "translation": "同一條路，有人跑，有人慢慢晃，都到了。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "012",
@@ -143,7 +155,8 @@
       "self-worth",
       "let-go"
     ],
-    "translation": "第一次煮的菜，有點鹹，但還是吃完了。"
+    "translation": "第一次煮的菜，有點鹹，但還是吃完了。",
+    "quadrant": "IR"
   },
   {
     "id": "013",
@@ -158,7 +171,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "信封還沒拆開，先深呼吸一下。"
+    "translation": "信封還沒拆開，先深呼吸一下。",
+    "quadrant": "IR"
   },
   {
     "id": "017",
@@ -172,7 +186,8 @@
       "action",
       "courage"
     ],
-    "translation": "餓了就自己去開冰箱，沒人會幫你送過來。"
+    "translation": "餓了就自己去開冰箱，沒人會幫你送過來。",
+    "quadrant": "IP"
   },
   {
     "id": "018",
@@ -187,7 +202,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "隔壁桌在聊什麼，跟你沒關係。"
+    "translation": "隔壁桌在聊什麼，跟你沒關係。",
+    "quadrant": "SR"
   },
   {
     "id": "019",
@@ -202,7 +218,9 @@
       "relationships",
       "let-go"
     ],
-    "translation": "月台上的人來了又走，列車繼續往前開。"
+    "translation": "月台上的人來了又走，列車繼續往前開。",
+    "quadrant": "SR",
+    "quadrantSecondary": "SP"
   },
   {
     "id": "021",
@@ -217,7 +235,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "硬幣拋出去，正反各一半，沒什麼好驚訝的。"
+    "translation": "硬幣拋出去，正反各一半，沒什麼好驚訝的。",
+    "quadrant": "IR"
   },
   {
     "id": "022",
@@ -232,7 +251,9 @@
       "relationships",
       "let-go"
     ],
-    "translation": "不是所有人都需要澆水，找對了再澆。"
+    "translation": "不是所有人都需要澆水，找對了再澆。",
+    "quadrant": "SP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "025",
@@ -246,7 +267,8 @@
       "action",
       "courage"
     ],
-    "translation": "筆還沒碰紙，什麼都不會發生。"
+    "translation": "筆還沒碰紙，什麼都不會發生。",
+    "quadrant": "IP"
   },
   {
     "id": "026",
@@ -261,7 +283,8 @@
       "self-worth",
       "let-go"
     ],
-    "translation": "行事曆上的格子就那麼多，填進去的名字要想清楚。"
+    "translation": "行事曆上的格子就那麼多，填進去的名字要想清楚。",
+    "quadrant": "SR"
   },
   {
     "id": "028",
@@ -275,7 +298,9 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "那道題沒有標準答案，翻到最後一頁也找不到。"
+    "translation": "那道題沒有標準答案，翻到最後一頁也找不到。",
+    "quadrant": "IR",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "029",
@@ -289,7 +314,8 @@
       "confused",
       "perspective"
     ],
-    "translation": "昨天的天氣預報，今天不一定準。"
+    "translation": "昨天的天氣預報，今天不一定準。",
+    "quadrant": "IR"
   },
   {
     "id": "030",
@@ -304,7 +330,9 @@
       "relationships",
       "self-worth"
     ],
-    "translation": "有人覺得太甜，有人覺得剛好，是同一塊蛋糕。"
+    "translation": "有人覺得太甜，有人覺得剛好，是同一塊蛋糕。",
+    "quadrant": "SR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "032",
@@ -318,7 +346,9 @@
       "action",
       "perspective"
     ],
-    "translation": "多做一些好事，錢包沒有少任何東西。"
+    "translation": "多做一些好事，錢包沒有少任何東西。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SP"
   },
   {
     "id": "033",
@@ -333,7 +363,9 @@
       "relationships",
       "courage"
     ],
-    "translation": "穿錯鞋去爬山，換鞋就好，不用練腳皮。"
+    "translation": "穿錯鞋去爬山，換鞋就好，不用練腳皮。",
+    "quadrant": "SR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "037",
@@ -347,7 +379,8 @@
       "tired",
       "let-go"
     ],
-    "translation": "今天天氣陰，也是天氣的一種。"
+    "translation": "今天天氣陰，也是天氣的一種。",
+    "quadrant": "IR"
   },
   {
     "id": "039",
@@ -361,7 +394,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "有人一出生手裡就握著金湯匙，有人是銀的，有人則需要用手吃飯。"
+    "translation": "有人一出生手裡就握著金湯匙，有人是銀的，有人則需要用手吃飯。",
+    "quadrant": "IR"
   },
   {
     "id": "040",
@@ -375,7 +409,8 @@
       "relationships",
       "courage"
     ],
-    "translation": "你看我，我看你。彼此都等了很久，但沒有人想要先說話。"
+    "translation": "你看我，我看你。彼此都等了很久，但沒有人想要先說話。",
+    "quadrant": "SP"
   },
   {
     "id": "042",
@@ -389,7 +424,9 @@
       "tired",
       "perspective"
     ],
-    "translation": "睡前翻開小本子，今天有什麼值得寫的？"
+    "translation": "睡前翻開小本子，今天有什麼值得寫的？",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "043",
@@ -403,7 +440,8 @@
       "relationships",
       "action"
     ],
-    "translation": "有人記得你上次說過的那件小事。"
+    "translation": "有人記得你上次說過的那件小事。",
+    "quadrant": "SP"
   },
   {
     "id": "045",
@@ -418,7 +456,9 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "鞋子不合腳，有人換鞋，有人繼續磨。"
+    "translation": "鞋子不合腳，有人換鞋，有人繼續磨。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "047",
@@ -433,7 +473,8 @@
       "overthinking",
       "perspective"
     ],
-    "translation": "說完對不起，他轉身就走了。"
+    "translation": "說完對不起，他轉身就走了。",
+    "quadrant": "IP"
   },
   {
     "id": "048",
@@ -447,7 +488,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "他本來有別的事，但還是來了。"
+    "translation": "他本來有別的事，但還是來了。",
+    "quadrant": "SP"
   },
   {
     "id": "049",
@@ -462,7 +504,9 @@
       "relationships",
       "let-go"
     ],
-    "translation": "有些話說給三個人聽就夠了，不用廣播。"
+    "translation": "有些話說給三個人聽就夠了，不用廣播。",
+    "quadrant": "SR",
+    "quadrantSecondary": "SP"
   },
   {
     "id": "050",
@@ -477,7 +521,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "深夜有人傳訊息：最近好嗎？"
+    "translation": "深夜有人傳訊息：最近好嗎？",
+    "quadrant": "SP"
   },
   {
     "id": "051",
@@ -492,7 +537,8 @@
       "action",
       "patience"
     ],
-    "translation": "麵包還在烤，時間到了自然會好。"
+    "translation": "麵包還在烤，時間到了自然會好。",
+    "quadrant": "IR"
   },
   {
     "id": "052",
@@ -507,7 +553,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "地圖上的路是直的，實際走起來有幾個彎。"
+    "translation": "地圖上的路是直的，實際走起來有幾個彎。",
+    "quadrant": "IR"
   },
   {
     "id": "054",
@@ -522,7 +569,8 @@
       "action",
       "courage"
     ],
-    "translation": "同一片土，有人種出花，有人說土不好。"
+    "translation": "同一片土，有人種出花，有人說土不好。",
+    "quadrant": "IP"
   },
   {
     "id": "057",
@@ -537,7 +585,9 @@
       "overthinking",
       "perspective"
     ],
-    "translation": "跑道上只有一個你，跟昨天的你比就好。"
+    "translation": "跑道上只有一個你，跟昨天的你比就好。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "058",
@@ -552,7 +602,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "同一條路，有人看到終點，有人只看到坡。"
+    "translation": "同一條路，有人看到終點，有人只看到坡。",
+    "quadrant": "IR"
   },
   {
     "id": "060",
@@ -567,7 +618,8 @@
       "setback",
       "let-go"
     ],
-    "translation": "氣球吹得越大，破掉的聲音越響。先有個底。"
+    "translation": "氣球吹得越大，破掉的聲音越響。先有個底。",
+    "quadrant": "IR"
   },
   {
     "id": "062",
@@ -582,7 +634,8 @@
       "action",
       "courage"
     ],
-    "translation": "想說的話，今天說比明天說好。"
+    "translation": "想說的話，今天說比明天說好。",
+    "quadrant": "SP"
   },
   {
     "id": "063",
@@ -597,7 +650,8 @@
       "tired",
       "courage"
     ],
-    "translation": "竹子彎下去，風停了還是站回來。"
+    "translation": "竹子彎下去，風停了還是站回來。",
+    "quadrant": "IP"
   },
   {
     "id": "064",
@@ -611,7 +665,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "鹽放太多不行，太少也不行，嚐一口就知道。"
+    "translation": "鹽放太多不行，太少也不行，嚐一口就知道。",
+    "quadrant": "IR"
   },
   {
     "id": "066",
@@ -625,7 +680,8 @@
       "confused",
       "perspective"
     ],
-    "translation": "站在一樓只看得到隔壁的牆。"
+    "translation": "站在一樓只看得到隔壁的牆。",
+    "quadrant": "IP"
   },
   {
     "id": "071",
@@ -639,7 +695,8 @@
       "self-worth",
       "perspective"
     ],
-    "translation": "最深的水，通常是最靜的那一段。"
+    "translation": "最深的水，通常是最靜的那一段。",
+    "quadrant": "IP"
   },
   {
     "id": "074",
@@ -654,7 +711,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "第一次踩到坑，下次走這條路記得繞開。"
+    "translation": "第一次踩到坑，下次走這條路記得繞開。",
+    "quadrant": "IP"
   },
   {
     "id": "080",
@@ -669,7 +727,8 @@
       "tired",
       "patience"
     ],
-    "translation": "存錢筒每天丟一枚硬幣，不急，會滿的。"
+    "translation": "存錢筒每天丟一枚硬幣，不急，會滿的。",
+    "quadrant": "IP"
   },
   {
     "id": "083",
@@ -683,7 +742,8 @@
       "confused",
       "perspective"
     ],
-    "translation": "跑了很遠，回頭看一下當初站在哪裡出發的。"
+    "translation": "跑了很遠，回頭看一下當初站在哪裡出發的。",
+    "quadrant": "IP"
   },
   {
     "id": "087",
@@ -698,7 +758,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "路上有塊石頭，繞過去就好，不用跟它吵架。"
+    "translation": "路上有塊石頭，繞過去就好，不用跟它吵架。",
+    "quadrant": "SR"
   },
   {
     "id": "088",
@@ -712,7 +773,8 @@
       "action",
       "perspective"
     ],
-    "translation": "小小的火苗，可以點亮一根蠟燭，也可以燒掉一棟房子。"
+    "translation": "小小的火苗，可以點亮一根蠟燭，也可以燒掉一棟房子。",
+    "quadrant": "IP"
   },
   {
     "id": "090",
@@ -727,7 +789,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "晚宴只喝開水，回家的路上不用怕路檢。"
+    "translation": "晚宴只喝開水，回家的路上不用怕路檢。",
+    "quadrant": "SR"
   },
   {
     "id": "091",
@@ -742,7 +805,9 @@
       "hurt",
       "perspective"
     ],
-    "translation": "獎盃是放在架子上的，不是掛在嘴上的。"
+    "translation": "獎盃是放在架子上的，不是掛在嘴上的。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "093",
@@ -757,7 +822,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "把那件事折好，放進抽屜最深處。沒有扔，只是不放在桌上了。"
+    "translation": "把那件事折好，放進抽屜最深處。沒有扔，只是不放在桌上了。",
+    "quadrant": "IR"
   },
   {
     "id": "094",
@@ -771,7 +837,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "別人說的那個人，跟你見到的是同一個嗎？"
+    "translation": "別人說的那個人，跟你見到的是同一個嗎？",
+    "quadrant": "SR"
   },
   {
     "id": "095",
@@ -785,7 +852,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "抓著不放的東西，手會越來越痠。"
+    "translation": "抓著不放的東西，手會越來越痠。",
+    "quadrant": "IR"
   },
   {
     "id": "100",
@@ -800,7 +868,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "收音機播什麼你決定不了，但你可以換台。"
+    "translation": "收音機播什麼你決定不了，但你可以換台。",
+    "quadrant": "SR"
   },
   {
     "id": "103",
@@ -815,7 +884,8 @@
       "action",
       "perspective"
     ],
-    "translation": "前面施工，有人等，有人找別條路，有人直接穿過去。"
+    "translation": "前面施工，有人等，有人找別條路，有人直接穿過去。",
+    "quadrant": "IP"
   },
   {
     "id": "104",
@@ -830,7 +900,8 @@
       "hurt",
       "perspective"
     ],
-    "translation": "背包上貼滿了貼紙，有些是自己貼的，有些是別人貼的。"
+    "translation": "背包上貼滿了貼紙，有些是自己貼的，有些是別人貼的。",
+    "quadrant": "IR"
   },
   {
     "id": "109",
@@ -844,7 +915,8 @@
       "tired",
       "let-go"
     ],
-    "translation": "一碗熱湯，一張電影票，帳單上的數字不大，但夠了。"
+    "translation": "一碗熱湯，一張電影票，帳單上的數字不大，但夠了。",
+    "quadrant": "IR"
   },
   {
     "id": "112",
@@ -859,7 +931,9 @@
       "overthinking",
       "patience"
     ],
-    "translation": "第一次見面就把家裡的鑰匙給對方，有點太快了。"
+    "translation": "第一次見面就把家裡的鑰匙給對方，有點太快了。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "115",
@@ -873,7 +947,9 @@
       "self-worth",
       "perspective"
     ],
-    "translation": "以為爬到頂了，抬頭一看，還有更高的地方。"
+    "translation": "以為爬到頂了，抬頭一看，還有更高的地方。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "122",
@@ -888,7 +964,8 @@
       "self-worth",
       "patience"
     ],
-    "translation": "第一百次跟第一次，握筆的手感不一樣了。"
+    "translation": "第一百次跟第一次，握筆的手感不一樣了。",
+    "quadrant": "IP"
   },
   {
     "id": "123",
@@ -902,7 +979,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "他記得你說過不喜歡香菜，點餐的時候特別說了一聲。"
+    "translation": "他記得你說過不喜歡香菜，點餐的時候特別說了一聲。",
+    "quadrant": "SP"
   },
   {
     "id": "125",
@@ -917,7 +995,9 @@
       "relationships",
       "let-go"
     ],
-    "translation": "同一場雨，有人淋濕了很狼狽，有人站在屋簷下說：有那麼嚴重嗎？"
+    "translation": "同一場雨，有人淋濕了很狼狽，有人站在屋簷下說：有那麼嚴重嗎？",
+    "quadrant": "SR",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "126",
@@ -931,7 +1011,8 @@
       "action",
       "courage"
     ],
-    "translation": "那封信寫好了，但放了三個月還沒寄出去。"
+    "translation": "那封信寫好了，但放了三個月還沒寄出去。",
+    "quadrant": "IP"
   },
   {
     "id": "128",
@@ -946,7 +1027,9 @@
       "overthinking",
       "patience"
     ],
-    "translation": "龜兔賽跑，贏的不是跑最快的那個。"
+    "translation": "龜兔賽跑，贏的不是跑最快的那個。",
+    "quadrant": "IR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "130",
@@ -961,7 +1044,8 @@
       "action",
       "perspective"
     ],
-    "translation": "同樣的木頭，有人用手鋸了三個小時，有人找來電鋸，十分鐘就好了。"
+    "translation": "同樣的木頭，有人用手鋸了三個小時，有人找來電鋸，十分鐘就好了。",
+    "quadrant": "IP"
   },
   {
     "id": "132",
@@ -976,7 +1060,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "每個人桌上的考卷題目都不一樣。"
+    "translation": "每個人桌上的考卷題目都不一樣。",
+    "quadrant": "SR"
   },
   {
     "id": "133",
@@ -990,7 +1075,8 @@
       "action",
       "courage"
     ],
-    "translation": "食譜看了很多，但從來沒進過廚房。"
+    "translation": "食譜看了很多，但從來沒進過廚房。",
+    "quadrant": "IP"
   },
   {
     "id": "141",
@@ -1004,7 +1090,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "牛頓說得很清楚：你推出去多少力，就會有多少力推回來。"
+    "translation": "牛頓說得很清楚：你推出去多少力，就會有多少力推回來。",
+    "quadrant": "SP"
   },
   {
     "id": "142",
@@ -1019,7 +1106,9 @@
       "setback",
       "let-go"
     ],
-    "translation": "眼眶紅著，但還是把那碗飯吃完了。"
+    "translation": "眼眶紅著，但還是把那碗飯吃完了。",
+    "quadrant": "IR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "145",
@@ -1034,7 +1123,8 @@
       "setback",
       "courage"
     ],
-    "translation": "第一次騎腳踏車跌倒，第十次可以從台北騎到高雄。"
+    "translation": "第一次騎腳踏車跌倒，第十次可以從台北騎到高雄。",
+    "quadrant": "IP"
   },
   {
     "id": "146",
@@ -1049,7 +1139,9 @@
       "action",
       "perspective"
     ],
-    "translation": "沒有地址，導航要導去哪裡？"
+    "translation": "沒有地址，導航要導去哪裡？",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "150",
@@ -1064,7 +1156,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "有人在公司被罵了，回家把門關得很用力。門沒有做錯什麼。"
+    "translation": "有人在公司被罵了，回家把門關得很用力。門沒有做錯什麼。",
+    "quadrant": "SP"
   },
   {
     "id": "151",
@@ -1079,7 +1172,9 @@
       "hurt",
       "courage"
     ],
-    "translation": "耳機戴上，外面的聲音小了一點。"
+    "translation": "耳機戴上，外面的聲音小了一點。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "152",
@@ -1094,7 +1189,9 @@
       "confused",
       "let-go"
     ],
-    "translation": "一直在為明天澆水，今天的花快枯了。"
+    "translation": "一直在為明天澆水，今天的花快枯了。",
+    "quadrant": "IR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "153",
@@ -1109,7 +1206,8 @@
       "overthinking",
       "patience"
     ],
-    "translation": "整條麵包一口吃不下，買散裝的，或切開來就好了。"
+    "translation": "整條麵包一口吃不下，買散裝的，或切開來就好了。",
+    "quadrant": "IP"
   },
   {
     "id": "156",
@@ -1123,7 +1221,8 @@
       "action",
       "perspective"
     ],
-    "translation": "海綿吸到擰不出水來為止，然後繼續吸。"
+    "translation": "海綿吸到擰不出水來為止，然後繼續吸。",
+    "quadrant": "IP"
   },
   {
     "id": "158",
@@ -1138,7 +1237,9 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "鍋裡的東西燒焦了，早點關火，至少少點臭味。"
+    "translation": "鍋裡的東西燒焦了，早點關火，至少少點臭味。",
+    "quadrant": "IR",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "162",
@@ -1153,7 +1254,9 @@
       "tired",
       "let-go"
     ],
-    "translation": "牌是發下來的，怎麼打是自己的事。但偶爾也需要等一張好牌從牌堆裡摸出來。"
+    "translation": "牌是發下來的，怎麼打是自己的事。但偶爾也需要等一張好牌從牌堆裡摸出來。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "163",
@@ -1168,7 +1271,8 @@
       "tired",
       "courage"
     ],
-    "translation": "路燈亮著，不管底下有沒有人走過。"
+    "translation": "路燈亮著，不管底下有沒有人走過。",
+    "quadrant": "IP"
   },
   {
     "id": "164",
@@ -1183,7 +1287,9 @@
       "self-worth",
       "perspective"
     ],
-    "translation": "他請客，不是因為想讓人說他大方。"
+    "translation": "他請客，不是因為想讓人說他大方。",
+    "quadrant": "IP",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "165",
@@ -1197,7 +1303,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "想了三個小時，結果跟第一個念頭一樣。"
+    "translation": "想了三個小時，結果跟第一個念頭一樣。",
+    "quadrant": "IR"
   },
   {
     "id": "166",
@@ -1211,7 +1318,9 @@
       "relationships",
       "action"
     ],
-    "translation": "一個人搬不動的東西，打一通電話就有人來了。"
+    "translation": "一個人搬不動的東西，打一通電話就有人來了。",
+    "quadrant": "SP",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "170",
@@ -1226,7 +1335,8 @@
       "overthinking",
       "courage"
     ],
-    "translation": "那趟旅行，兩個人說了好幾年要一起去。後來其中一個人先走了。"
+    "translation": "那趟旅行，兩個人說了好幾年要一起去。後來其中一個人先走了。",
+    "quadrant": "IP"
   },
   {
     "id": "171",
@@ -1241,7 +1351,9 @@
       "setback",
       "let-go"
     ],
-    "translation": "貓跌下來，舔舔腳，然後走掉了。"
+    "translation": "貓跌下來，舔舔腳，然後走掉了。",
+    "quadrant": "IR",
+    "quadrantSecondary": "IP"
   },
   {
     "id": "174",
@@ -1256,7 +1368,8 @@
       "action",
       "perspective"
     ],
-    "translation": "花在自己身上的錢，利息最高。"
+    "translation": "花在自己身上的錢，利息最高。",
+    "quadrant": "IP"
   },
   {
     "id": "175",
@@ -1271,7 +1384,8 @@
       "tired",
       "courage"
     ],
-    "translation": "被踩了一腳，過幾秒又爬起來了，繼續往前走。"
+    "translation": "被踩了一腳，過幾秒又爬起來了，繼續往前走。",
+    "quadrant": "IP"
   },
   {
     "id": "176",
@@ -1286,7 +1400,8 @@
       "self-worth",
       "perspective"
     ],
-    "translation": "手裡的牌多一點，選擇就多一點。"
+    "translation": "手裡的牌多一點，選擇就多一點。",
+    "quadrant": "IP"
   },
   {
     "id": "180",
@@ -1301,7 +1416,9 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "什麼都有，但沒有力氣享受，有點可惜。"
+    "translation": "什麼都有，但沒有力氣享受，有點可惜。",
+    "quadrant": "IP",
+    "quadrantSecondary": "IR"
   },
   {
     "id": "182",
@@ -1316,7 +1433,9 @@
       "self-worth",
       "patience"
     ],
-    "translation": "有的花春天開，有的花要等到夏天才開。"
+    "translation": "有的花春天開，有的花要等到夏天才開。",
+    "quadrant": "IR",
+    "quadrantSecondary": "SR"
   },
   {
     "id": "183",
@@ -1331,7 +1450,8 @@
       "self-worth",
       "perspective"
     ],
-    "translation": "沒有人的時候，收銀機多找了一百塊，他還是放回去了。"
+    "translation": "沒有人的時候，收銀機多找了一百塊，他還是放回去了。",
+    "quadrant": "IP"
   },
   {
     "id": "185",
@@ -1345,7 +1465,8 @@
       "action",
       "patience"
     ],
-    "translation": "大家都在等同一班車，但只有他提前查好了時刻表。"
+    "translation": "大家都在等同一班車，但只有他提前查好了時刻表。",
+    "quadrant": "IP"
   },
   {
     "id": "188",
@@ -1360,7 +1481,8 @@
       "overthinking",
       "let-go"
     ],
-    "translation": "隨手種下的東西，某天回來發現已經長大了。"
+    "translation": "隨手種下的東西，某天回來發現已經長大了。",
+    "quadrant": "IR"
   },
   {
     "id": "189",
@@ -1374,7 +1496,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "兩棵樹種在一起，根系交纏，反而都長得更好。"
+    "translation": "兩棵樹種在一起，根系交纏，反而都長得更好。",
+    "quadrant": "SP"
   },
   {
     "id": "191",
@@ -1389,7 +1512,8 @@
       "confused",
       "patience"
     ],
-    "translation": "錯過了那班車，卻在月台上遇到了一個人。"
+    "translation": "錯過了那班車，卻在月台上遇到了一個人。",
+    "quadrant": "IR"
   },
   {
     "id": "194",
@@ -1403,7 +1527,8 @@
       "setback",
       "perspective"
     ],
-    "translation": "以為失去了什麼，後來發現空出來的位置，裝進了更多東西。"
+    "translation": "以為失去了什麼，後來發現空出來的位置，裝進了更多東西。",
+    "quadrant": "IR"
   },
   {
     "id": "195",
@@ -1418,7 +1543,8 @@
       "action",
       "courage"
     ],
-    "translation": "雛鳥看著母鳥怎麼飛，試了幾次，後來飛得比母鳥還遠。"
+    "translation": "雛鳥看著母鳥怎麼飛，試了幾次，後來飛得比母鳥還遠。",
+    "quadrant": "IP"
   },
   {
     "id": "196",
@@ -1433,7 +1559,8 @@
       "relationships",
       "let-go"
     ],
-    "translation": "有些事情知道了，就再也回不去了。"
+    "translation": "有些事情知道了，就再也回不去了。",
+    "quadrant": "IR"
   },
   {
     "id": "198",
@@ -1448,7 +1575,8 @@
       "setback",
       "patience"
     ],
-    "translation": "最黑的時候，是天快亮之前。"
+    "translation": "最黑的時候，是天快亮之前。",
+    "quadrant": "IR"
   },
   {
     "id": "199",
@@ -1462,6 +1590,8 @@
       "relationships",
       "perspective"
     ],
-    "translation": "聊了兩個小時，一次也沒提到別人的名字。"
+    "translation": "聊了兩個小時，一次也沒提到別人的名字。",
+    "quadrant": "SR",
+    "quadrantSecondary": "SP"
   }
 ]
