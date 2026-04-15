@@ -31,7 +31,7 @@ module.exports = async function handler(req, res) {
     const apiKeys = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
         .split(',').map(s => s.trim()).filter(Boolean);
     // Claude：當另一方全部失敗時的 backup
-    const claudeKey = process.env.ANTHROPIC_API_KEY || '';
+    const claudeKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY || '';
     if (apiKeys.length === 0 && !claudeKey) {
         return res.status(500).json({ error: 'No API keys configured' });
     }
