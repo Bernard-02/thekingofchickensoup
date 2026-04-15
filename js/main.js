@@ -846,18 +846,31 @@ function showChatResult() {
 // 開始 loading 動畫（持續循環直到 API 回應）
 let loadingTimeline = null;
 
-function startLoadingAnim(zhText = '雞湯生成中...') {
+function startLoadingAnim(phrases) {
     const zhEl = document.getElementById('chat-loading-zh');
     const enEl = document.getElementById('chat-loading-en');
     zhEl.textContent = '';
     if (enEl) enEl.textContent = '';
 
+    // 支援單一字串（相容舊呼叫）或陣列
+    const lines = Array.isArray(phrases)
+        ? phrases
+        : [phrases || '雞湯生成中...', '正在熬煮你的雞湯...', '火候剛剛好...'];
+
+    // 洗牌，每次進入 loading 順序不同
+    for (let i = lines.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [lines[i], lines[j]] = [lines[j], lines[i]];
+    }
+
     loadingTimeline = gsap.timeline({ repeat: -1 });
-    loadingTimeline
-        .to(zhEl, { duration: zhText.length * 0.08, text: zhText, ease: 'none' })
-        .to({}, { duration: 0.8 })
-        .to(zhEl, { duration: 0.2, text: '', ease: 'none' })
-        .to({}, { duration: 0.3 });
+    lines.forEach(line => {
+        loadingTimeline
+            .to(zhEl, { duration: line.length * 0.08, text: line, ease: 'none' })
+            .to({}, { duration: 0.8 })
+            .to(zhEl, { duration: 0.2, text: '', ease: 'none' })
+            .to({}, { duration: 0.3 });
+    });
 }
 
 function stopLoadingAnim() {
@@ -873,6 +886,10 @@ window.submitChat = async function() {
     const text = input.value.trim();
     if (!text) return;
     lastChatMessage = text;
+
+    // 清掉上一次的 retry hint
+    const hint = document.getElementById('chat-retry-hint');
+    if (hint) hint.style.display = 'none';
 
     // 進入 loading
     showView('chat-loading-view');
@@ -923,8 +940,19 @@ window.submitChat = async function() {
 
         if (!result.valid) {
             stopLoadingAnim();
-            alert(result.retry_message || '可以再多說一點嗎？');
+            const hint = document.getElementById('chat-retry-hint');
+            if (hint) {
+                hint.textContent = result.retry_message || '可以再多說一點嗎？';
+                hint.style.display = '';
+                gsap.fromTo(hint, { opacity: 0, y: 8 }, { opacity: 0.7, y: 0, duration: 0.5, ease: 'power2.out' });
+            }
             showView('chat-view');
+            // 保留使用者原本輸入方便他繼續補充
+            const inputEl = document.getElementById('chat-input');
+            if (inputEl) {
+                inputEl.value = lastChatMessage;
+                inputEl.focus();
+            }
             return;
         }
 
@@ -1012,35 +1040,35 @@ const SAVE_RATIOS = {
     '4:5':  { w: 900,  h: 1125 },
     '1:1':  { w: 1000, h: 1000 },
 };
-const SAVE_DEFAULTS = { ratio: '4:5', bg: '#ffffff', text: '#000000' };
+const SAVE_DEFAULTS = { ratio: '4:5', bg: '#f2f2f2', text: '#000000', border: '#000000', noBorder: true };
 
 function applySaveCardStyle() {
     const ratio = document.querySelector('input[name="save-ratio"]:checked')?.value || '4:5';
     const bg = document.getElementById('save-bg-color').value;
     const textColor = document.getElementById('save-text-color').value;
+    const borderColor = document.getElementById('save-border-color').value;
+    const noBorder = document.getElementById('save-no-border').checked;
     const { w, h } = SAVE_RATIOS[ratio];
 
     const card = document.getElementById('save-card');
     const wrapper = document.getElementById('save-preview-wrapper');
     if (!card || !wrapper) return;
 
-    // 基於預覽容器計算縮放（等比）
-    const pad = 48;
-    const availW = wrapper.clientWidth - pad;
-    const availH = wrapper.clientHeight - pad;
+    const availW = wrapper.clientWidth;
+    const availH = wrapper.clientHeight;
     const scale = Math.min(availW / w, availH / h, 1);
 
     card.style.width = w + 'px';
     card.style.height = h + 'px';
     card.style.background = bg;
     card.style.color = textColor;
+    card.style.border = noBorder ? 'none' : `2px solid ${borderColor}`;
     card.style.transform = `scale(${scale})`;
     card.style.transformOrigin = 'center';
 
-    // logo 反色：深底用白 logo（目前的 png），淺底把 logo 黑色化（filter invert）
+    // logo 反色：淺底用黑 logo，深底用白 logo
     const logo = document.getElementById('save-card-logo');
     if (logo) {
-        // 判斷背景亮度
         const hex = bg.replace('#', '');
         const r = parseInt(hex.slice(0, 2), 16);
         const g = parseInt(hex.slice(2, 4), 16);
@@ -1071,6 +1099,8 @@ window.resetSaveDefaults = function() {
     if (ratioInput) ratioInput.checked = true;
     document.getElementById('save-bg-color').value = SAVE_DEFAULTS.bg;
     document.getElementById('save-text-color').value = SAVE_DEFAULTS.text;
+    document.getElementById('save-border-color').value = SAVE_DEFAULTS.border;
+    document.getElementById('save-no-border').checked = SAVE_DEFAULTS.noBorder;
     applySaveCardStyle();
 };
 
@@ -1138,10 +1168,12 @@ window.sendSaveCard = async function() {
 
 // 控制面板變動即時更新預覽
 document.addEventListener('DOMContentLoaded', () => {
-    ['save-bg-color', 'save-text-color'].forEach(id => {
+    ['save-bg-color', 'save-text-color', 'save-border-color'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', applySaveCardStyle);
     });
+    const noBorderCb = document.getElementById('save-no-border');
+    if (noBorderCb) noBorderCb.addEventListener('change', applySaveCardStyle);
     document.querySelectorAll('input[name="save-ratio"]').forEach(el => {
         el.addEventListener('change', applySaveCardStyle);
     });
