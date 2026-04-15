@@ -67,7 +67,7 @@
             <div class="max-w-2xl mx-auto text-center w-full">
                 <p id="question-progress" class="en font-normal mb-6">1 / 8</p>
                 <h2 id="question-text" class="font-medium mb-4"></h2>
-                <h4 id="question-text-en" class="en font-normal mb-12"></h4>
+                <h4 id="question-text-en" class="en font-normal mb-12" style="display:none;"></h4>
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
             </div>
@@ -105,7 +105,10 @@
                 <h4 id="chat-loading-en" class="en font-normal"></h4>
                 <div id="chat-retry-section" class="mt-12" style="display: none;">
                     <p class="mb-4 opacity-50" style="font-size: 1rem;">雞湯熬太久了，再試一次？</p>
-                    <button onclick="retryLastChat()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">再試一次</button>
+                    <div class="flex gap-4 justify-center">
+                        <button onclick="retryLastChat()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">再試一次</button>
+                        <button onclick="restart()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">回到首頁</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,14 +154,6 @@
                         <input id="param-en-toggle" type="checkbox" class="custom-checkbox">
                         <span class="en text-xs">English</span>
                     </label>
-                    <!-- Manglish ↔ Formal slider（預設隱藏） -->
-                    <div id="param-en-style-wrapper" class="flex flex-col gap-3" style="display: none;">
-                        <div class="flex justify-between">
-                            <span class="en text-xs">Manglish</span>
-                            <span class="en text-xs">Formal</span>
-                        </div>
-                        <input id="param-english" type="range" min="0" max="100" step="25" value="50" class="param-slider">
-                    </div>
                 </div>
                 <!-- 字體選擇（最下面）-->
                 <div class="flex flex-col gap-2">

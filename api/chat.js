@@ -9,7 +9,8 @@ let quotesCache = null;
 function loadQuotes() {
     if (quotesCache) return quotesCache;
     try {
-        const filePath = path.join(process.cwd(), 'data', 'quotes-selected.json');
+        // 用完整 200 句做風格學習，比只用 selected 的 100 句涵蓋更多語感
+        const filePath = path.join(process.cwd(), 'data', 'quotes.json');
         const data = fs.readFileSync(filePath, 'utf-8');
         quotesCache = JSON.parse(data);
     } catch (e) {
@@ -26,10 +27,16 @@ module.exports = async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: 'API key not configured' });
+    // Gemini：支援多把 key（逗號分隔），失敗會自動輪替
+    const apiKeys = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
+        .split(',').map(s => s.trim()).filter(Boolean);
+    // Claude：當 Gemini 全部失敗時的 backup
+    const claudeKey = process.env.ANTHROPIC_API_KEY || '';
+    if (apiKeys.length === 0 && !claudeKey) {
+        return res.status(500).json({ error: 'No API keys configured' });
+    }
 
-    const { userMessage, scores, tone, english, englishStyle, length, retranslateOnly, existingCN, avoidCN } = req.body;
+    const { userMessage, scores, tone, length, retranslateOnly, existingCN, avoidCN } = req.body;
     if (!userMessage || !userMessage.trim()) {
         return res.status(400).json({ error: 'Empty message' });
     }
@@ -38,46 +45,28 @@ module.exports = async function handler(req, res) {
     const snap = v => Math.round(Number(v ?? 50) / 25) * 25;
     const toneSnap = snap(tone);
     const lengthSnap = snap(length);
-    const enStyleSnap = snap(englishStyle);
     const toneIdx = toneSnap / 25; // 0..4
 
-    // Manglish / English 風格 SOP：等級越小 → 越 Manglish
-    // 每個等級都給具體規則，讓 Gemini 有明確的操作依據
-    const MANGLISH_SOP = `Manglish (馬式英文) 轉換規則參考：
-- 句末語氣詞：can → can lah / can or not、yes → yes lah、ok → ok lor、sure → sure one、good → good mah
-- 驚嘆：Oh my god → walao、Oh no → aiyo、wow → wah、really → really ah / really meh
-- 強調：very tired → damn tired / tired die、a lot → got a lot
-- 疑問：Don't you think? → izzit?、Do you know? → you know or not?
-- 代名詞省略：I am tired → tired lah / so tired lah
-- 直接的 Chinglish 結構：because + 逗號、mix 一點 Malay/粵語詞（kaya, kopi, makan, sudah, aiya）
-- 允許破碎/省略語法（像口語），不要太工整`;
-
-    const styleDescByLevel = {
-        0: `FULL MANGLISH — 大量使用 Manglish。必須至少符合 3 項以上規則：句末加 lah/lor/mah/meh、用 aiyo/walao/wah、可加 Malay 詞、用破碎口語語法。不要寫成標準英文。\n${MANGLISH_SOP}`,
-        25: `Manglish-flavored — 用 1-2 個 Manglish 特徵（例如：句末加一次 lah / 用一次 walao），整體仍可懂，但一眼看出是馬來西亞人在講話。\n${MANGLISH_SOP}`,
-        50: `Natural conversational English — 不 Manglish，也不正式。像朋友間平常聊天的英文。可以用縮寫 (you're, don't, it's)。`,
-        75: `Polished conversational English — 輕微偏正式。減少縮寫，句子結構完整，但不會太書面。`,
-        100: `FULLY FORMAL English — 完全正式書面英文。不用縮寫，句子完整，像寫文章或演講稿那樣。避免 slang、語氣詞。`
-    };
-    const styleDesc = styleDescByLevel[enStyleSnap];
-
-    // 模式一：只重新翻譯英文
+    // 模式一：只重新翻譯英文（用自然對話風格）
     if (retranslateOnly && existingCN) {
-        const translatePrompt = `將以下中文語錄翻譯成英文。
+        const translatePrompt = `將以下中文語錄翻譯成英文，用自然對話的英文。
 
 中文原句：${existingCN}
 
-⚠ 英文風格硬性要求：${styleDesc}
-
-寫完後**請自己檢查**是否符合上述風格等級，不符合就重寫。
-
-其他注意：
+注意：
 - 不要改變原意
-- 中文的語氣和口吻不會影響英文翻譯的風格
+- 英文風格：natural conversational English（可用縮寫如 you're / don't / it's）
 - 只回傳英文翻譯，不要加任何其他文字或格式`;
 
         try {
-            const result = await callGemini(apiKey, translatePrompt, '你是一個翻譯專家。');
+            let result;
+            try {
+                result = await callGemini(apiKeys, translatePrompt, '你是一個翻譯專家。');
+            } catch (geminiErr) {
+                console.log('[chat] Gemini translate failed, falling back to Claude:', geminiErr.message);
+                if (!claudeKey) throw geminiErr;
+                result = await callClaude(claudeKey, translatePrompt, '你是一個翻譯專家。');
+            }
             return res.status(200).json({ textEN: result.trim() });
         } catch (err) {
             return res.status(502).json({ error: err.message });
@@ -152,11 +141,7 @@ ${examples}
 - 不要用「加油」「相信自己」「一切都會好的」這種空泛的話
 - 要像說話一樣自然，不要太文藝
 
-另外，請把**第 ${toneIdx + 1} 個版本**翻譯成英文。
-
-⚠ 英文風格硬性要求：${styleDesc}
-
-寫完英文後，**請自己檢查**是否符合上述風格等級，不符合就重寫。
+另外，請把**第 ${toneIdx + 1} 個版本**翻譯成自然對話的英文（可用縮寫如 you're / don't / it's，不要太正式、也不要太破碎）。不要改變原意。
 
 ${Array.isArray(avoidCN) && avoidCN.length > 0 ? `⚠ 重要：你之前已經寫過這些版本，請**不要重複**（連相似的意思、相似的結構都避開，換新的角度或比喻）：
 ${avoidCN.filter(Boolean).map((s, i) => `${i + 1}. ${s}`).join('\n')}
@@ -212,7 +197,14 @@ ${profile}
     }
 
     try {
-        const text = await callGemini(apiKey, userContext, systemPrompt, true);
+        let text;
+        try {
+            text = await callGemini(apiKeys, userContext, systemPrompt, true);
+        } catch (geminiErr) {
+            console.log('[chat] Gemini full-gen failed, falling back to Claude:', geminiErr.message);
+            if (!claudeKey) throw geminiErr;
+            text = await callClaude(claudeKey, userContext, systemPrompt, true);
+        }
 
         // 嘗試解析 JSON（jsonMode 已經要求 Gemini 直接回 JSON，但保留清理邏輯做保底）
         let cleaned = text;
@@ -244,7 +236,8 @@ ${profile}
 }
 
 // 呼叫 Gemini API（自動 fallback 不同模型）
-async function callGemini(apiKey, userText, systemText, jsonMode = false) {
+async function callGemini(apiKeys, userText, systemText, jsonMode = false) {
+    const keys = Array.isArray(apiKeys) ? apiKeys : [apiKeys];
     const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
     const generationConfig = {
         temperature: 0.9,
@@ -261,28 +254,116 @@ async function callGemini(apiKey, userText, systemText, jsonMode = false) {
         generationConfig,
     });
 
-    let response;
-    for (const model of models) {
-        response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: requestBody,
+    let lastErr = null;
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // 嘗試每把 key × 每個 model 的組合
+    // 遇到 429 (rate limit) / 503 (overload) 會在同組合做 2 次 retry（指數 backoff + jitter）
+    for (let k = 0; k < keys.length; k++) {
+        const key = keys[k];
+        for (const model of models) {
+            const MAX_RETRIES = 2;
+            for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+                try {
+                    const response = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: requestBody,
+                        }
+                    );
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        const status = response.status;
+                        console.log(`[chat] key#${k + 1} + ${model} attempt ${attempt + 1} failed (${status}): ${errText.slice(0, 200)}`);
+                        lastErr = `${status}: ${errText.slice(0, 200)}`;
+
+                        // 429 / 503 值得 retry；其他錯誤直接換下一組
+                        if ((status === 429 || status === 503) && attempt < MAX_RETRIES) {
+                            const backoffMs = (500 << attempt) + Math.floor(Math.random() * 300); // 500 / 1000 + jitter
+                            await sleep(backoffMs);
+                            continue;
+                        }
+                        break; // 換下一個 model / key
+                    }
+                    const data = await response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!text) {
+                        console.log(`[chat] key#${k + 1} + ${model} returned empty text`);
+                        lastErr = 'Empty response';
+                        break;
+                    }
+                    return text;
+                } catch (err) {
+                    console.log(`[chat] key#${k + 1} + ${model} attempt ${attempt + 1} threw: ${err.message}`);
+                    lastErr = err.message;
+                    if (attempt < MAX_RETRIES) {
+                        await sleep((500 << attempt) + Math.floor(Math.random() * 300));
+                        continue;
+                    }
+                    break;
+                }
             }
-        );
-        if (response.ok) break;
-        console.log(`Model ${model} failed, trying next...`);
+        }
     }
 
-    if (!response.ok) {
-        const err = await response.text();
-        console.error('All Gemini models failed:', err);
-        throw new Error('Gemini API error');
-    }
+    throw new Error(`All Gemini keys/models failed. Last error: ${lastErr}`);
+}
 
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Empty response from Gemini');
-    return text;
+// 呼叫 Claude API（Haiku 4.5，當 Gemini 全部失敗時的 backup）
+async function callClaude(apiKey, userText, systemText, jsonMode = false) {
+    const MAX_RETRIES = 2;
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+    const url = 'https://api.anthropic.com/v1/messages';
+
+    // JSON 模式：在 system prompt 尾端強化指令，讓 Claude 只回 JSON
+    const effectiveSystem = jsonMode
+        ? `${systemText}\n\n⚠ 重要：只回傳 JSON，不要加任何 markdown code block 或說明文字。`
+        : systemText;
+
+    const body = JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        system: effectiveSystem,
+        messages: [{ role: 'user', content: userText }],
+    });
+
+    let lastErr = null;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'x-api-key': apiKey,
+                    'anthropic-version': '2023-06-01',
+                    'content-type': 'application/json',
+                },
+                body,
+            });
+            if (!response.ok) {
+                const errText = await response.text();
+                const status = response.status;
+                console.log(`[chat] Claude attempt ${attempt + 1} failed (${status}): ${errText.slice(0, 200)}`);
+                lastErr = `${status}: ${errText.slice(0, 200)}`;
+                if ((status === 429 || status === 529 || status >= 500) && attempt < MAX_RETRIES) {
+                    await sleep((500 << attempt) + Math.floor(Math.random() * 300));
+                    continue;
+                }
+                throw new Error(lastErr);
+            }
+            const data = await response.json();
+            const text = data.content?.[0]?.text;
+            if (!text) throw new Error('Empty response from Claude');
+            return text;
+        } catch (err) {
+            lastErr = err.message;
+            if (attempt < MAX_RETRIES) {
+                await sleep((500 << attempt) + Math.floor(Math.random() * 300));
+                continue;
+            }
+            throw new Error(`Claude failed after ${MAX_RETRIES + 1} attempts. Last error: ${lastErr}`);
+        }
+    }
+    throw new Error(`Claude failed. Last error: ${lastErr}`);
 }

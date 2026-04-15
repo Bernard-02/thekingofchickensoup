@@ -185,16 +185,21 @@ class NFCManager {
                     await window.buildQuotesList(finalQuote.number);
                 }
 
-                // list 動畫大約 2.5s 跑完（300ms 延遲 + scroll + 600ms flash + 1s hold + 0.6s fade）
-                // 動畫結束後自動 slide in 對應 quote panel
-                setTimeout(() => {
+                // list 動畫大約 2.5s 跑完後自動 slide in 對應 quote panel
+                // 用 main.js 的 setDecodeOpenTimer → 離開 view 會自動 cancel，避免殘留
+                const openFn = () => {
                     if (typeof window.openQuotePanel === 'function') {
                         log(`自動 slide in quote panel #${finalQuote.number}`, 'info');
                         window.openQuotePanel(finalQuote);
                     } else {
                         log('警告：openQuotePanel 未定義，無法自動開啟 panel', 'warn');
                     }
-                }, 2800);
+                };
+                if (typeof window.setDecodeOpenTimer === 'function') {
+                    window.setDecodeOpenTimer(openFn, 2800);
+                } else {
+                    setTimeout(openFn, 2800);
+                }
             }
 
         } catch (error) {

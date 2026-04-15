@@ -10,12 +10,36 @@ let userAnswers = [];             // 新增：儲存所有答題的完整物件�
 let finalQuizResult = null;       // 新增：儲存測驗算出來的結果
 
 // 顯示指定view（帶淡入淡出效果）
+// 離開 info-website-view 時要清的 timer / 動畫
+let decodeOpenTimer = null;
+window.clearDecodeOpenTimer = function() {
+    if (decodeOpenTimer) { clearTimeout(decodeOpenTimer); decodeOpenTimer = null; }
+};
+window.setDecodeOpenTimer = function(fn, delay) {
+    if (decodeOpenTimer) clearTimeout(decodeOpenTimer);
+    decodeOpenTimer = setTimeout(() => {
+        decodeOpenTimer = null;
+        fn();
+    }, delay);
+};
+
 window.showView = function(viewId) {
     const currentView = document.querySelector('.view-container.active');
     const nextView = document.getElementById(viewId);
     const logo = document.getElementById('logo');
 
     if (!nextView) return;
+
+    // 離開 info-website-view：清 timer + 關 panel + 停粒子，避免殘留
+    if (currentView && currentView.id === 'info-website-view' && viewId !== 'info-website-view') {
+        if (decodeOpenTimer) { clearTimeout(decodeOpenTimer); decodeOpenTimer = null; }
+        if (typeof stopParticles === 'function') stopParticles();
+        const panel = document.getElementById('quote-slide-panel');
+        const backdrop = document.getElementById('quote-slide-backdrop');
+        if (panel) panel.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('open');
+        window.currentOpenedQuoteNumber = null;
+    }
 
     // 控制全域 Logo 顯示/隱藏 (因為資訊頁面自己有專屬左下角Logo，所以全域的要藏起來)
     if (viewId === 'info-website-view') {
@@ -271,6 +295,14 @@ function restart() {
     currentSelectedOption = null;
     userAnswers = [];
     finalQuizResult = null;
+    // AI 聊天狀態也要清，避免下一個使用者看到上一個人的結果
+    chatAIResult = null;
+    lastChatMessage = '';
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.value = '';
+        chatInput.style.height = 'auto';
+    }
     document.getElementById('quote-actions').classList.remove('visible');
     showView('home-view');
 }
@@ -280,18 +312,14 @@ function renderQuestion(index) {
     const q = questions[index];
     if (!q) return;
 
-    // 問題文字（打字機效果）
+    // 問題文字（fade in）
     const questionEl = document.getElementById('question-text');
-    questionEl.textContent = '';
-    gsap.to(questionEl, { duration: q.text.length * 0.05, text: q.text, ease: 'none' });
+    questionEl.textContent = q.text;
+    gsap.fromTo(questionEl, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' });
 
-    // 英文題目
+    // 英文題目（已隱藏，保留元素避免版面位移）
     const questionEnEl = document.getElementById('question-text-en');
-    questionEnEl.textContent = '';
-    if (q.textEN) {
-        const enDelay = q.text.length * 0.05 + 0.3;
-        gsap.to(questionEnEl, { duration: q.textEN.length * 0.015, text: q.textEN, ease: 'none', delay: enDelay });
-    }
+    if (questionEnEl) questionEnEl.textContent = '';
 
     // 進度
     document.getElementById('question-progress').textContent = `${index + 1} / ${questions.length}`;
@@ -307,9 +335,7 @@ function renderQuestion(index) {
     confirmBtn.classList.remove('visible');
 
     // 打字機結束後，選項依序從下往上 fade in
-    const cnDuration = q.text.length * 0.05;
-    const enDuration = q.textEN ? (cnDuration + 0.3 + q.textEN.length * 0.015) : cnDuration;
-    const typewriterDuration = Math.max(cnDuration, enDuration);
+    const typewriterDuration = 0.6; // fade in 時長
 
     q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
@@ -725,24 +751,39 @@ window.revealQuoteInPanel = function() {
 
 // 進入解籤畫面
 window.decodeQuote = async function() {
-    if (!finalQuizResult) return;
+    console.log('[decodeQuote] 開始', finalQuizResult);
+    if (!finalQuizResult) {
+        console.warn('[decodeQuote] finalQuizResult 為空，無法執行');
+        return;
+    }
 
     const finalQuote = finalQuizResult.quote;
 
+    // 先切到 Quotes 頁（transition 會跑 300ms）
+    showView('info-website-view');
+    switchInfoTab('quotes');
+
     // 通知 NFC Manager (ESP8266) 當前顯示的雞湯編號
     if (window.nfcManager) {
-        window.nfcManager.updateCurrentQuote(finalQuote.number);
+        try {
+            window.nfcManager.updateCurrentQuote(finalQuote.number);
+        } catch (e) {
+            console.warn('[decodeQuote] updateCurrentQuote 失敗：', e);
+        }
     }
 
-    // 確保一進來是顯示 Quotes 畫面
-    switchInfoTab('quotes');
-    showView('info-website-view');
-
     // 建立 list 並 scroll 到抽中的句子
-    await buildQuotesList(finalQuote.number);
+    try {
+        await buildQuotesList(finalQuote.number);
+    } catch (e) {
+        console.error('[decodeQuote] buildQuotesList 失敗：', e);
+        return;
+    }
 
     // list 動畫 ~2.5s 跑完後自動 slide in 對應 quote panel
-    setTimeout(() => {
+    if (decodeOpenTimer) clearTimeout(decodeOpenTimer);
+    decodeOpenTimer = setTimeout(() => {
+        decodeOpenTimer = null;
         if (typeof openQuotePanel === 'function') {
             openQuotePanel(finalQuote);
         }
@@ -842,7 +883,6 @@ window.submitChat = async function() {
     // 收集參數
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
-    const englishStyle = document.getElementById('param-english')?.value || 50;
     const length = document.getElementById('param-length')?.value || 50;
 
     // 收集問答 scores
@@ -869,7 +909,6 @@ window.submitChat = async function() {
                 scores,
                 tone: Number(tone),
                 english: enToggle,
-                englishStyle: Number(englishStyle),
                 length: Number(length),
             })
         });
@@ -931,9 +970,11 @@ window.revealChatQuote = function() {
     const hint = document.getElementById('chat-result-hint');
     const actions = document.getElementById('chat-result-actions');
 
-    // 依當前語氣 slider 選對應版本
+    // 依當前語氣 slider 選對應版本（bounds + 型別防護）
     const idx = snapToneIdx(document.getElementById('param-tone')?.value);
-    const currentCN = (chatAIResult.tonesCN && chatAIResult.tonesCN[idx]) || chatAIResult.textCN;
+    const tones = chatAIResult.tonesCN;
+    const safeIdx = (Array.isArray(tones) && idx >= 0 && idx < tones.length) ? idx : 2; // 預設中間
+    const currentCN = (Array.isArray(tones) && tones[safeIdx]) || chatAIResult.textCN || '';
     chatAIResult.textCN = currentCN;
 
     // 轉譯 fade out → 換成原句 fade in
@@ -1047,7 +1088,6 @@ async function regenerateWithParams() {
 
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
-    const englishStyle = document.getElementById('param-english')?.value || 50;
     const length = document.getElementById('param-length')?.value || 50;
 
     const scores = {};
@@ -1072,7 +1112,6 @@ async function regenerateWithParams() {
                 scores,
                 tone: Number(tone),
                 english: enToggle,
-                englishStyle: Number(englishStyle),
                 length: Number(length),
                 avoidCN: (chatAIResult && Array.isArray(chatAIResult.tonesCN)) ? chatAIResult.tonesCN : [],
             })
@@ -1149,7 +1188,6 @@ async function retranslateEnglish() {
         }
     });
 
-    const englishStyle = document.getElementById('param-english')?.value || 50;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -1163,7 +1201,6 @@ async function retranslateEnglish() {
                 scores: {},
                 tone: 50,
                 english: true,
-                englishStyle: Number(englishStyle),
                 length: 50,
                 retranslateOnly: true,
                 existingCN: chatAIResult.textCN,
@@ -1208,16 +1245,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 800);
     }
 
-    // English toggle → 顯示/隱藏英文文字 + Manglish↔Formal slider
+    // English toggle → 顯示/隱藏英文文字
     const enToggle = document.getElementById('param-en-toggle');
     if (enToggle) {
         enToggle.addEventListener('change', () => {
             const enTextEl = document.getElementById('chat-en-text');
-            const enStyleWrapper = document.getElementById('param-en-style-wrapper');
-            enStyleWrapper.style.display = enToggle.checked ? 'flex' : 'none';
 
             if (enToggle.checked) {
-                // 顯示英文（用已有的 AI 結果）
                 if (chatAIResult && chatAIResult.textEN) {
                     enTextEl.textContent = chatAIResult.textEN;
                     enTextEl.style.display = '';
@@ -1233,10 +1267,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toneSlider = document.getElementById('param-tone');
     if (toneSlider) {
         toneSlider.addEventListener('change', () => {
-            if (!chatAIResult || !Array.isArray(chatAIResult.tonesCN)) return;
+            if (!chatAIResult || !Array.isArray(chatAIResult.tonesCN) || chatAIResult.tonesCN.length === 0) return;
             const idx = snapToneIdx(toneSlider.value);
-            const newCN = chatAIResult.tonesCN[idx] || chatAIResult.textCN;
-            if (newCN === chatAIResult.textCN) return;
+            const safeIdx = (idx >= 0 && idx < chatAIResult.tonesCN.length) ? idx : 2;
+            const newCN = chatAIResult.tonesCN[safeIdx] || chatAIResult.textCN;
+            if (!newCN || newCN === chatAIResult.textCN) return;
             chatAIResult.textCN = newCN;
 
             // 只有在已經 reveal（hint 已隱藏）後才需要視覺切換
@@ -1288,16 +1323,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // English style slider 變動 → 只重新翻譯英文
-    const enStyleSlider = document.getElementById('param-english');
-    if (enStyleSlider) {
-        enStyleSlider.addEventListener('change', () => {
-            clearTimeout(paramDebounceTimer);
-            paramDebounceTimer = setTimeout(() => {
-                if (chatAIResult && lastChatMessage) retranslateEnglish();
-            }, 800);
-        });
-    }
 
     // 聊天輸入框邏輯
     const chatInput = document.getElementById('chat-input');
