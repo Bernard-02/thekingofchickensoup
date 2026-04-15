@@ -20,6 +20,9 @@
     <!-- QR Code 產生器 -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
+    <!-- html2canvas 產 PNG -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
     <!-- GSAP -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
@@ -66,7 +69,7 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center w-full">
                 <p id="question-progress" class="en font-normal mb-6">1 / 8</p>
-                <h2 id="question-text" class="font-medium mb-4"></h2>
+                <h2 id="question-text" class="font-medium mb-16"></h2>
                 <h4 id="question-text-en" class="en font-normal mb-12" style="display:none;"></h4>
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
@@ -78,8 +81,7 @@
     <div id="chat-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto w-full text-center">
-                <h2 class="font-medium mb-4">最近你一直在想什麼事呢？</h2>
-                <h4 class="en font-normal mb-12">What's been on your mind lately?</h4>
+                <h2 class="font-medium mb-12">最近你一直在想什麼事呢？</h2>
                 <div class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
                     <textarea id="chat-input"
                         class="w-full text-lg leading-relaxed resize-none"
@@ -88,8 +90,9 @@
                         maxlength="400"
                         placeholder="說些什麼吧"></textarea>
                     <div class="flex justify-end">
-                        <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center" style="width: 32px; height: 32px; background: #000; border: none; cursor: pointer;">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14V2M8 2L2 8M8 2L14 8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center gap-2" style="padding: 6px 14px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 0.875rem;">
+                            <span>下一步</span>
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </button>
                     </div>
                 </div>
@@ -125,8 +128,8 @@
 
             <!-- 中央：雞湯文字 -->
             <div class="max-w-2xl mx-auto text-center w-full">
-                <h2 id="chat-translation-text" class="font-medium text-black mb-4"></h2>
-                <h4 id="chat-en-text" class="en font-normal text-black mb-8" style="display: none;"></h4>
+                <h2 id="chat-translation-text" class="font-medium text-black mb-4" style="text-wrap: balance;"></h2>
+                <h4 id="chat-en-text" class="en font-normal text-black mb-8" style="display: none; text-wrap: balance;"></h4>
                 <p id="chat-result-hint" class="mt-12 mb-4 opacity-50" style="font-size: 1rem;">掃描裝置以解讀這句雞湯</p>
             </div>
 
@@ -155,25 +158,8 @@
                         <span class="en text-xs">English</span>
                     </label>
                 </div>
-                <!-- 字體選擇（最下面）-->
-                <div class="flex flex-col gap-2">
-                    <div class="flex gap-4">
-                        <div class="flex-1 flex flex-col gap-1">
-                            <span class="text-xs">中文字體</span>
-                            <select id="param-font-zh" class="custom-select">
-                                <option value="noto-sans-tc">Noto Sans TC</option>
-                                <option value="noto-serif-tc">思源宋體 TW</option>
-                            </select>
-                        </div>
-                        <div class="flex-1 flex flex-col gap-1">
-                            <span class="en text-xs">English Font</span>
-                            <select id="param-font-en" class="en custom-select">
-                                <option value="helvetica">Helvetica</option>
-                                <option value="times-new-roman">Times New Roman</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <!-- 收藏 CTA -->
+                <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%;">我想收藏</button>
             </div>
         </div>
     </div>
@@ -530,6 +516,64 @@
     <script src="js/config.js"></script>
     <script src="js/context.js"></script>
     <script src="js/nfc.js"></script>
+    <!-- 收藏雞湯 Overlay -->
+    <div id="save-overlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.96); z-index:500; padding:24px; box-sizing:border-box;">
+        <div class="flex w-full h-full" style="gap:24px;">
+            <!-- 左側 70%：預覽 -->
+            <div style="flex:7 1 0; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                <div id="save-preview-wrapper" style="display:flex; align-items:center; justify-content:center; max-width:100%; max-height:100%;">
+                    <div id="save-card" style="position:relative; background:#ffffff; color:#000000; border:1px solid #000; display:flex; align-items:center; justify-content:center; padding:48px; box-sizing:border-box; overflow:hidden;">
+                        <p id="save-card-text" style="font-size:2rem; font-weight:500; line-height:1.4; text-align:center; text-wrap:balance; margin:0;"></p>
+                        <img id="save-card-logo" src="Logo/雞湯Logo White.png" alt="logo" style="position:absolute; right:24px; bottom:24px; height:40px; opacity:0.9; filter:invert(0);" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側 30%：控制面板 -->
+            <div style="flex:3 1 0; display:flex; flex-direction:column; gap:20px; padding:16px 0; min-width:220px; max-width:320px;">
+                <h3 class="font-medium" style="font-size:1.125rem;">收藏雞湯</h3>
+
+                <!-- 比例 -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs">比例</span>
+                    <div class="flex gap-3">
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="save-ratio" value="16:9" class="custom-radio"> <span class="en text-xs">16:9</span></label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="save-ratio" value="4:5" class="custom-radio" checked> <span class="en text-xs">4:5</span></label>
+                        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="save-ratio" value="1:1" class="custom-radio"> <span class="en text-xs">1:1</span></label>
+                    </div>
+                </div>
+
+                <!-- 背景色 -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs" style="min-width:4rem;">背景色</span>
+                    <input id="save-bg-color" type="color" value="#ffffff" style="width:40px; height:28px; border:1px solid #000; cursor:pointer; padding:0;">
+                </div>
+
+                <!-- 文字色 -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs" style="min-width:4rem;">文字色</span>
+                    <input id="save-text-color" type="color" value="#000000" style="width:40px; height:28px; border:1px solid #000; cursor:pointer; padding:0;">
+                </div>
+
+                <!-- Email -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs">你的 Email</span>
+                    <input id="save-email" type="email" placeholder="you@example.com" style="border:1px solid #000; padding:8px; background:transparent; font-size:0.875rem; outline:none;" />
+                </div>
+
+                <!-- 寄送狀態提示 -->
+                <p id="save-status" class="text-xs" style="opacity:0.6; min-height:1.2em;"></p>
+
+                <!-- 按鈕 -->
+                <div class="flex flex-col gap-2" style="margin-top:auto;">
+                    <button id="save-send-btn" onclick="sendSaveCard()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem;">寄送到我的 Email</button>
+                    <button onclick="resetSaveDefaults()" style="background:transparent; color:#000; border:1px solid #000; padding:10px 16px; cursor:pointer; font-size:0.875rem;">回到預設</button>
+                    <button onclick="closeSaveOverlay()" style="background:transparent; color:#000; border:none; padding:6px; cursor:pointer; font-size:0.875rem; opacity:0.6;">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- QR Code Overlay -->
     <div id="qr-overlay" onclick="hideQRCode(event)" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.85); z-index:400; align-items:center; justify-content:center; cursor:pointer;">
         <div onclick="event.stopPropagation()" style="background:#fff; padding:2rem; border:1px solid #000; display:flex; flex-direction:column; align-items:center; gap:1rem; cursor:default;">

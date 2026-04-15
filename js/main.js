@@ -846,19 +846,17 @@ function showChatResult() {
 // 開始 loading 動畫（持續循環直到 API 回應）
 let loadingTimeline = null;
 
-function startLoadingAnim(zhText = '雞湯生成中...', enText = 'Your chicken soup is brewing...') {
+function startLoadingAnim(zhText = '雞湯生成中...') {
     const zhEl = document.getElementById('chat-loading-zh');
     const enEl = document.getElementById('chat-loading-en');
     zhEl.textContent = '';
-    enEl.textContent = '';
+    if (enEl) enEl.textContent = '';
 
     loadingTimeline = gsap.timeline({ repeat: -1 });
     loadingTimeline
         .to(zhEl, { duration: zhText.length * 0.08, text: zhText, ease: 'none' })
-        .to(enEl, { duration: enText.length * 0.04, text: enText, ease: 'none' }, `>0.3`)
-        .to({}, { duration: 0.5 })
+        .to({}, { duration: 0.8 })
         .to(zhEl, { duration: 0.2, text: '', ease: 'none' })
-        .to(enEl, { duration: 0.2, text: '', ease: 'none' }, '<')
         .to({}, { duration: 0.3 });
 }
 
@@ -947,7 +945,7 @@ function showRetryPrompt() {
     const zhEl = document.getElementById('chat-loading-zh');
     const enEl = document.getElementById('chat-loading-en');
     zhEl.textContent = '雞湯熬太久了';
-    enEl.textContent = 'The soup took too long...';
+    if (enEl) enEl.textContent = '';
     document.getElementById('chat-retry-section').style.display = '';
 }
 
@@ -1007,6 +1005,153 @@ window.revealChatQuote = function() {
     );
 };
 
+// ========= 收藏雞湯卡片 =========
+
+const SAVE_RATIOS = {
+    '16:9': { w: 1280, h: 720 },
+    '4:5':  { w: 900,  h: 1125 },
+    '1:1':  { w: 1000, h: 1000 },
+};
+const SAVE_DEFAULTS = { ratio: '4:5', bg: '#ffffff', text: '#000000' };
+
+function applySaveCardStyle() {
+    const ratio = document.querySelector('input[name="save-ratio"]:checked')?.value || '4:5';
+    const bg = document.getElementById('save-bg-color').value;
+    const textColor = document.getElementById('save-text-color').value;
+    const { w, h } = SAVE_RATIOS[ratio];
+
+    const card = document.getElementById('save-card');
+    const wrapper = document.getElementById('save-preview-wrapper');
+    if (!card || !wrapper) return;
+
+    // 基於預覽容器計算縮放（等比）
+    const pad = 48;
+    const availW = wrapper.clientWidth - pad;
+    const availH = wrapper.clientHeight - pad;
+    const scale = Math.min(availW / w, availH / h, 1);
+
+    card.style.width = w + 'px';
+    card.style.height = h + 'px';
+    card.style.background = bg;
+    card.style.color = textColor;
+    card.style.transform = `scale(${scale})`;
+    card.style.transformOrigin = 'center';
+
+    // logo 反色：深底用白 logo（目前的 png），淺底把 logo 黑色化（filter invert）
+    const logo = document.getElementById('save-card-logo');
+    if (logo) {
+        // 判斷背景亮度
+        const hex = bg.replace('#', '');
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        logo.style.filter = luminance > 0.6 ? 'invert(1)' : 'invert(0)';
+    }
+}
+
+window.saveChatQuote = function() {
+    if (!chatAIResult) return;
+    document.getElementById('save-card-text').textContent = chatAIResult.textCN || '';
+    document.getElementById('save-email').value = '';
+    document.getElementById('save-status').textContent = '';
+    document.getElementById('save-send-btn').disabled = false;
+    resetSaveDefaults(); // 先套預設樣式
+    document.getElementById('save-overlay').style.display = 'block';
+    // 下一個 frame 才能算容器尺寸
+    requestAnimationFrame(applySaveCardStyle);
+};
+
+window.closeSaveOverlay = function() {
+    document.getElementById('save-overlay').style.display = 'none';
+};
+
+window.resetSaveDefaults = function() {
+    const ratioInput = document.querySelector(`input[name="save-ratio"][value="${SAVE_DEFAULTS.ratio}"]`);
+    if (ratioInput) ratioInput.checked = true;
+    document.getElementById('save-bg-color').value = SAVE_DEFAULTS.bg;
+    document.getElementById('save-text-color').value = SAVE_DEFAULTS.text;
+    applySaveCardStyle();
+};
+
+window.sendSaveCard = async function() {
+    const email = document.getElementById('save-email').value.trim();
+    const statusEl = document.getElementById('save-status');
+    const btn = document.getElementById('save-send-btn');
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        statusEl.textContent = 'Email 格式好像不太對';
+        statusEl.style.color = '#c00';
+        return;
+    }
+
+    statusEl.style.color = '';
+    statusEl.textContent = '雞湯打包中...';
+    btn.disabled = true;
+
+    try {
+        const card = document.getElementById('save-card');
+        // 截圖時先把 scale 拿掉，保證輸出原始尺寸
+        const originalTransform = card.style.transform;
+        card.style.transform = 'none';
+
+        const canvas = await html2canvas(card, {
+            backgroundColor: null,
+            scale: 1,
+            useCORS: true,
+            logging: false,
+        });
+
+        card.style.transform = originalTransform;
+
+        const pngBase64 = canvas.toDataURL('image/png');
+
+        statusEl.textContent = '寄送中...';
+
+        const resp = await fetch('/api/send-card', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+                pngBase64,
+                quoteTextCN: chatAIResult?.textCN || '',
+            }),
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || '寄送失敗');
+        }
+
+        statusEl.style.color = '';
+        statusEl.textContent = '寄出了！請去收信箱看看（可能在垃圾信）。';
+        setTimeout(() => {
+            closeSaveOverlay();
+        }, 2500);
+    } catch (err) {
+        console.error('[sendSaveCard]', err);
+        statusEl.style.color = '#c00';
+        statusEl.textContent = '寄送失敗：' + err.message;
+        btn.disabled = false;
+    }
+};
+
+// 控制面板變動即時更新預覽
+document.addEventListener('DOMContentLoaded', () => {
+    ['save-bg-color', 'save-text-color'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', applySaveCardStyle);
+    });
+    document.querySelectorAll('input[name="save-ratio"]').forEach(el => {
+        el.addEventListener('change', applySaveCardStyle);
+    });
+    window.addEventListener('resize', () => {
+        if (document.getElementById('save-overlay').style.display === 'block') {
+            applySaveCardStyle();
+        }
+    });
+});
+
 // 再回答一次
 window.retryChatInput = function() {
     const input = document.getElementById('chat-input');
@@ -1052,28 +1197,18 @@ async function regenerateWithParams() {
     // 打字機動畫顯示「調味中...」
     const zhSeason = '雞湯正在調味中...';
 
-    const enSeason = 'Seasoning your chicken soup...';
-
     gsap.to(textEl, {
         opacity: 0, duration: 0.3, ease: 'power2.out',
         onComplete: () => {
             textEl.textContent = '';
             gsap.to(textEl, { opacity: 1, duration: 0.1 });
             if (seasoningTimeline) seasoningTimeline.kill();
-            const enVisible = enEl.style.display !== 'none';
             seasoningTimeline = gsap.timeline({ repeat: -1 });
             seasoningTimeline
-                .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' });
-            if (enVisible) {
-                seasoningTimeline.to(enEl, { duration: enSeason.length * 0.04, text: enSeason, ease: 'none' }, `>0.3`);
-            }
-            seasoningTimeline
-                .to({}, { duration: 0.5 })
-                .to(textEl, { duration: 0.2, text: '', ease: 'none' });
-            if (enVisible) {
-                seasoningTimeline.to(enEl, { duration: 0.2, text: '', ease: 'none' }, '<');
-            }
-            seasoningTimeline.to({}, { duration: 0.3 });
+                .to(textEl, { duration: zhSeason.length * 0.08, text: zhSeason, ease: 'none' })
+                .to({}, { duration: 0.8 })
+                .to(textEl, { duration: 0.2, text: '', ease: 'none' })
+                .to({}, { duration: 0.3 });
         }
     });
     if (enEl.style.display !== 'none') {
