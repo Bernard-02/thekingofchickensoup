@@ -11,6 +11,9 @@
 
     <title>The King of Chicken Soup</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="Logo/Website Favicon.png">
+
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
 
@@ -44,6 +47,7 @@
     <div id="guide-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="w-full max-w-2xl mx-auto text-center">
+                <img id="guide-image" src="Images/雞湯王出場.png" alt="" class="mx-auto mb-10" style="width: 100%; max-width: 360px; height: 150px; object-fit: contain;">
                 <h2 id="guide-text" class="font-medium mb-12" style="white-space: pre-line; line-break: strict; text-align: center;">歡迎來到雞湯王的雞湯熬製秘所，
 現在請跟著我的步伐獲得專屬於你的雞湯！</h2>
                 <button id="guide-btn" class="primary-btn" onclick="advanceGuide()">下一步</button>
@@ -61,28 +65,31 @@
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
             </div>
+            <!-- 右下角：雞湯王陪考（選項選到時閉眼） -->
+            <img id="question-mascot" src="Images/雞湯王.png" alt=""
+                 style="position: fixed; bottom: 24px; right: 24px; width: 160px; height: auto; pointer-events: none; display: none;">
         </div>
     </div>
 
-    <!-- 聊天：自由輸入 -->
+    <!-- 聊天：自由輸入（學徒對話） -->
     <div id="chat-view" class="view-container">
-        <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="max-w-2xl mx-auto w-full text-center">
-                <h2 class="font-medium mb-12">最近你一直在想什麼事呢？</h2>
-                <p id="chat-retry-hint" class="mb-6 opacity-70" style="font-size:0.95rem; line-height:1.6; display:none; text-wrap:balance;"></p>
-                <div class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
-                    <textarea id="chat-input"
-                        class="w-full text-lg leading-relaxed resize-none"
-                        style="background: transparent; border: none; outline: none; overflow: hidden; padding: 0;"
-                        rows="1"
-                        maxlength="400"
-                        placeholder="說些什麼吧"></textarea>
-                    <div class="flex justify-end">
-                        <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center gap-2" style="padding: 6px 14px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 0.875rem;">
-                            <span>下一步</span>
-                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </button>
-                    </div>
+        <div class="min-h-screen flex flex-col p-6 max-w-2xl mx-auto w-full" style="padding-bottom: 110px;">
+            <!-- 對話區：新訊息由下往上堆疊 -->
+            <div id="chat-messages" class="flex-1 flex flex-col gap-5 py-6 overflow-y-auto justify-end" style="min-height: 0;"></div>
+            <!-- 輸入框 -->
+            <div id="chat-input-wrapper" class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
+                <p id="chat-retry-hint" class="mb-2 opacity-70" style="font-size:0.9rem; line-height:1.5; display:none; text-wrap:balance;"></p>
+                <textarea id="chat-input"
+                    class="w-full text-base leading-relaxed resize-none"
+                    style="background: transparent; border: none; outline: none; overflow: hidden; padding: 0;"
+                    rows="1"
+                    maxlength="400"
+                    placeholder="說些什麼吧"></textarea>
+                <div class="flex justify-end">
+                    <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center gap-2" style="padding: 6px 14px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 0.875rem;">
+                        <span>下一步</span>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -118,7 +125,9 @@
             <div class="max-w-3xl mx-auto text-center w-full">
                 <h2 id="chat-translation-text" class="font-medium text-black mb-4" style="text-wrap: balance; line-break: strict; word-break: keep-all;"></h2>
                 <h4 id="chat-en-text" class="en font-normal text-black mb-8" style="display: none; text-wrap: balance;"></h4>
+                <p id="chat-context" class="text-black mt-6 mb-8" style="display: none; text-wrap: balance; font-size: 1rem; line-height: 1.7; opacity: 0.7;"></p>
                 <p id="chat-result-hint" class="mt-12 mb-4 opacity-50" style="font-size: 1rem;">掃描裝置以解讀這句雞湯</p>
+                <button id="chat-customize-btn" class="primary-btn btn-solid" style="display: none;" onclick="enterChatCustomize()">開始客製化</button>
             </div>
 
             <!-- 右下角：參數調整 -->
@@ -137,15 +146,10 @@
                         <span class="text-xs">更短</span>
                         <span class="text-xs">更長</span>
                     </div>
-                    <input id="param-length" type="range" min="0" max="100" step="25" value="50" class="param-slider">
+                    <input id="param-length" type="range" min="0" max="100" step="25" value="25" class="param-slider">
                 </div>
-                <!-- 英文開關 -->
-                <div class="flex flex-col gap-3">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input id="param-en-toggle" type="checkbox" class="custom-checkbox">
-                        <span class="en text-xs">English</span>
-                    </label>
-                </div>
+                <!-- 英文開關：已移除，英文固定顯示 -->
+                <input id="param-en-toggle" type="checkbox" checked style="display: none;">
                 <!-- 收藏 CTA -->
                 <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%;">收藏</button>
             </div>
@@ -166,7 +170,7 @@
     <div id="ingredient-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
-                <h2 class="font-medium text-black mb-10" style="text-wrap: balance;">獲取了需要的食材</h2>
+                <h2 class="font-medium text-black mb-10" style="text-wrap: balance;">獲取了需要的食材！</h2>
                 <div id="ingredient-list" class="grid grid-cols-4 gap-4 mb-12 w-full"></div>
                 <button class="primary-btn btn-solid" onclick="goToCooking()">開始熬製</button>
             </div>

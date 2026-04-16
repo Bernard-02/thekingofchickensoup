@@ -369,6 +369,12 @@ void loop() {
       Serial.println("Tag removed.\n");
       lastUID = "";
     }
+    // 每 2 秒印一次心跳，確認 loop 有在跑、tagPresent 只是一直 false
+    static unsigned long lastHeartbeat = 0;
+    if (currentTime - lastHeartbeat >= 2000) {
+      Serial.printf("[scan] no tag (heap=%u)\n", ESP.getFreeHeap());
+      lastHeartbeat = currentTime;
+    }
     delay(50);
   }
 }

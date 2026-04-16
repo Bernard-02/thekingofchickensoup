@@ -260,8 +260,8 @@ window.scrollToResearchPart = function(event, partId) {
 
 // 導航
 const GUIDE_STEPS = [
-    { text: '歡迎來到雞湯王的雞湯熬製秘所，\n現在請跟著我的步伐獲得專屬於你的雞湯！', btn: '下一步' },
-    { text: '請回答5個問題獲取雞湯的製作原料',                                         btn: 'ok，我已了解' },
+    { text: '歡迎來到雞湯王的雞湯熬製秘所，\n現在請跟著我的步伐獲得專屬於你的雞湯！', btn: '下一步',     image: 'Images/雞湯王出場.png' },
+    { text: '請回答5個問題獲取雞湯的製作原料',                                         btn: 'ok，我已了解', image: 'Images/5個問題.png'     },
 ];
 let guideStepIndex = 0;
 
@@ -270,21 +270,25 @@ function goToGuide() {
 
     const textEl = document.getElementById('guide-text');
     const btn = document.getElementById('guide-btn');
+    const imgEl = document.getElementById('guide-image');
 
     guideStepIndex = 0;
     textEl.textContent = GUIDE_STEPS[0].text;
     btn.textContent = GUIDE_STEPS[0].btn;
+    if (imgEl) imgEl.src = GUIDE_STEPS[0].image;
 
-    gsap.set([textEl, btn], { opacity: 0 });
+    gsap.set([imgEl, textEl, btn], { opacity: 0 });
     gsap.set(btn, { y: 20, pointerEvents: 'none' });
 
-    gsap.to(textEl, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.2 });
+    gsap.to(imgEl, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.1 });
+    gsap.to(textEl, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.3 });
     gsap.to(btn, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.6, ease: 'power2.out', delay: 0.9 });
 }
 
 function advanceGuide() {
     const textEl = document.getElementById('guide-text');
     const btn = document.getElementById('guide-btn');
+    const imgEl = document.getElementById('guide-image');
 
     // 第二步之後 → 進入問題
     if (guideStepIndex >= GUIDE_STEPS.length - 1) {
@@ -294,7 +298,7 @@ function advanceGuide() {
 
     // 原地替換文字：fade out → swap → stagger fade in（跟成品頁同一套節奏）
     gsap.set(btn, { pointerEvents: 'none' });
-    gsap.to([textEl, btn], {
+    gsap.to([imgEl, textEl, btn], {
         opacity: 0,
         duration: 0.35,
         ease: 'power2.in',
@@ -303,11 +307,13 @@ function advanceGuide() {
             const next = GUIDE_STEPS[guideStepIndex];
             textEl.textContent = next.text;
             btn.textContent = next.btn;
+            if (imgEl) imgEl.src = next.image;
 
-            gsap.set([textEl, btn], { opacity: 0, y: 10 });
-            gsap.to(textEl, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+            gsap.set([imgEl, textEl, btn], { opacity: 0, y: 10 });
+            gsap.to(imgEl, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+            gsap.to(textEl, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.15 });
             gsap.to(btn, {
-                opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.6,
+                opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.75,
                 onStart: () => { btn.style.pointerEvents = 'auto'; }
             });
         }
@@ -381,6 +387,17 @@ function renderQuestion(index) {
     const confirmBtn = document.getElementById('confirm-question');
     confirmBtn.classList.remove('visible');
 
+    // 右下角雞湯王：單選題才顯示，預設睜眼
+    const mascot = document.getElementById('question-mascot');
+    if (mascot) {
+        if (q.type === 'container-choice') {
+            mascot.style.display = 'none';
+        } else {
+            mascot.src = 'Images/雞湯王.png';
+            mascot.style.display = '';
+        }
+    }
+
     // 題目 fade in 0.6s 結束後選項緊接進場
     const optionStartDelay = 0.65;
 
@@ -416,9 +433,18 @@ function renderSingleChoice(q, optionsContainer, confirmBtn, optionStartDelay) {
             currentSelectedValue = opt.value;
             currentSelectedOption = opt;
             confirmBtn.classList.add('visible');
+            // 雞湯王閉眼（有選項被選時）
+            const mascot = document.getElementById('question-mascot');
+            if (mascot) mascot.src = 'Images/雞湯王閉眼.png';
         });
     });
 }
+
+// 容器選擇題的標題對應到圖檔
+const CONTAINER_IMAGE_BY_TITLE = {
+    '雞湯學徒的鍋子': 'Images/雞湯學徒的鍋子.png',
+    '雞湯王的鍋子':   'Images/雞湯王的鍋子.png',
+};
 
 function renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay) {
     optionsContainer.classList.add('container-choice-layout');
@@ -428,9 +454,18 @@ function renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay
         box.className = 'container-choice-box';
         box.setAttribute('data-value', opt.value);
 
-        const imgEl = document.createElement('div');
-        imgEl.className = 'container-choice-image';
-        imgEl.textContent = '圖案';
+        const imgSrc = CONTAINER_IMAGE_BY_TITLE[opt.title];
+        let imgEl;
+        if (imgSrc) {
+            imgEl = document.createElement('img');
+            imgEl.src = imgSrc;
+            imgEl.alt = opt.title || '';
+            imgEl.className = 'container-choice-image';
+        } else {
+            imgEl = document.createElement('div');
+            imgEl.className = 'container-choice-image';
+            imgEl.textContent = '圖案';
+        }
 
         const titleEl = document.createElement('div');
         titleEl.className = 'container-choice-title';
@@ -473,6 +508,7 @@ function confirmQuestion() {
             nfcManager.userAnswers = userAnswers; // 把完整的計分陣列交給 NFC Manager
         }
         if (currentSelectedValue === 'chat') {
+            initChatView();
             showView('chat-view');
         } else {
             // 跳過 NFC，直接計算結果並顯示轉譯
@@ -519,10 +555,10 @@ async function calculateAndShowTranslation() {
 const QUADRANT_TO_INGREDIENT = { IP: 'seasoning', IR: 'water', SP: 'aromatics', SR: 'chicken' };
 
 const INGREDIENT_SPEC = {
-    chicken:   { name: '雞',     unit: 'g',  base: 200, primaryBoost: 250, secondaryBoost: 100 },
-    water:     { name: '水',     unit: 'ml', base: 400, primaryBoost: 400, secondaryBoost: 150 },
-    aromatics: { name: '蔥薑蒜', unit: '份', base: 2,   primaryBoost: 3,   secondaryBoost: 1   },
-    seasoning: { name: '調味料', unit: 'g',  base: 5,   primaryBoost: 20,  secondaryBoost: 8   },
+    chicken:   { name: '雞',     unit: 'g',  base: 200, primaryBoost: 250, secondaryBoost: 100, img: 'Images/雞.png'     },
+    water:     { name: '水',     unit: 'ml', base: 400, primaryBoost: 400, secondaryBoost: 150, img: 'Images/水.png'     },
+    aromatics: { name: '蔥薑蒜', unit: '份', base: 2,   primaryBoost: 3,   secondaryBoost: 1,   img: 'Images/葱薑蒜.png' },
+    seasoning: { name: '調味料', unit: 'g',  base: 5,   primaryBoost: 20,  secondaryBoost: 8,   img: 'Images/調味料.png' },
 };
 
 const INGREDIENT_ORDER = ['chicken', 'water', 'aromatics', 'seasoning'];
@@ -539,6 +575,7 @@ function computeIngredientsFromQuote(quote) {
         return {
             name: spec.name,
             amount: `${amount}${spec.unit}`,
+            img: spec.img,
         };
     });
 }
@@ -553,14 +590,14 @@ function showIngredientView() {
         const card = document.createElement('div');
         card.className = 'ingredient-card';
         card.innerHTML = `
-            <div class="ingredient-icon">圖案</div>
+            <img class="ingredient-icon" src="${ing.img}" alt="${ing.name}">
             <div class="ingredient-name">${ing.name}</div>
             <div class="ingredient-amount en">${ing.amount}</div>
         `;
         container.appendChild(card);
 
         gsap.set(card, { opacity: 0, y: 20 });
-        gsap.to(card, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 + i * 0.1 });
+        gsap.to(card, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 + i * 0.25 });
     });
 
     showView('ingredient-view');
@@ -1104,13 +1141,42 @@ const API_URL = IS_LOCAL ? 'https://chicken-soup-quote.vercel.app/api/chat' : '/
 
 // 顯示結果頁面
 function showChatResult() {
-    document.getElementById('chat-translation-text').textContent = chatAIResult.translation;
-    document.getElementById('chat-result-hint').style.opacity = '0.5';
-    document.getElementById('chat-result-hint').textContent = '掃描裝置以解讀這句雞湯';
-    document.getElementById('chat-result-hint').style.display = '';
+    const textEl = document.getElementById('chat-translation-text');
+    const enEl   = document.getElementById('chat-en-text');
+    const ctxEl  = document.getElementById('chat-context');
+    const hintEl = document.getElementById('chat-result-hint');
+    const custBtn = document.getElementById('chat-customize-btn');
+
+    // 直接顯示 AI 生成的原句（不再先給轉譯）
+    textEl.textContent = chatAIResult.textCN || '';
+    if (enEl) {
+        enEl.textContent = chatAIResult.textEN || '';
+        enEl.style.display = chatAIResult.textEN ? '' : 'none';
+    }
+
+    // 脈絡、客製化按鈕預設藏起來（NFC reveal 後才出現）
+    if (ctxEl)  { ctxEl.textContent = ''; ctxEl.style.display = 'none'; }
+    if (custBtn) custBtn.style.display = 'none';
+
+    hintEl.style.opacity = '0.5';
+    hintEl.textContent = '掃描裝置以解讀這句雞湯';
+    hintEl.style.display = '';
+
     document.getElementById('chat-result-actions').style.display = 'none';
     document.getElementById('chat-params-panel').style.display = 'none';
+
+    // 文字先隱藏，粒子蓋上去
+    textEl.style.color = '#f2f2f2';
+    if (enEl && enEl.style.display !== 'none') enEl.style.color = '#f2f2f2';
+
     showView('chat-result-view');
+
+    // showView 有 300ms fade，等 view active 再量尺寸畫粒子
+    setTimeout(() => {
+        const targets = [textEl];
+        if (enEl && enEl.style.display !== 'none') targets.push(enEl);
+        startParticles(targets);
+    }, 400);
 }
 
 // 開始 loading 動畫（持續循環直到 API 回應）
@@ -1150,27 +1216,107 @@ function stopLoadingAnim() {
     }
 }
 
-// 送出自由輸入
-window.submitChat = async function() {
+// 初始化聊天畫面（回到學徒的第一個問候）
+window.initChatView = function() {
+    const container = document.getElementById('chat-messages');
+    if (container) {
+        container.innerHTML = '';
+        const msg = buildChatMessage('apprentice', '最近你一直在想什麼事呢？');
+        container.appendChild(msg);
+        gsap.fromTo(msg, { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+    }
+    const wrapper = document.getElementById('chat-input-wrapper');
+    if (wrapper) {
+        wrapper.style.display = '';
+        gsap.set(wrapper, { opacity: 1, y: 0, pointerEvents: 'auto' });
+    }
     const input = document.getElementById('chat-input');
-    const text = input.value.trim();
-    if (!text) return;
-    lastChatMessage = text;
+    if (input) { input.disabled = false; input.value = ''; }
+};
 
-    // 清掉上一次的 retry hint
-    const hint = document.getElementById('chat-retry-hint');
-    if (hint) hint.style.display = 'none';
+// 建立一則訊息 DOM
+function buildChatMessage(role, content) {
+    const msg = document.createElement('div');
+    msg.className = `chat-msg chat-msg-${role}`;
 
-    // 進入 loading
-    showView('chat-loading-view');
-    startLoadingAnim();
+    if (role === 'apprentice') {
+        const avatar = document.createElement('img');
+        avatar.src = 'Images/雞湯學徒.png';
+        avatar.alt = '';
+        avatar.className = 'chat-avatar';
+        msg.appendChild(avatar);
+    }
 
-    // 收集參數
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.textContent = content;
+    msg.appendChild(bubble);
+    return msg;
+}
+
+// 建立「思考文字」訊息（學徒 avatar + 沒有泡泡的斜體打字機文字）
+function buildChatThinking() {
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg chat-msg-apprentice';
+
+    const avatar = document.createElement('img');
+    avatar.src = 'Images/雞湯學徒.png';
+    avatar.alt = '';
+    avatar.className = 'chat-avatar';
+    msg.appendChild(avatar);
+
+    const text = document.createElement('div');
+    text.className = 'chat-thinking-text';
+    text.textContent = '';
+    msg.appendChild(text);
+    return msg;
+}
+
+function appendChatMessage(role, content) {
+    const container = document.getElementById('chat-messages');
+    if (!container) return null;
+    const msg = buildChatMessage(role, content);
+    container.appendChild(msg);
+    gsap.fromTo(msg, { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
+    container.scrollTop = container.scrollHeight;
+    return msg;
+}
+
+function appendChatThinking() {
+    const container = document.getElementById('chat-messages');
+    if (!container) return null;
+    const msg = buildChatThinking();
+    container.appendChild(msg);
+    gsap.fromTo(msg, { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
+    container.scrollTop = container.scrollHeight;
+    return msg.querySelector('.chat-thinking-text');
+}
+
+// 打字機把一段文字打到某個元素，回傳 Promise
+function typewriteTo(el, text, charDelay = 80) {
+    return new Promise(resolve => {
+        el.textContent = '';
+        let i = 0;
+        const tick = () => {
+            if (i >= text.length) { resolve(); return; }
+            el.textContent += text[i++];
+            setTimeout(tick, charDelay);
+        };
+        tick();
+    });
+}
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// 純粹打 API 的部分（不碰 UI）
+async function fetchChatResult(text) {
     const tone = document.getElementById('param-tone')?.value || 50;
     const enToggle = document.getElementById('param-en-toggle')?.checked || false;
-    const length = document.getElementById('param-length')?.value || 50;
+    const length = document.getElementById('param-length')?.value || 25;
 
-    // 收集問答 scores
     const scores = {};
     userAnswers.forEach(opt => {
         if (opt && opt.scores) {
@@ -1180,10 +1326,8 @@ window.submitChat = async function() {
         }
     });
 
-    // 30 秒超時
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
-
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
@@ -1198,26 +1342,117 @@ window.submitChat = async function() {
             })
         });
         clearTimeout(timeoutId);
-
         const result = await response.json();
+        return { ok: response.ok, result };
+    } catch (err) {
+        clearTimeout(timeoutId);
+        throw err;
+    }
+}
+
+// 產生學徒的 thinking 腳本（根據觀眾輸入 + 問答結果）— 4 拍、5 秒內
+function buildThinkingScript(userText) {
+    const truncate = (s, n) => (s && s.length > n) ? s.slice(0, n) + '...' : (s || '');
+    const preview = truncate(userText, 12);
+
+    // 四象限總分
+    const sb = { IP: 0, IR: 0, SP: 0, SR: 0 };
+    userAnswers.forEach(opt => {
+        if (opt && opt.scores) {
+            Object.entries(opt.scores).forEach(([k, v]) => { if (sb[k] !== undefined) sb[k] += v; });
+        }
+    });
+    const top = Object.entries(sb).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const quadrantHint = {
+        IP: '你還在往前衝',
+        IR: '你想喘口氣',
+        SP: '你在乎身邊的人',
+        SR: '你想清靜一下',
+    }[top] || '我再感覺一下';
+
+    // 取兩個單選題的答案（避開 container-choice）
+    const refs = questions
+        .map((q, i) => ({ q, ans: userAnswers[i] }))
+        .filter(x => x.q && x.ans && x.q.type !== 'container-choice');
+
+    const a1 = refs[0] ? truncate(refs[0].ans.text, 10) : '';
+    const a2 = (refs[2] || refs[1]) ? truncate((refs[2] || refs[1]).ans.text, 10) : '';
+
+    const refLine = (a1 && a2) ? `之前你選了「${a1}」和「${a2}」`
+                    : a1        ? `之前你選了「${a1}」`
+                                : '之前的幾題你也答過了';
+
+    return [
+        `你說「${preview}」......`,
+        refLine,
+        `嗯...... ${quadrantHint}`,
+        `讓我想想怎麼熬......`,
+    ];
+}
+
+// 送出自由輸入
+window.submitChat = async function() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    lastChatMessage = text;
+
+    const hint = document.getElementById('chat-retry-hint');
+    if (hint) hint.style.display = 'none';
+
+    // 1. 觀眾的回覆 → 右邊泡泡
+    appendChatMessage('user', text);
+
+    // 2. 清空輸入框（保留可見但停用、50% 不透明）
+    input.value = '';
+    input.style.height = 'auto';
+    input.disabled = true;
+    const wrapper = document.getElementById('chat-input-wrapper');
+    if (wrapper) {
+        gsap.to(wrapper, { opacity: 0.5, pointerEvents: 'none', duration: 0.35, ease: 'power2.out' });
+    }
+
+    // 3. 同時開始 API 呼叫
+    const apiPromise = fetchChatResult(text);
+
+    // 4. 學徒 thinking：avatar 旁邊用打字機把思考句依序打出
+    await sleep(350);
+    const thinkingEl = appendChatThinking();
+    const thoughts = buildThinkingScript(text);
+    for (let i = 0; i < thoughts.length; i++) {
+        await typewriteTo(thinkingEl, thoughts[i], 55);
+        if (i < thoughts.length - 1) {
+            await sleep(250);
+            thinkingEl.textContent = '';
+        } else {
+            await sleep(200);
+        }
+    }
+
+    // 5. 進入生成中畫面，並繼續等 API
+    showView('chat-loading-view');
+    startLoadingAnim();
+
+    try {
+        const { ok, result } = await apiPromise;
         stopLoadingAnim();
 
-        if (!response.ok || result.error) {
+        if (!ok || result.error) {
             console.error('API error:', result.error, 'detail:', result.detail);
             showRetryPrompt();
             return;
         }
 
         if (!result.valid) {
-            stopLoadingAnim();
-            const hint = document.getElementById('chat-retry-hint');
-            if (hint) {
-                hint.textContent = result.retry_message || '可以再多說一點嗎？';
-                hint.style.display = '';
-                gsap.fromTo(hint, { opacity: 0, y: 8 }, { opacity: 0.7, y: 0, duration: 0.5, ease: 'power2.out' });
+            // 太短或亂打：回聊天畫面，附上 retry 提示
+            initChatView();
+            const retryHint = document.getElementById('chat-retry-hint');
+            if (retryHint) {
+                retryHint.textContent = result.retry_message || '可以再多說一點嗎？';
+                retryHint.style.display = '';
+                gsap.fromTo(retryHint, { opacity: 0, y: 8 }, { opacity: 0.7, y: 0, duration: 0.5, ease: 'power2.out' });
             }
             showView('chat-view');
-            // 保留使用者原本輸入方便他繼續補充
             const inputEl = document.getElementById('chat-input');
             if (inputEl) {
                 inputEl.value = lastChatMessage;
@@ -1228,9 +1463,7 @@ window.submitChat = async function() {
 
         chatAIResult = result;
         showChatResult();
-
     } catch (err) {
-        clearTimeout(timeoutId);
         console.error('Fetch error:', err);
         stopLoadingAnim();
         showRetryPrompt();
@@ -1254,7 +1487,7 @@ window.retryLastChat = function() {
     submitChat();
 };
 
-// NFC 解碼 AI 生成的原句
+// NFC 解碼 AI 生成的原句（粒子散開 → 顯示脈絡 + 客製化按鈕）
 window.revealChatQuote = function() {
     if (!chatAIResult) return;
 
@@ -1262,45 +1495,67 @@ window.revealChatQuote = function() {
     const hintEl = document.getElementById('chat-result-hint');
     if (hintEl && hintEl.style.display === 'none') return;
 
-    const translationEl = document.getElementById('chat-translation-text');
-    const hint = document.getElementById('chat-result-hint');
-    const actions = document.getElementById('chat-result-actions');
+    const textEl   = document.getElementById('chat-translation-text');
+    const enEl     = document.getElementById('chat-en-text');
+    const ctxEl    = document.getElementById('chat-context');
+    const custBtn  = document.getElementById('chat-customize-btn');
+    const actions  = document.getElementById('chat-result-actions');
 
-    // 依當前語氣 slider 選對應版本（bounds + 型別防護）
-    const idx = snapToneIdx(document.getElementById('param-tone')?.value);
-    const tones = chatAIResult.tonesCN;
-    const safeIdx = (Array.isArray(tones) && idx >= 0 && idx < tones.length) ? idx : 2; // 預設中間
-    const currentCN = (Array.isArray(tones) && tones[safeIdx]) || chatAIResult.textCN || '';
-    chatAIResult.textCN = currentCN;
+    // 文字恢復顏色，粒子散開
+    textEl.style.color = '';
+    if (enEl && enEl.style.display !== 'none') enEl.style.color = '';
 
-    // 轉譯 fade out → 換成原句 fade in
-    gsap.to(translationEl, {
-        opacity: 0, duration: 0.4, ease: 'power2.out',
-        onComplete: () => {
-            translationEl.textContent = currentCN;
-            gsap.to(translationEl, { opacity: 1, duration: 0.6, ease: 'power2.out' });
+    dissolveParticles(() => {
+        // 粒子散完：藏 hint、顯示脈絡 + 客製化按鈕 + 左上角導航
+        gsap.to(hintEl, {
+            opacity: 0, duration: 0.3, ease: 'power2.out',
+            onComplete: () => { hintEl.style.display = 'none'; }
+        });
+
+        // 脈絡：用 AI 給的 translation（原本是籤文式的轉譯）當這句話的背景
+        const reasoning = chatAIResult.reasoning || chatAIResult.translation;
+        if (ctxEl && reasoning) {
+            ctxEl.textContent = reasoning;
+            ctxEl.style.display = '';
+            gsap.fromTo(ctxEl, { opacity: 0, y: 10 },
+                { opacity: 0.7, y: 0, duration: 0.6, delay: 0.3, ease: 'power2.out' });
         }
-    });
 
-    // hint fade out → 換字 → fade in
-    gsap.to(hint, {
-        opacity: 0, duration: 0.4, ease: 'power2.out',
-        onComplete: () => {
-            hint.textContent = '';
-            hint.style.display = 'none';
+        // 客製化按鈕
+        if (custBtn) {
+            custBtn.style.display = '';
+            gsap.fromTo(custBtn, { opacity: 0, y: 10 },
+                { opacity: 1, y: 0, duration: 0.5, delay: 0.8, ease: 'power2.out' });
         }
-    });
 
-    // 顯示左下角按鈕 + 右下角參數
-    const paramsPanel = document.getElementById('chat-params-panel');
-    gsap.fromTo(actions,
-        { display: 'flex', opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.6, delay: 1.5, ease: 'power2.out' }
-    );
-    gsap.fromTo(paramsPanel,
-        { display: 'flex', opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.6, delay: 1.8, ease: 'power2.out' }
-    );
+        // 左上角 Start Over / Try Again
+        gsap.fromTo(actions,
+            { display: 'flex', opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: 0.6, delay: 1.2, ease: 'power2.out' }
+        );
+    });
+};
+
+// 點「開始客製化」→ 隱藏脈絡與按鈕，顯示右下角參數面板
+window.enterChatCustomize = function() {
+    const ctxEl   = document.getElementById('chat-context');
+    const custBtn = document.getElementById('chat-customize-btn');
+    const panel   = document.getElementById('chat-params-panel');
+
+    if (ctxEl) {
+        gsap.to(ctxEl, { opacity: 0, duration: 0.3, ease: 'power2.in',
+            onComplete: () => { ctxEl.style.display = 'none'; } });
+    }
+    if (custBtn) {
+        gsap.to(custBtn, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in',
+            onComplete: () => { custBtn.style.display = 'none'; } });
+    }
+    if (panel) {
+        gsap.fromTo(panel,
+            { display: 'flex', opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: 0.5, delay: 0.2, ease: 'power2.out' }
+        );
+    }
 };
 
 // ========= 收藏雞湯卡片 =========
@@ -1461,6 +1716,7 @@ window.retryChatInput = function() {
     input.style.height = 'auto';
     input.style.overflow = 'hidden';
     chatAIResult = null;
+    initChatView();
     showView('chat-view');
 };
 
