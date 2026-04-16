@@ -43,23 +43,10 @@
     <!-- 使用提示 -->
     <div id="guide-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="w-full text-center">
-                <h2 class="font-bold">操作提示</h2>
-                <div class="guide-steps">
-                    <div class="step-card">
-                        <div class="step-number">①</div>
-                        <p class="step-text">回答幾個問題，抽取你的雞湯</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">②</div>
-                        <p class="step-text">將對應編號的玻璃瓶子放在紅色的 NFC 裝置以解碼雞湯</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">③</div>
-                        <p class="step-text">翻閱書本以查看雞湯的脈絡，或更多內容</p>
-                    </div>
-                </div>
-                <button class="primary-btn" onclick="goToQuestions()">ok，我已了解</button>
+            <div class="w-full max-w-2xl mx-auto text-center">
+                <h2 id="guide-text" class="font-medium mb-12" style="white-space: pre-line; line-break: strict; text-align: center;">歡迎來到雞湯王的雞湯熬製秘所，
+現在請跟著我的步伐獲得專屬於你的雞湯！</h2>
+                <button id="guide-btn" class="primary-btn" onclick="advanceGuide()">下一步</button>
             </div>
         </div>
     </div>
@@ -81,7 +68,7 @@
     <div id="chat-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto w-full text-center">
-                <h2 class="font-medium mb-6">最近你一直在想什麼事呢？</h2>
+                <h2 class="font-medium mb-12">最近你一直在想什麼事呢？</h2>
                 <p id="chat-retry-hint" class="mb-6 opacity-70" style="font-size:0.95rem; line-height:1.6; display:none; text-wrap:balance;"></p>
                 <div class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
                     <textarea id="chat-input"
@@ -175,15 +162,64 @@
         </div>
     </div>
 
-    <!-- 轉譯頁面（先給暗示文字） -->
+    <!-- 食材清單 -->
+    <div id="ingredient-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-3xl mx-auto text-center w-full">
+                <h2 class="font-medium text-black mb-10" style="text-wrap: balance;">獲取了需要的食材</h2>
+                <div id="ingredient-list" class="grid grid-cols-4 gap-4 mb-12 w-full"></div>
+                <button class="primary-btn btn-solid" onclick="goToCooking()">開始熬製</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 熬製過程（同頁，下方 4 box 進度條） -->
+    <div id="cooking-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-3xl mx-auto text-center w-full">
+                <h2 id="cooking-step-title" class="font-medium text-black mb-10"></h2>
+                <div id="cooking-image" class="mx-auto mb-10" style="width: 240px; height: 240px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案（熬煮動畫）</div>
+                <button class="primary-btn btn-solid mb-10" onclick="advanceCooking()">模擬感應 NFC（測試用）</button>
+                <div id="cooking-progress-boxes" class="flex flex-row gap-2 justify-center"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 雞湯成品（內容會替換成「差最後一步了」的掃描提示） -->
+    <div id="soup-result-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-3xl mx-auto text-center w-full">
+                <p id="soup-top-label" class="en font-normal mb-4" style="opacity: 0.5;">你熬出了一碗</p>
+                <h2 id="soup-name" class="font-medium text-black mb-8" style="text-wrap: balance; font-size: 2.5rem;"></h2>
+                <div id="soup-image" class="mx-auto mb-10" style="width: 200px; height: 200px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案</div>
+                <p id="soup-desc" class="font-normal text-black mb-12" style="text-wrap: balance; font-size: 1.1rem; line-height: 1.7;"></p>
+                <button id="soup-btn" class="primary-btn btn-solid" onclick="advanceFromSoup()">下一步</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 轉譯頁面：掃描提示 -->
     <div id="translation-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center w-full">
-                <p id="translation-hint" class="font-normal text-black mb-6 text-lg"></p>
-                <h2 id="translation-text" class="font-medium text-black mb-12" style="text-wrap: balance;"></h2>
+                <h2 class="font-medium text-black mb-8" style="text-wrap: balance;">差最後一步了！</h2>
+                <div id="translation-image" class="mx-auto mb-8" style="width: 180px; height: 180px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案</div>
+                <p id="translation-text" class="font-medium text-black" style="text-wrap: balance; font-size: 1.25rem; line-height: 1.6;"></p>
+                <button class="primary-btn btn-solid mt-12" onclick="revealQuote()">模擬掃描 NFC（測試用）</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 原句揭曉頁面 -->
+    <div id="quote-reveal-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-3xl mx-auto text-center w-full">
+                <p id="reveal-number" class="en font-normal mb-4" style="font-size: 2rem;"></p>
+                <h2 id="reveal-zh" class="font-medium text-black mb-4" style="text-wrap: balance; line-break: strict;"></h2>
+                <h4 id="reveal-en" class="en font-normal text-black mb-12" style="text-wrap: balance;"></h4>
                 <div class="flex flex-row items-center justify-center gap-4">
-                    <button class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'" onclick="restart()">再來一次</button>
-                    <button class="primary-btn" style="background-color: #000; color: #fff; border: 1px solid #000;" onclick="decodeQuote()">查看更多 / 解籤</button>
+                    <button class="primary-btn en" onclick="restart()">Start over</button>
+                    <button class="primary-btn btn-solid en" onclick="goToWebsite()">Explore</button>
                 </div>
             </div>
         </div>
@@ -195,11 +231,10 @@
             <!-- 左半邊：導航區塊 -->
             <div class="w-1/2 h-full relative flex flex-col justify-start p-8">
                 <!-- 返回按鈕 -->
-                <button onclick="showView('home-view')" class="en hover-underline absolute top-8 left-8 text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;">← Back</button>
+                <button onclick="restart()" class="en hover-underline absolute top-8 left-8 text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;">← Start over</button>
 
                 <!-- 選單按鈕 -->
                 <div class="flex flex-col gap-2 mt-16" id="info-nav">
-                    <button onclick="switchInfoTab('quotes')" id="tab-btn-quotes" class="en info-nav-btn text-left font-normal">Quotes</button>
                     <button onclick="switchInfoTab('about')" id="tab-btn-about" class="en info-nav-btn text-left font-normal">About</button>
                     <button onclick="switchInfoTab('research')" id="tab-btn-research" class="en info-nav-btn text-left font-normal">Research</button>
 

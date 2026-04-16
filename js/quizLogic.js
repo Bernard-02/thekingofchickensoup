@@ -63,6 +63,7 @@ export function getQuizResult(userAnswers, quotesDB) {
 
     return {
         userCombo: [primary, secondary],
+        scoreBoard,
         quote: pick.quote
     };
 }

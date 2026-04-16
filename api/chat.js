@@ -36,8 +36,9 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'No API keys configured' });
     }
 
-    // 嘗試順序：AI_PROVIDER=claude 代表 Claude 優先，否則 Gemini 優先
-    const claudeFirst = (process.env.AI_PROVIDER || '').toLowerCase() === 'claude';
+    // 強制 Gemini 優先；Claude 僅作為 Gemini 全部失敗時的 backup
+    // （如果要切回 Claude 優先，改成讀 process.env.AI_PROVIDER）
+    const claudeFirst = false;
 
     const { userMessage, scores, tone, length, retranslateOnly, existingCN, avoidCN } = req.body;
     if (!userMessage || !userMessage.trim()) {

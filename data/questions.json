@@ -5,10 +5,10 @@
     "type": "single",
     "tag": "mood",
     "options": [
-      { "value": "ip", "text": "在衝一些事情，整個人都在動",                 "scores": { "IP": 1 } },
+      { "value": "ip", "text": "在弄一些事情，整個人都在動",                 "scores": { "IP": 1 } },
       { "value": "ir", "text": "有點累，想喘口氣",                               "scores": { "IR": 1 } },
       { "value": "sp", "text": "有些人際的事想好好經營",                         "scores": { "SP": 1 } },
-      { "value": "sr", "text": "被一些人際煩到，想清靜一下",                     "scores": { "SR": 1 } }
+      { "value": "sr", "text": "被一些人煩到，想清靜一下",                       "scores": { "SR": 1 } }
     ]
   },
   {
@@ -31,7 +31,7 @@
     "options": [
       { "value": "ip", "text": "動起來，做點什麼新的事",                           "scores": { "IP": 1 } },
       { "value": "ir", "text": "什麼都不做，讓腦袋放空",                           "scores": { "IR": 1 } },
-      { "value": "sp", "text": "找個人聊聊，不一定要建議",                         "scores": { "SP": 1 } },
+      { "value": "sp", "text": "找個人聊聊天，不一定要有什麽建議",                         "scores": { "SP": 1 } },
       { "value": "sr", "text": "把外界聲音靜音，自己待著",                         "scores": { "SR": 1 } }
     ]
   },
@@ -44,7 +44,7 @@
       { "value": "ip", "text": "會在乎，但會拿來督促自己",                         "scores": { "IP": 1 } },
       { "value": "ir", "text": "會想，但會提醒自己別太糾結",                       "scores": { "IR": 1 } },
       { "value": "sp", "text": "對我重要的人的看法才算數",                         "scores": { "SP": 1 } },
-      { "value": "sr", "text": "沒那麼重要了，活自己的就好",                       "scores": { "SR": 1 } }
+      { "value": "sr", "text": "沒那麽重要，我自己開心才更重要",                       "scores": { "SR": 1 } }
     ]
   },
   {
@@ -53,7 +53,7 @@
     "type": "single",
     "tag": "future",
     "options": [
-      { "value": "ip", "text": "有些目標在跑，充滿幹勁",                           "scores": { "IP": 1 } },
+      { "value": "ip", "text": "有些目標，現在充滿幹勁",                           "scores": { "IP": 1 } },
       { "value": "ir", "text": "別想太多，先把今天過好",                           "scores": { "IR": 1 } },
       { "value": "sp", "text": "想跟重要的人一起走下去",                           "scores": { "SP": 1 } },
       { "value": "sr", "text": "有點焦慮，不太想面對",                             "scores": { "SR": 1 } }
@@ -61,12 +61,12 @@
   },
   {
     "id": "q6",
-    "text": "不知不覺聊到了最後。今天來這裡，你還有什麼想說的嗎？",
-    "type": "single",
-    "tag": "chat",
+    "text": "原料已準備好了，接下來請選擇你的熬製容器",
+    "type": "container-choice",
+    "tag": "container",
     "options": [
-      { "value": "chat", "text": "有，我想多說一點",                               "scores": {} },
-      { "value": "skip", "text": "沒有，我想說的都說完了",                         "scores": {} }
+      { "value": "chat", "title": "雞湯學徒的鍋子", "text": "使用雞湯學徒的鍋子，輸入內容以獲得雞湯學徒熬製的雞湯", "scores": {} },
+      { "value": "skip", "title": "雞湯王的鍋子",   "text": "使用雞湯王的鍋子，可獲得雞湯王熬製的雞湯",             "scores": {} }
     ]
   }
 ]

@@ -264,6 +264,23 @@ class NFCManager {
 
             log(`✓ 找到匹配的雞湯: #${matchedQuote.number}`, 'info');
 
+            // 在掃描提示頁（translation-view）且 UID 匹配抽中瓶號 → 揭曉原句
+            const translationView = document.getElementById('translation-view');
+            if (translationView && translationView.classList.contains('active')) {
+                const expected = window.finalQuizResult && window.finalQuizResult.quote
+                    ? window.finalQuizResult.quote.number
+                    : null;
+                if (expected === matchedQuote.number) {
+                    if (typeof window.revealQuote === 'function') {
+                        window.revealQuote();
+                    }
+                } else {
+                    log(`⚠ 錯誤的瓶子：應掃 #${expected}，掃的是 #${matchedQuote.number}`, 'warn');
+                    this.shakeWrongBottleHint();
+                }
+                return;
+            }
+
             const panel = document.getElementById('quote-slide-panel');
             const isOpen = panel && panel.classList.contains('open');
 

@@ -259,22 +259,59 @@ window.scrollToResearchPart = function(event, partId) {
 };
 
 // 導航
+const GUIDE_STEPS = [
+    { text: '歡迎來到雞湯王的雞湯熬製秘所，\n現在請跟著我的步伐獲得專屬於你的雞湯！', btn: '下一步' },
+    { text: '請回答5個問題獲取雞湯的製作原料',                                         btn: 'ok，我已了解' },
+];
+let guideStepIndex = 0;
+
 function goToGuide() {
     showView('guide-view');
 
-    // 步驟 1、2、3 依序 fade in，CTA 最後往上 fade in
-    const steps = document.querySelectorAll('#guide-view .step-card');
-    const cta = document.querySelector('#guide-view .primary-btn');
+    const textEl = document.getElementById('guide-text');
+    const btn = document.getElementById('guide-btn');
 
-    gsap.set([...steps, cta], { opacity: 0 });
-    gsap.set(cta, { y: 20, pointerEvents: 'none' });
+    guideStepIndex = 0;
+    textEl.textContent = GUIDE_STEPS[0].text;
+    btn.textContent = GUIDE_STEPS[0].btn;
 
-    steps.forEach((step, i) => {
-        gsap.to(step, { opacity: 1, duration: 1, ease: 'power2.out', delay: 0.3 + i * 0.4 });
+    gsap.set([textEl, btn], { opacity: 0 });
+    gsap.set(btn, { y: 20, pointerEvents: 'none' });
+
+    gsap.to(textEl, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.2 });
+    gsap.to(btn, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.6, ease: 'power2.out', delay: 0.9 });
+}
+
+function advanceGuide() {
+    const textEl = document.getElementById('guide-text');
+    const btn = document.getElementById('guide-btn');
+
+    // 第二步之後 → 進入問題
+    if (guideStepIndex >= GUIDE_STEPS.length - 1) {
+        goToQuestions();
+        return;
+    }
+
+    // 原地替換文字：fade out → swap → stagger fade in（跟成品頁同一套節奏）
+    gsap.set(btn, { pointerEvents: 'none' });
+    gsap.to([textEl, btn], {
+        opacity: 0,
+        duration: 0.35,
+        ease: 'power2.in',
+        onComplete: () => {
+            guideStepIndex++;
+            const next = GUIDE_STEPS[guideStepIndex];
+            textEl.textContent = next.text;
+            btn.textContent = next.btn;
+
+            gsap.set([textEl, btn], { opacity: 0, y: 10 });
+            gsap.to(textEl, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+            gsap.to(btn, {
+                opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', delay: 0.6,
+                onStart: () => { btn.style.pointerEvents = 'auto'; }
+            });
+        }
     });
-
-    const ctaDelay = 0.3 + steps.length * 0.4 + 0.3;
-    gsap.to(cta, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.6, ease: 'power2.out', delay: ctaDelay });
 }
 
 function goToQuestions() {
@@ -284,6 +321,7 @@ function goToQuestions() {
     currentSelectedValue = null;
     currentSelectedOption = null;
     finalQuizResult = null;
+    window.finalQuizResult = null;
     renderQuestion(currentQuestionIndex);
     showView('question-view');
 }
@@ -295,6 +333,7 @@ function restart() {
     currentSelectedOption = null;
     userAnswers = [];
     finalQuizResult = null;
+    window.finalQuizResult = null;
     // AI 聊天狀態也要清，避免下一個使用者看到上一個人的結果
     chatAIResult = null;
     lastChatMessage = '';
@@ -303,7 +342,6 @@ function restart() {
         chatInput.value = '';
         chatInput.style.height = 'auto';
     }
-    document.getElementById('quote-actions').classList.remove('visible');
     showView('home-view');
 }
 
@@ -321,8 +359,17 @@ function renderQuestion(index) {
     const questionEnEl = document.getElementById('question-text-en');
     if (questionEnEl) questionEnEl.textContent = '';
 
-    // 進度
-    document.getElementById('question-progress').textContent = `${index + 1} / ${questions.length}`;
+    // 進度（容器選擇題不顯示題號）
+    const progressEl = document.getElementById('question-progress');
+    if (q.type === 'container-choice') {
+        progressEl.textContent = '';
+        progressEl.style.visibility = 'hidden';
+    } else {
+        // 容器選擇題不計入總數：用除了 container-choice 以外的題數做分母
+        const totalQs = questions.filter(qq => qq.type !== 'container-choice').length;
+        progressEl.textContent = `${index + 1} / ${totalQs}`;
+        progressEl.style.visibility = 'visible';
+    }
 
     // 選項
     const optionsContainer = document.getElementById('question-options');
@@ -334,8 +381,18 @@ function renderQuestion(index) {
     const confirmBtn = document.getElementById('confirm-question');
     confirmBtn.classList.remove('visible');
 
-    // 打字機結束後，選項依序從下往上 fade in
-    const typewriterDuration = 0.6; // fade in 時長
+    // 題目 fade in 0.6s 結束後選項緊接進場
+    const optionStartDelay = 0.65;
+
+    if (q.type === 'container-choice') {
+        renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay);
+    } else {
+        renderSingleChoice(q, optionsContainer, confirmBtn, optionStartDelay);
+    }
+}
+
+function renderSingleChoice(q, optionsContainer, confirmBtn, optionStartDelay) {
+    optionsContainer.classList.remove('container-choice-layout');
 
     q.options.forEach((opt, i) => {
         const btn = document.createElement('button');
@@ -350,14 +407,50 @@ function renderQuestion(index) {
         btn.appendChild(document.createTextNode(opt.text));
         optionsContainer.appendChild(btn);
 
-        // 初始隱藏且不可互動，打字機結束後依序進場
         gsap.set(btn, { opacity: 0, y: 20, pointerEvents: 'none' });
-        gsap.to(btn, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.8, ease: 'power2.out', delay: typewriterDuration + 0.5 + i * 0.1 });
+        gsap.to(btn, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', delay: optionStartDelay + i * 0.1 });
 
-        // 綁定點擊事件
         btn.addEventListener('click', () => {
             optionsContainer.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
+            currentSelectedValue = opt.value;
+            currentSelectedOption = opt;
+            confirmBtn.classList.add('visible');
+        });
+    });
+}
+
+function renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay) {
+    optionsContainer.classList.add('container-choice-layout');
+
+    q.options.forEach((opt, i) => {
+        const box = document.createElement('button');
+        box.className = 'container-choice-box';
+        box.setAttribute('data-value', opt.value);
+
+        const imgEl = document.createElement('div');
+        imgEl.className = 'container-choice-image';
+        imgEl.textContent = '圖案';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'container-choice-title';
+        titleEl.textContent = opt.title || '';
+
+        const textEl = document.createElement('div');
+        textEl.className = 'container-choice-text';
+        textEl.textContent = opt.text;
+
+        box.appendChild(imgEl);
+        box.appendChild(titleEl);
+        box.appendChild(textEl);
+        optionsContainer.appendChild(box);
+
+        gsap.set(box, { opacity: 0, y: 20, pointerEvents: 'none' });
+        gsap.to(box, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.5, ease: 'power2.out', delay: optionStartDelay + i * 0.1 });
+
+        box.addEventListener('click', () => {
+            optionsContainer.querySelectorAll('.container-choice-box').forEach(b => b.classList.remove('selected'));
+            box.classList.add('selected');
             currentSelectedValue = opt.value;
             currentSelectedOption = opt;
             confirmBtn.classList.add('visible');
@@ -400,31 +493,201 @@ async function calculateAndShowTranslation() {
         // 載入雞湯資料
         const response = await fetch('data/quotes-selected.json');
         let quotes = await response.json();
-        
+
         // 只從 selected 的前 50 筆中選（= 有實體 NFC 卡的那 50 句）
         quotes = quotes.slice(0, 50);
 
         // 動態載入 3D 計分大腦
         const { getQuizResult } = await import('./quizLogic.js');
         finalQuizResult = getQuizResult(userAnswers, quotes);
+        window.finalQuizResult = finalQuizResult;
 
         console.log(`🎯 測驗匹配選中: #${finalQuizResult.quote.number} (痛點組合: ${finalQuizResult.userCombo.join(', ')})`);
 
-        // 上方提示：3 句雞湯味的招呼語隨機挑一個
-        const soupTeasers = [
-            '雞湯的香味出來啦！',
-            '你聞到雞湯的味道了嗎？',
-            '是不是有什麼東西滾了？'
-        ];
-        const teaser = soupTeasers[Math.floor(Math.random() * soupTeasers.length)];
-        document.getElementById('translation-hint').textContent = teaser;
-        // 下方仍顯示該句雞湯的籤文轉譯
-        document.getElementById('translation-text').textContent = finalQuizResult.quote.translation;
-        showView('translation-view');
+        // 進入食材清單頁
+        showIngredientView();
     } catch (error) {
         console.error('計算結果失敗:', error);
     }
 }
+
+// ========== 食材清單 → 熬製 → 雞湯成品 ==========
+
+// 語錄的象限 → 四種食材份量
+// 邏輯：主象限對應的食材「明顯多」、次象限「稍微多」、其他維持底線
+// 對應：IP=調味料（衝）/ IR=水（淡）/ SP=蔥薑蒜（暖）/ SR=雞（紮實）
+const QUADRANT_TO_INGREDIENT = { IP: 'seasoning', IR: 'water', SP: 'aromatics', SR: 'chicken' };
+
+const INGREDIENT_SPEC = {
+    chicken:   { name: '雞',     unit: 'g',  base: 200, primaryBoost: 250, secondaryBoost: 100 },
+    water:     { name: '水',     unit: 'ml', base: 400, primaryBoost: 400, secondaryBoost: 150 },
+    aromatics: { name: '蔥薑蒜', unit: '份', base: 2,   primaryBoost: 3,   secondaryBoost: 1   },
+    seasoning: { name: '調味料', unit: 'g',  base: 5,   primaryBoost: 20,  secondaryBoost: 8   },
+};
+
+const INGREDIENT_ORDER = ['chicken', 'water', 'aromatics', 'seasoning'];
+
+function computeIngredientsFromQuote(quote) {
+    const primaryKey   = QUADRANT_TO_INGREDIENT[quote.quadrant];
+    const secondaryKey = QUADRANT_TO_INGREDIENT[quote.quadrantSecondary];
+
+    return INGREDIENT_ORDER.map(key => {
+        const spec = INGREDIENT_SPEC[key];
+        let amount = spec.base;
+        if (key === primaryKey)   amount += spec.primaryBoost;
+        if (key === secondaryKey) amount += spec.secondaryBoost;
+        return {
+            name: spec.name,
+            amount: `${amount}${spec.unit}`,
+        };
+    });
+}
+
+function showIngredientView() {
+    if (!finalQuizResult) return;
+    const list = computeIngredientsFromQuote(finalQuizResult.quote);
+
+    const container = document.getElementById('ingredient-list');
+    container.innerHTML = '';
+    list.forEach((ing, i) => {
+        const card = document.createElement('div');
+        card.className = 'ingredient-card';
+        card.innerHTML = `
+            <div class="ingredient-icon">圖案</div>
+            <div class="ingredient-name">${ing.name}</div>
+            <div class="ingredient-amount en">${ing.amount}</div>
+        `;
+        container.appendChild(card);
+
+        gsap.set(card, { opacity: 0, y: 20 });
+        gsap.to(card, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 + i * 0.1 });
+    });
+
+    showView('ingredient-view');
+}
+
+// ========== 熬製四步驟（同頁，下方進度 box） ==========
+const COOKING_STEPS = [
+    { title: '放入食材' },
+    { title: '開火煮滾' },
+    { title: '去除浮沫' },
+    { title: '調味'     },
+];
+let cookingStepIndex = 0;
+
+window.goToCooking = function() {
+    cookingStepIndex = 0;
+    buildCookingProgressBoxes();
+    renderCookingStep();
+    showView('cooking-view');
+};
+
+function buildCookingProgressBoxes() {
+    const container = document.getElementById('cooking-progress-boxes');
+    container.innerHTML = '';
+    for (let i = 0; i < COOKING_STEPS.length; i++) {
+        const box = document.createElement('div');
+        box.className = 'cooking-progress-box';
+        container.appendChild(box);
+    }
+}
+
+function updateCookingProgressBoxes(step) {
+    const boxes = document.querySelectorAll('#cooking-progress-boxes .cooking-progress-box');
+    boxes.forEach((b, i) => b.classList.toggle('filled', i <= step));
+}
+
+function renderCookingStep() {
+    const step = COOKING_STEPS[cookingStepIndex];
+    if (!step) return;
+
+    const titleEl = document.getElementById('cooking-step-title');
+    titleEl.textContent = step.title;
+
+    updateCookingProgressBoxes(cookingStepIndex);
+
+    gsap.fromTo(titleEl,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+    );
+}
+
+window.advanceCooking = function() {
+    cookingStepIndex++;
+    if (cookingStepIndex >= COOKING_STEPS.length) {
+        showSoupResult();
+        return;
+    }
+    renderCookingStep();
+};
+
+// ========== 雞湯成品（內容可切換成「差最後一步」掃描提示） ==========
+let soupViewMode = 'soup'; // 'soup' | 'scan'
+
+function showSoupResult() {
+    if (!finalQuizResult) return;
+    soupViewMode = 'soup';
+    renderSoupView();
+    showView('soup-result-view');
+}
+
+function renderSoupView() {
+    if (!finalQuizResult) return;
+    const q = finalQuizResult.quote;
+    const topEl   = document.getElementById('soup-top-label');
+    const nameEl  = document.getElementById('soup-name');
+    const descEl  = document.getElementById('soup-desc');
+    const btn     = document.getElementById('soup-btn');
+
+    const soupName = q.soupName || `#${q.number} 雞湯`;
+
+    if (soupViewMode === 'soup') {
+        topEl.textContent = '';
+        topEl.style.display = 'none';
+        nameEl.textContent = soupName;
+        nameEl.style.fontSize = '2.5rem';
+        if (q.soupDesc) {
+            descEl.textContent = q.soupDesc;
+            descEl.style.display = '';
+        } else {
+            descEl.textContent = '';
+            descEl.style.display = 'none';
+        }
+        btn.textContent = '下一步';
+    } else {
+        // scan 模式：差最後一步
+        topEl.textContent = '';
+        topEl.style.display = 'none';
+        nameEl.textContent = '差最後一步了！';
+        nameEl.style.fontSize = '2.5rem';
+        descEl.textContent = `請拿右邊#${q.number}瓶子掃描鍋子以接住萃取後的${soupName}`;
+        descEl.style.display = '';
+        btn.textContent = '模擬掃描 NFC（測試用）';
+    }
+}
+
+// 成品頁按鈕動作：第一次點 → 切成掃描提示（同頁替換）；第二次點 → 揭曉原句
+window.advanceFromSoup = function() {
+    if (soupViewMode === 'soup') {
+        // 替換內容：fade out → 切模式 → fade in
+        const nodes = ['soup-top-label', 'soup-name', 'soup-desc', 'soup-btn']
+            .map(id => document.getElementById(id));
+        gsap.to(nodes, {
+            opacity: 0, duration: 0.35, ease: 'power2.in',
+            onComplete: () => {
+                soupViewMode = 'scan';
+                renderSoupView();
+                gsap.fromTo(nodes,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.08 }
+                );
+            }
+        });
+    } else {
+        // scan 模式：揭曉原句
+        revealQuote();
+    }
+};
 
 // 建立 quotes list
 let allQuotes = [];
@@ -655,19 +918,15 @@ window.closeQuotePanel = closeQuotePanel;
 window.openQuotePanel = openQuotePanel;
 window.buildQuotesList = buildQuotesList;
 
-// NFC 掃描成功後，粒子 scatter 並 reveal（供 nfc.js 呼叫）
-window.revealQuoteInPanel = function() {
+// 把目前畫面上的粒子 scatter + dissolve，結束後呼叫 onComplete
+function dissolveParticles(onComplete) {
     cancelAnimationFrame(particleAnimFrame);
     particleAnimFrame = null;
 
-    // 立刻顯示 zh/en 文字（粒子在透明底上叠加，慢慢透出）
-    document.getElementById('quote-panel-zh').style.color = '';
-    document.getElementById('quote-panel-en').style.color = '';
-
     const snapshot = [...particleCanvases];
     particleCanvases = [];
+    if (snapshot.length === 0) { if (onComplete) onComplete(); return; }
 
-    // 計算所有 canvas 合併後的全局中心點
     const allBounds = snapshot.map(({ canvas, w, h }) => ({
         left:   parseFloat(canvas.style.left) + PAD,
         top:    parseFloat(canvas.style.top)  + PAD,
@@ -677,7 +936,6 @@ window.revealQuoteInPanel = function() {
     const globalCX = (Math.min(...allBounds.map(b => b.left)) + Math.max(...allBounds.map(b => b.right)))  / 2;
     const globalCY = (Math.min(...allBounds.map(b => b.top))  + Math.max(...allBounds.map(b => b.bottom))) / 2;
 
-    // 給每個粒子疊加向外的速度
     snapshot.forEach(({ canvas, particles }) => {
         const canvasLeft = parseFloat(canvas.style.left) + PAD;
         const canvasTop  = parseFloat(canvas.style.top)  + PAD;
@@ -693,10 +951,8 @@ window.revealQuoteInPanel = function() {
         });
     });
 
-    // 記錄初始粒子數量
     snapshot.forEach(item => { item.initialCount = item.particles.length; });
 
-    // 0.5s 內根據進度移除粒子，透明底讓文字從粒子之間透出
     const startTime = performance.now();
     const DURATION = 500;
 
@@ -706,7 +962,6 @@ window.revealQuoteInPanel = function() {
 
         let anyLeft = false;
         snapshot.forEach(({ canvas, particles, initialCount }) => {
-            // 按比例隨機移除粒子
             const target = Math.floor(initialCount * keepFraction);
             while (particles.length > target) {
                 particles.splice(Math.floor(Math.random() * particles.length), 1);
@@ -714,7 +969,6 @@ window.revealQuoteInPanel = function() {
 
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // 透明底，zh/en 文字從粒子之間透出
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
@@ -732,63 +986,79 @@ window.revealQuoteInPanel = function() {
         } else {
             particleAnimFrame = null;
             snapshot.forEach(({ canvas }) => canvas.remove());
-
-            // hint 文字：先 fade out，停留 2s，再換字 fade in
-            const hint = document.getElementById('quote-panel-hint');
-            gsap.to(hint, {
-                opacity: 0, duration: 0.4, ease: 'power2.out',
-                onComplete: () => {
-                    const page = window.currentOpenedQuoteNumber ? getQuotePage(window.currentOpenedQuoteNumber) : null;
-                    hint.textContent = page ? `翻閱書本第 ${page} 頁以了解這句的脈絡` : '翻閱書本以了解這句的脈絡';
-                    gsap.to(hint, { opacity: 0.5, duration: 0.6, delay: 0.5, ease: 'power2.out' });
-                }
-            });
+            if (onComplete) onComplete();
         }
     }
 
     particleAnimFrame = requestAnimationFrame(dissolve);
+}
+
+// NFC 掃描成功後，粒子 scatter 並 reveal（供 nfc.js 呼叫）
+window.revealQuoteInPanel = function() {
+    // 立刻顯示 zh/en 文字（粒子在透明底上叠加，慢慢透出）
+    document.getElementById('quote-panel-zh').style.color = '';
+    document.getElementById('quote-panel-en').style.color = '';
+
+    dissolveParticles(() => {
+        // hint 文字：先 fade out，停留 2s，再換字 fade in
+        const hint = document.getElementById('quote-panel-hint');
+        gsap.to(hint, {
+            opacity: 0, duration: 0.4, ease: 'power2.out',
+            onComplete: () => {
+                const page = window.currentOpenedQuoteNumber ? getQuotePage(window.currentOpenedQuoteNumber) : null;
+                hint.textContent = page ? `翻閱書本第 ${page} 頁以了解這句的脈絡` : '翻閱書本以了解這句的脈絡';
+                gsap.to(hint, { opacity: 0.5, duration: 0.6, delay: 0.5, ease: 'power2.out' });
+            }
+        });
+    });
 };
 
-// 進入解籤畫面
-window.decodeQuote = async function() {
-    console.log('[decodeQuote] 開始', finalQuizResult);
-    if (!finalQuizResult) {
-        console.warn('[decodeQuote] finalQuizResult 為空，無法執行');
-        return;
-    }
+// 揭曉原句（NFC 掃描對應瓶子後呼叫）：1s 粒子鋪面 → 自動 dissolve → 按鈕上浮
+window.revealQuote = function() {
+    if (!finalQuizResult) return;
+    const q = finalQuizResult.quote;
+    const numEl = document.getElementById('reveal-number');
+    const zhEl = document.getElementById('reveal-zh');
+    const enEl = document.getElementById('reveal-en');
+    const buttons = document.querySelectorAll('#quote-reveal-view .primary-btn');
 
-    const finalQuote = finalQuizResult.quote;
+    numEl.textContent = `#${q.number}`;
+    zhEl.textContent = q.textCN || '';
+    enEl.textContent = q.textEN || '';
 
-    // 先切到 Quotes 頁（transition 會跑 300ms）
+    // 文字先隱藏（粒子蓋住）、按鈕藏起來
+    zhEl.style.color = '#f2f2f2';
+    enEl.style.color = '#f2f2f2';
+    gsap.set(buttons, { opacity: 0, y: 20, pointerEvents: 'none' });
+
+    showView('quote-reveal-view');
+
+    // showView 有 300ms fade，等 view active 再量尺寸畫粒子
+    setTimeout(() => {
+        startParticles([zhEl, enEl]);
+
+        // 停留 1s 後自動 reveal
+        setTimeout(() => {
+            zhEl.style.color = '';
+            enEl.style.color = '';
+            dissolveParticles(() => {
+                gsap.to(buttons, {
+                    opacity: 1, y: 0, pointerEvents: 'auto',
+                    duration: 0.6, stagger: 0.15, ease: 'power2.out'
+                });
+            });
+        }, 1000);
+    }, 400);
+};
+
+// 進入網站瀏覽（Explore 按鈕）
+window.goToWebsite = function() {
     showView('info-website-view');
-    switchInfoTab('quotes');
-
-    // 通知 NFC Manager (ESP8266) 當前顯示的雞湯編號
-    if (window.nfcManager) {
-        try {
-            window.nfcManager.updateCurrentQuote(finalQuote.number);
-        } catch (e) {
-            console.warn('[decodeQuote] updateCurrentQuote 失敗：', e);
-        }
-    }
-
-    // 建立 list 並 scroll 到抽中的句子
-    try {
-        await buildQuotesList(finalQuote.number);
-    } catch (e) {
-        console.error('[decodeQuote] buildQuotesList 失敗：', e);
-        return;
-    }
-
-    // list 動畫 ~2.5s 跑完後自動 slide in 對應 quote panel
-    if (decodeOpenTimer) clearTimeout(decodeOpenTimer);
-    decodeOpenTimer = setTimeout(() => {
-        decodeOpenTimer = null;
-        if (typeof openQuotePanel === 'function') {
-            openQuotePanel(finalQuote);
-        }
-    }, 2800);
+    switchInfoTab('about');
 };
+
+// 舊入口：保留為 Website 動作的別名，避免其他地方呼叫時壞掉
+window.decodeQuote = window.goToWebsite;
 
 // 載入問題資料
 async function loadQuestions() {
@@ -1562,6 +1832,15 @@ function startHomeAnimation() {
 
     const zhText = '這個人超會寫雞湯';
     const enText = 'The King of Chicken Soup';
+
+    // 預先量好最終寬高並鎖住：寬度讓打字機從左打到右，高度避免英文出現時中文被擠上去
+    [[zhEl, zhText], [enEl, enText]].forEach(([el, txt]) => {
+        el.textContent = txt;
+        el.style.minWidth = el.offsetWidth + 'px';
+        el.style.minHeight = el.offsetHeight + 'px';
+        el.style.textAlign = 'left';
+        el.textContent = '';
+    });
 
     // 初始隱藏 logo
     gsap.set(logo, { opacity: 0 });
