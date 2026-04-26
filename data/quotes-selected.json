@@ -798,7 +798,7 @@
     "category": "人生哲理",
     "textCN": "你的成就應該由你做過的客觀事實來奠定，而不是靠他人的三言兩語。",
     "textEN": "Your achievements should be built upon what you've actually done — not on what others say about you.",
-    "nfcUID": "",
+    "nfcUID": "04:4E:6F:97:CC:2A:81",
     "contextId": "091",
     "tags": [
       "self-worth",
@@ -815,7 +815,7 @@
     "category": "人生哲理",
     "textCN": "有些事情其實沒說要原諒，只是覺得算了。",
     "textEN": "Sometimes forgiveness isn't really given; it's just deciding to let things go.",
-    "nfcUID": "",
+    "nfcUID": "04:4D:6F:97:CC:2A:81",
     "contextId": "093",
     "tags": [
       "hurt",
@@ -831,7 +831,7 @@
     "category": "處世態度",
     "textCN": "你應該通過自己的眼睛去認識對方，而不是通過別人的嘴巴。",
     "textEN": "You should see people through your own eyes, not through someone else's words.",
-    "nfcUID": "",
+    "nfcUID": "04:48:6F:97:CC:2A:81",
     "contextId": "094",
     "tags": [
       "relationships",
@@ -846,7 +846,7 @@
     "category": "人生哲理",
     "textCN": "糾結在一個沒辦法控制的事物上只會讓自己更痛苦。",
     "textEN": "Obsessing over something you can't control will only make you suffer more.",
-    "nfcUID": "",
+    "nfcUID": "04:47:6F:97:CC:2A:81",
     "contextId": "095",
     "tags": [
       "overthinking",
@@ -861,7 +861,7 @@
     "category": "處世態度",
     "textCN": "別人的嘴巴長在他們身上，我們沒辦法決定他人要說什麽，但我們可以決定自己要聽什麽。",
     "textEN": "You can't control what others say, but you can choose what to listen to.",
-    "nfcUID": "",
+    "nfcUID": "04:46:6F:97:CC:2A:81",
     "contextId": "100",
     "tags": [
       "hurt",
@@ -877,7 +877,7 @@
     "category": "處世態度",
     "textCN": "路不轉人轉，要麼硬是開一條路，要麼換別條路走，總會有方法的。",
     "textEN": "When the road doesn't turn, you can — either carve a new path or take another route. There's always a way.",
-    "nfcUID": "",
+    "nfcUID": "04:45:6F:97:CC:2A:81",
     "contextId": "103",
     "tags": [
       "setback",
@@ -893,7 +893,7 @@
     "category": "人生哲理",
     "textCN": "每個人身上都有標籤，或多或少。",
     "textEN": "Everyone carries labels, more or less.",
-    "nfcUID": "",
+    "nfcUID": "04:3F:6F:97:CC:2A:81",
     "contextId": "104",
     "tags": [
       "self-worth",
@@ -909,7 +909,7 @@
     "category": "人生哲理",
     "textCN": "錢其實是可以買到幸福的。好吃的一餐、好喝的飲料、好看的電影，都可以帶來幸福感。",
     "textEN": "Money can buy happiness — a good meal, a nice drink, a great movie can all bring joy.",
-    "nfcUID": "",
+    "nfcUID": "04:3E:6F:97:CC:2A:81",
     "contextId": "109",
     "tags": [
       "tired",
@@ -924,7 +924,7 @@
     "category": "人際關係",
     "textCN": "在對的關係階段裡做那個階段該做的事，不要越界。",
     "textEN": "Do what's appropriate for the stage of the relationship you're in; don't overstep the line.",
-    "nfcUID": "",
+    "nfcUID": "04:3D:6F:97:CC:2A:81",
     "contextId": "112",
     "tags": [
       "relationships",
@@ -941,7 +941,7 @@
     "category": "處世態度",
     "textCN": "天外有天，人外有人。拿捏自信的程度，別太多，也別太少。",
     "textEN": "There's always someone better out there. Keep your confidence in check — not too much, not too little.",
-    "nfcUID": "",
+    "nfcUID": "04:3C:6F:97:CC:2A:81",
     "contextId": "115",
     "tags": [
       "self-worth",
@@ -957,7 +957,7 @@
     "category": "處世態度",
     "textCN": "練習可以使你更趨近於完美。",
     "textEN": "Practice brings you closer to perfection.",
-    "nfcUID": "",
+    "nfcUID": "04:37:6F:97:CC:2A:81",
     "contextId": "122",
     "tags": [
       "action",
@@ -973,7 +973,7 @@
     "category": "人際關係",
     "textCN": "因為把你放在心上，所以記得你、在乎你、關心你。",
     "textEN": "Because you hold someone in your heart, you remember them, care about them, and think about them.",
-    "nfcUID": "",
+    "nfcUID": "04:36:6F:97:CC:2A:81",
     "contextId": "123",
     "tags": [
       "relationships",
@@ -988,7 +988,7 @@
     "category": "人生哲理",
     "textCN": "我們真的很難理解某個人的痛楚或處境。",
     "textEN": "It's truly hard for us to fully understand another person's pain or situation.",
-    "nfcUID": "",
+    "nfcUID": "04:35:6F:97:CC:2A:81",
     "contextId": "125",
     "tags": [
       "hurt",
@@ -1005,7 +1005,7 @@
     "category": "處世態度",
     "textCN": "打鐵需要趁熱，有些事情熱度過了就沒意思了。",
     "textEN": "Strike while the iron is hot — once the momentum fades, the meaning fades too.",
-    "nfcUID": "",
+    "nfcUID": "04:34:6F:97:CC:2A:81",
     "contextId": "126",
     "tags": [
       "action",
@@ -1020,7 +1020,7 @@
     "category": "處世態度",
     "textCN": "慢就會穩，穩就會快。",
     "textEN": "Slow makes steady, and steady makes fast.",
-    "nfcUID": "",
+    "nfcUID": "04:2E:6F:97:CC:2A:81",
     "contextId": "128",
     "tags": [
       "action",
@@ -1037,7 +1037,7 @@
     "category": "處世態度",
     "textCN": "別只是一味地努力，我們可以聰明地努力。",
     "textEN": "Don't just work hard — work smart.",
-    "nfcUID": "",
+    "nfcUID": "04:2D:6F:97:CC:2A:81",
     "contextId": "130",
     "tags": [
       "tired",
@@ -1053,7 +1053,7 @@
     "category": "人生哲理",
     "textCN": "每個人都有他們各自的課題需要面對。",
     "textEN": "Everyone has their own lessons to deal with.",
-    "nfcUID": "",
+    "nfcUID": "04:2C:6F:97:CC:2A:81",
     "contextId": "132",
     "tags": [
       "self-worth",
@@ -1069,7 +1069,7 @@
     "category": "處世態度",
     "textCN": "讀書很好啊，但更好的是你有學以致用。",
     "textEN": "Studying is good, but applying what you learn is even better.",
-    "nfcUID": "",
+    "nfcUID": "04:2B:6F:97:CC:2A:81",
     "contextId": "133",
     "tags": [
       "action",
@@ -1084,7 +1084,7 @@
     "category": "人際關係",
     "textCN": "將心比心，你怎麽對待別人，別人就怎麽對待你。",
     "textEN": "Treat others the way you want to be treated; people usually reflect what you give.",
-    "nfcUID": "",
+    "nfcUID": "04:26:6F:97:CC:2A:81",
     "contextId": "141",
     "tags": [
       "relationships",
@@ -1099,7 +1099,7 @@
     "category": "人生哲理",
     "textCN": "無論再怎麽難過，肚子餓了還是要吃，感覺累了還是要睡——生活還是要過。",
     "textEN": "No matter how sad you are, you still need to eat when you're hungry and sleep when you're tired—life goes on.",
-    "nfcUID": "",
+    "nfcUID": "04:25:6F:97:CC:2A:81",
     "contextId": "142",
     "tags": [
       "tired",
@@ -1116,7 +1116,7 @@
     "category": "處世態度",
     "textCN": "一回生，二回熟，多做幾次就會游刃有餘了，所以不要害怕第一次做的不好。",
     "textEN": "Everything feels strange the first time, but it gets easier the more you do it. Don't fear doing something poorly at the beginning.",
-    "nfcUID": "",
+    "nfcUID": "04:D1:6E:97:CC:2A:81",
     "contextId": "145",
     "tags": [
       "action",
@@ -1132,7 +1132,7 @@
     "category": "人生哲理",
     "textCN": "對你想過的生活有點想像吧！若不符合理想生活的方向，自然就會想要調整了。",
     "textEN": "Imagine the life you want. When reality doesn't match that direction, you'll naturally want to adjust.",
-    "nfcUID": "",
+    "nfcUID": "04:D2:6E:97:CC:2A:81",
     "contextId": "146",
     "tags": [
       "confused",
@@ -1149,7 +1149,7 @@
     "category": "人際關係",
     "textCN": "不要將你對別人的氣出在另外一個不相關的人上，很莫名其妙也很令人受傷。",
     "textEN": "Don't take your anger at one person out on someone else. It's unfair, confusing, and hurtful.",
-    "nfcUID": "",
+    "nfcUID": "04:24:6F:97:CC:2A:81",
     "contextId": "150",
     "tags": [
       "hurt",
@@ -1165,7 +1165,7 @@
     "category": "處世態度",
     "textCN": "做你該做的事，你的節奏不要輕易地被外界打亂。",
     "textEN": "Do what you need to do, and don't let the outside world throw off your rhythm.",
-    "nfcUID": "",
+    "nfcUID": "04:23:6F:97:CC:2A:81",
     "contextId": "151",
     "tags": [
       "overthinking",
@@ -1182,7 +1182,7 @@
     "category": "人生哲理",
     "textCN": "當你正在對未來籌備及規劃時，記得活在當下也同樣重要。",
     "textEN": "While planning and preparing for the future, don't forget that living in the present matters just as much.",
-    "nfcUID": "",
+    "nfcUID": "04:1D:6F:97:CC:2A:81",
     "contextId": "152",
     "tags": [
       "overthinking",
@@ -1199,7 +1199,7 @@
     "category": "處世態度",
     "textCN": "將一個大目標拆分成好幾個小目標，逐個擊破，這樣才不會覺得目標遙不可及。",
     "textEN": "Break a big goal into smaller ones and tackle them one by one — that's how it stops feeling out of reach.",
-    "nfcUID": "",
+    "nfcUID": "04:1C:6F:97:CC:2A:81",
     "contextId": "153",
     "tags": [
       "action",
@@ -1215,7 +1215,7 @@
     "category": "處世態度",
     "textCN": "學習應該是自發性且永無止境的。",
     "textEN": "Learning should be self-driven — and never-ending.",
-    "nfcUID": "",
+    "nfcUID": "04:1B:6F:97:CC:2A:81",
     "contextId": "156",
     "tags": [
       "action",
@@ -1230,7 +1230,7 @@
     "category": "人生哲理",
     "textCN": "及時止損何嘗不是一種解決方法呢？",
     "textEN": "Sometimes cutting your losses is one of the ways to deal with it.",
-    "nfcUID": "",
+    "nfcUID": "04:1A:6F:97:CC:2A:81",
     "contextId": "158",
     "tags": [
       "setback",
@@ -1247,7 +1247,7 @@
     "category": "人生哲理",
     "textCN": "滿分十分的話，三分天注定，六分靠打拼，還有一分要靠運氣。",
     "textEN": "If life were scored out of ten, three would be fate, six would be hard work, and the last one would be luck.",
-    "nfcUID": "",
+    "nfcUID": "04:15:6F:97:CC:2A:81",
     "contextId": "162",
     "tags": [
       "setback",
@@ -1264,7 +1264,7 @@
     "category": "處世態度",
     "textCN": "希望你在沒人看見的時候也能持續地發光發熱。",
     "textEN": "I hope you can keep shining even when no one's watching.",
-    "nfcUID": "",
+    "nfcUID": "04:14:6F:97:CC:2A:81",
     "contextId": "163",
     "tags": [
       "self-worth",
@@ -1280,7 +1280,7 @@
     "category": "人際關係",
     "textCN": "對你好是因為我很好，而不是我被大家評價是個好人。",
     "textEN": "I'm good to you because I am a good person—not because people label me as one.",
-    "nfcUID": "",
+    "nfcUID": "04:12:6F:97:CC:2A:81",
     "contextId": "164",
     "tags": [
       "relationships",
@@ -1297,7 +1297,7 @@
     "category": "處世態度",
     "textCN": "別想太多，有的時候心思不那麽細膩也行。",
     "textEN": "Don't overthink everything. It's okay if your mind isn't always so delicate and precise.",
-    "nfcUID": "",
+    "nfcUID": "04:FC:6E:97:CC:2A:81",
     "contextId": "165",
     "tags": [
       "overthinking",
@@ -1312,7 +1312,7 @@
     "category": "人際關係",
     "textCN": "在家靠父母，出外靠朋友。人脈很重要，多擴展你的交友圈。",
     "textEN": "At home you rely on your parents; once you step outside, you rely on your friends. Connections matter, so keep expanding your circle.",
-    "nfcUID": "",
+    "nfcUID": "04:FB:6E:97:CC:2A:81",
     "contextId": "166",
     "tags": [
       "relationships",
@@ -1328,7 +1328,7 @@
     "category": "人生哲理",
     "textCN": "有想做的事情就去做吧，不要留有遺憾。有時候感到遺憾是因為沒做，而不是做了卻不滿意。",
     "textEN": "If there's something you want to do, go for it. Regret often comes from not trying, not from trying and falling short.",
-    "nfcUID": "",
+    "nfcUID": "04:FA:6E:97:CC:2A:81",
     "contextId": "170",
     "tags": [
       "action",
@@ -1344,7 +1344,7 @@
     "category": "處世態度",
     "textCN": "跌倒了可以躺著休息一下，躺夠了就站起來。",
     "textEN": "If you fall, it's okay to lie down and rest for a bit. Once you've rested enough, stand back up.",
-    "nfcUID": "",
+    "nfcUID": "04:F9:6E:97:CC:2A:81",
     "contextId": "171",
     "tags": [
       "tired",
@@ -1361,7 +1361,7 @@
     "category": "人生哲理",
     "textCN": "自己就是最好的投資，這一點準沒錯的。",
     "textEN": "Investing in yourself is always the best investment. That part never fails.",
-    "nfcUID": "",
+    "nfcUID": "04:F4:6E:97:CC:2A:81",
     "contextId": "174",
     "tags": [
       "self-worth",
@@ -1377,7 +1377,7 @@
     "category": "處世態度",
     "textCN": "做個打不死的小强，在接下來的日子也要披荊斬棘。",
     "textEN": "Be a little cockroach that refuses to die — keep pushing forward and cutting through the brambles ahead.",
-    "nfcUID": "",
+    "nfcUID": "04:F3:6E:97:CC:2A:81",
     "contextId": "175",
     "tags": [
       "setback",
@@ -1393,7 +1393,7 @@
     "category": "人生哲理",
     "textCN": "多讀一點書，多吸取一點知識，只為了讓自己可以有選擇。",
     "textEN": "Read more and absorb more knowledge, if only to give yourself more choices in life.",
-    "nfcUID": "",
+    "nfcUID": "04:F2:6E:97:CC:2A:81",
     "contextId": "176",
     "tags": [
       "action",
@@ -1409,7 +1409,7 @@
     "category": "人生哲理",
     "textCN": "健康最重要，活著才能做更多想做的事、體驗想體驗的人生。",
     "textEN": "Health comes first. Only when you're alive and well can you do what you want, and experience the life you hope to live.",
-    "nfcUID": "",
+    "nfcUID": "04:F1:6E:97:CC:2A:81",
     "contextId": "180",
     "tags": [
       "tired",
@@ -1426,7 +1426,7 @@
     "category": "人生哲理",
     "textCN": "每個人的綻放期都不一樣，你不一定會比別人慢，時間到了自然會盛開。",
     "textEN": "Everyone blooms at their own pace. You're not necessarily behind; when the time is right, you'll flourish too.",
-    "nfcUID": "",
+    "nfcUID": "04:EB:6E:97:CC:2A:81",
     "contextId": "182",
     "tags": [
       "confused",
@@ -1443,7 +1443,7 @@
     "category": "處世態度",
     "textCN": "你的言行舉止基本上就決定了你是個怎樣的人。",
     "textEN": "Your words and actions basically define the kind of person you are.",
-    "nfcUID": "",
+    "nfcUID": "04:EA:6E:97:CC:2A:81",
     "contextId": "183",
     "tags": [
       "relationships",
@@ -1459,7 +1459,7 @@
     "category": "處世態度",
     "textCN": "機會是留給有準備的人。保持個準備好的狀態，機會來了也請認出它、爭取它。",
     "textEN": "Opportunity favors the prepared. Stay ready, and when a chance comes, recognize it and go for it.",
-    "nfcUID": "",
+    "nfcUID": "04:E9:6E:97:CC:2A:81",
     "contextId": "185",
     "tags": [
       "action",
@@ -1474,7 +1474,7 @@
     "category": "人生哲理",
     "textCN": "無心插柳柳成蔭，有時候不經意做的事情往往都會有意想不到的結果發生。",
     "textEN": "Sometimes unexpected results come from things you did without intention—serendipity happens.",
-    "nfcUID": "",
+    "nfcUID": "04:E8:6E:97:CC:2A:81",
     "contextId": "188",
     "tags": [
       "action",
@@ -1490,7 +1490,7 @@
     "category": "人際關係",
     "textCN": "創建一個共贏的局面，帶來的價值絕對大於彼此之間爭個你死我活。",
     "textEN": "Creating a win–win situation brings far more value than fighting to the bitter end.",
-    "nfcUID": "",
+    "nfcUID": "04:E3:6E:97:CC:2A:81",
     "contextId": "189",
     "tags": [
       "relationships",
@@ -1505,7 +1505,7 @@
     "category": "人生哲理",
     "textCN": "一切都是最好的安排。",
     "textEN": "Everything happens for the best.",
-    "nfcUID": "",
+    "nfcUID": "04:E2:6E:97:CC:2A:81",
     "contextId": "191",
     "tags": [
       "setback",
@@ -1521,7 +1521,7 @@
     "category": "人生哲理",
     "textCN": "塞翁失馬焉知非福，有時候壞事發生也伴隨一些意想不到的好事。",
     "textEN": "A setback may turn out to be a blessing in disguise; bad things sometimes come with unexpected good.",
-    "nfcUID": "",
+    "nfcUID": "04:E1:6E:97:CC:2A:81",
     "contextId": "194",
     "tags": [
       "setback",
@@ -1536,7 +1536,7 @@
     "category": "處世態度",
     "textCN": "找個你欣賞的人當作榜樣，向他學習吧！",
     "textEN": "Find someone you admire, take them as a role model, and learn from them.",
-    "nfcUID": "",
+    "nfcUID": "04:DA:6E:97:CC:2A:81",
     "contextId": "195",
     "tags": [
       "confused",
@@ -1552,7 +1552,7 @@
     "category": "人生哲理",
     "textCN": "有時候不知道很多事情也可以是一種幸福。",
     "textEN": "Sometimes, not knowing too much can also be a kind of happiness.",
-    "nfcUID": "",
+    "nfcUID": "04:D9:6E:97:CC:2A:81",
     "contextId": "196",
     "tags": [
       "overthinking",
@@ -1568,7 +1568,7 @@
     "category": "人生哲理",
     "textCN": "否極泰來，相信在最低谷的時候，就是轉機的開始。",
     "textEN": "After hitting rock bottom, things can only go up; the lowest point may be the beginning of a turning point.",
-    "nfcUID": "",
+    "nfcUID": "04:D8:6E:97:CC:2A:81",
     "contextId": "198",
     "tags": [
       "tired",
@@ -1584,7 +1584,7 @@
     "category": "處世態度",
     "textCN": "兩個人之間有那麽多話題可以聊，我們沒有必要說他人的是非。",
     "textEN": "There are so many things two people can talk about—there's no need to gossip about others.",
-    "nfcUID": "",
+    "nfcUID": "04:D7:6E:97:CC:2A:81",
     "contextId": "199",
     "tags": [
       "relationships",

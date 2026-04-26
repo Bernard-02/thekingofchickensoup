@@ -41,6 +41,11 @@ window.showView = function(viewId) {
         window.currentOpenedQuoteNumber = null;
     }
 
+    // 切換 view 就取消所有殘留的掃描 hold 計時
+    if (currentView && currentView !== nextView && typeof window.cancelRevealHold === 'function') {
+        window.cancelRevealHold();
+    }
+
     // 控制全域 Logo 顯示/隱藏 (因為資訊頁面自己有專屬左下角Logo，所以全域的要藏起來)
     if (viewId === 'info-website-view') {
         logo.classList.add('hidden');
@@ -260,7 +265,7 @@ window.scrollToResearchPart = function(event, partId) {
 
 // 導航
 const GUIDE_STEPS = [
-    { text: '歡迎來到雞湯王的雞湯熬製秘所，\n現在請跟著我的步伐獲得專屬於你的雞湯！', btn: '下一步',     image: 'Images/雞湯王出場.png' },
+    { text: '歡迎來到雞湯王的熬製秘所，\n現在請跟著我的步伐\n獲得專屬於你的雞湯！', btn: '下一步',     image: 'Images/雞湯王出場.png' },
     { text: '請回答5個問題獲取雞湯的製作原料',                                         btn: 'ok，我已了解', image: 'Images/5個問題.png'     },
 ];
 let guideStepIndex = 0;
@@ -348,6 +353,8 @@ function restart() {
         chatInput.value = '';
         chatInput.style.height = 'auto';
     }
+    // 燈條回到 idle 白色呼吸
+    if (typeof window.sendLedMode === 'function') window.sendLedMode('idle');
     showView('home-view');
 }
 
@@ -540,8 +547,8 @@ async function calculateAndShowTranslation() {
 
         console.log(`🎯 測驗匹配選中: #${finalQuizResult.quote.number} (痛點組合: ${finalQuizResult.userCombo.join(', ')})`);
 
-        // 進入食材清單頁
-        showIngredientView();
+        // 直接進入熬製頁（食材結果保留在記憶體，畫面不額外顯示）
+        goToCooking();
     } catch (error) {
         console.error('計算結果失敗:', error);
     }
@@ -603,21 +610,104 @@ function showIngredientView() {
     showView('ingredient-view');
 }
 
-// ========== 熬製四步驟（同頁，下方進度 box） ==========
+// ========== 熬製五步驟（純鍵盤互動：空白鍵；幾何圖形佔位） ==========
+// 之後實際出圖時，把 setup 函式內的 div / 邊框換成圖檔即可，邏輯都不需要動
 const COOKING_STEPS = [
-    { title: '放入食材' },
-    { title: '開火煮滾' },
-    { title: '去除浮沫' },
-    { title: '調味'     },
+    { title: '剁碎食材',  hint: '按一下空白鍵，把當前的食材剁好',                type: 'chop'   },
+    { title: '加水',      hint: '長按空白鍵注水，到 lvl 水位線時放開',           type: 'water'  },
+    { title: '開火',      hint: '長按空白鍵點火，火力進到 perfect 區再放開',     type: 'fire'   },
+    { title: '撈去浮沫',  hint: '勺子轉到浮沫上時，按空白鍵把它撈起',            type: 'skim'   },
+    { title: '撒調味料',  hint: '節奏對到判定圈時，按空白鍵撒下',                type: 'season' },
 ];
+
+// Step 1 食材順序（之後可以改成從 quiz 結果動態決定）
+const STEP1_INGREDIENTS = [
+    { label: '雞肉' },
+    { label: '葱'   },
+    { label: '薑'   },
+    { label: '蒜'   },
+];
+
+// Step 2 加水
+const STEP2_FILL_MS      = 1800;   // 0 → 100% 全長按時間
+const STEP2_TARGET_LEVEL = 0.78;
+const STEP2_PERFECT_TOL  = 0.06;
+const STEP2_OKAY_FLOOR   = 0.55;
+
+// Step 3 開火
+const STEP3_FILL_MS      = 2400;
+const STEP3_PERFECT_MIN  = 0.62;
+const STEP3_PERFECT_MAX  = 0.80;
+const STEP3_OKAY_TOL     = 0.18;
+
+// Step 4 撈浮沫
+const STEP4_FOAM_COUNT      = 5;
+const STEP4_SPOON_PERIOD_MS = 3600;   // 勺子繞一圈的時間
+const STEP4_HIT_RADIUS_PX   = 40;
+
+// Step 5 節奏調味
+const STEP5_NOTE_TRAVEL_MS   = 2200;  // note 從右到判定圈的時間
+const STEP5_HIT_PERFECT_MS   = 130;
+const STEP5_HIT_GOOD_MS      = 260;
+const STEP5_NOTE_SPAWN_TIMES = [0, 600, 1100, 1600, 2300, 2800, 3500, 4200];  // ms
+
 let cookingStepIndex = 0;
+let cookingAdvancing = false;
+
+// 每換一個 step 就整個重置；集中管理 cleanup / timeouts，避免 ticker 殘留
+let cookingState = { cleanups: [], timeouts: [] };
+
+// 全域空白鍵排程：每個 step 設自己的 onDown / onUp
+let cookingKey = { down: null, up: null, isDown: false };
+
+function isCookingViewActive() {
+    const v = document.getElementById('cooking-view');
+    return !!(v && v.classList.contains('active'));
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || e.repeat) return;
+    if (!isCookingViewActive()) return;
+    e.preventDefault();
+    if (cookingKey.isDown) return;
+    cookingKey.isDown = true;
+    if (cookingKey.down) cookingKey.down();
+});
+document.addEventListener('keyup', (e) => {
+    if (e.code !== 'Space') return;
+    if (!isCookingViewActive()) return;
+    e.preventDefault();
+    cookingKey.isDown = false;
+    if (cookingKey.up) cookingKey.up();
+});
 
 window.goToCooking = function() {
     cookingStepIndex = 0;
+    cookingAdvancing = false;
+    clearCookingState();
     buildCookingProgressBoxes();
     renderCookingStep();
     showView('cooking-view');
 };
+
+function clearCookingState() {
+    if (cookingState.cleanups) cookingState.cleanups.forEach(fn => { try { fn(); } catch (e) {} });
+    if (cookingState.timeouts) cookingState.timeouts.forEach(clearTimeout);
+    cookingState = { cleanups: [], timeouts: [] };
+    cookingKey.down = null;
+    cookingKey.up   = null;
+    cookingKey.isDown = false;
+}
+
+function scheduleCookingTimeout(fn, ms) {
+    const id = setTimeout(fn, ms);
+    cookingState.timeouts.push(id);
+    return id;
+}
+
+function registerCookingCleanup(fn) {
+    cookingState.cleanups.push(fn);
+}
 
 function buildCookingProgressBoxes() {
     const container = document.getElementById('cooking-progress-boxes');
@@ -625,13 +715,21 @@ function buildCookingProgressBoxes() {
     for (let i = 0; i < COOKING_STEPS.length; i++) {
         const box = document.createElement('div');
         box.className = 'cooking-progress-box';
+        const fill = document.createElement('div');
+        fill.className = 'cooking-progress-fill';
+        box.appendChild(fill);
         container.appendChild(box);
     }
 }
 
-function updateCookingProgressBoxes(step) {
-    const boxes = document.querySelectorAll('#cooking-progress-boxes .cooking-progress-box');
-    boxes.forEach((b, i) => b.classList.toggle('filled', i <= step));
+// 更新第 step box 的 fill 百分比（0~1），前面的 box 強制 100%、後面的 0%
+function updateCookingBoxFill(step, fraction) {
+    const fills = document.querySelectorAll('#cooking-progress-boxes .cooking-progress-fill');
+    fills.forEach((f, i) => {
+        if (i < step)        f.style.width = '100%';
+        else if (i === step) f.style.width = Math.min(100, Math.max(0, fraction) * 100) + '%';
+        else                 f.style.width = '0%';
+    });
 }
 
 function renderCookingStep() {
@@ -639,24 +737,519 @@ function renderCookingStep() {
     if (!step) return;
 
     const titleEl = document.getElementById('cooking-step-title');
-    titleEl.textContent = step.title;
+    const hintEl  = document.getElementById('cooking-hint');
+    const kwEl    = document.getElementById('cooking-keyword');
+    const stage   = document.getElementById('cooking-stage');
+    const ctrls   = document.getElementById('cooking-controls');
 
-    updateCookingProgressBoxes(cookingStepIndex);
+    titleEl.textContent = step.title;
+    if (hintEl) hintEl.textContent = step.hint;
+    if (kwEl)  { kwEl.textContent = ''; kwEl.className = 'mb-4'; kwEl.style.opacity = 0; }
+    if (ctrls) ctrls.innerHTML = '';
+    if (stage) stage.innerHTML = '';
+
+    clearCookingState();
+    updateCookingBoxFill(cookingStepIndex, 0);
 
     gsap.fromTo(titleEl,
         { opacity: 0, y: 12 },
         { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
     );
+
+    switch (step.type) {
+        case 'chop':   setupStep1Chop();   break;
+        case 'water':  setupStep2Water();  break;
+        case 'fire':   setupStep3Fire();   break;
+        case 'skim':   setupStep4Skim();   break;
+        case 'season': setupStep5Season(); break;
+    }
 }
 
-window.advanceCooking = function() {
-    cookingStepIndex++;
-    if (cookingStepIndex >= COOKING_STEPS.length) {
-        showSoupResult();
+function advanceCookingStep() {
+    if (cookingAdvancing) return;
+    cookingAdvancing = true;
+    updateCookingBoxFill(cookingStepIndex, 1);
+
+    setTimeout(() => {
+        cookingStepIndex++;
+        cookingAdvancing = false;
+        if (cookingStepIndex >= COOKING_STEPS.length) {
+            clearCookingState();
+            showSoupResult();
+        } else {
+            renderCookingStep();
+        }
+    }, 700);
+}
+
+// 顯示 / 隱藏遊戲回饋（複用 cooking-keyword 的位置）
+function showCookingFeedback(text, level) {
+    const kwEl = document.getElementById('cooking-keyword');
+    if (!kwEl) return;
+    kwEl.textContent = text;
+    kwEl.className = 'cooking-feedback fb-' + level;
+    gsap.killTweensOf(kwEl);
+    gsap.fromTo(kwEl,
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
+    );
+}
+
+// ============= STEP 1: 剁碎食材 =============
+// 4 個食材並排，目前 active 的有外框 highlight。按一下空白鍵 → 刀子掉下、食材變剁碎狀，往下一個
+function setupStep1Chop() {
+    const stage = document.getElementById('cooking-stage');
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(480px, 92vw); height: 200px; display: flex; align-items: center; justify-content: center; gap: 1.5rem;';
+
+    const boxes = [];
+    STEP1_INGREDIENTS.forEach((ing, i) => {
+        const box = document.createElement('div');
+        box.className = 'chop-ingredient' + (i === 0 ? ' active' : '');
+        box.innerHTML = `
+            <div class="chop-shape"></div>
+            <div class="chop-label">${ing.label}</div>
+        `;
+        stage.appendChild(box);
+        boxes.push(box);
+        gsap.fromTo(box,
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.4, delay: 0.1 + i * 0.1, ease: 'power2.out' }
+        );
+    });
+
+    let chopIdx = 0;
+    cookingKey.down = () => {
+        if (chopIdx >= STEP1_INGREDIENTS.length) return;
+        const box = boxes[chopIdx];
+        const shape = box.querySelector('.chop-shape');
+
+        const knife = document.createElement('div');
+        knife.className = 'chop-knife';
+        box.appendChild(knife);
+        gsap.fromTo(knife,
+            { y: -50, opacity: 1 },
+            { y: 25, duration: 0.14, ease: 'power3.in',
+              onComplete: () => {
+                  shape.classList.add('chopped');
+                  gsap.to(knife, { y: -60, opacity: 0, duration: 0.2, ease: 'power2.out',
+                      onComplete: () => knife.remove() });
+                  gsap.fromTo(box, { x: -3 }, { x: 3, duration: 0.05, repeat: 3, yoyo: true, clearProps: 'x' });
+              }
+            }
+        );
+
+        box.classList.remove('active');
+        chopIdx++;
+        if (boxes[chopIdx]) boxes[chopIdx].classList.add('active');
+        updateCookingBoxFill(cookingStepIndex, chopIdx / STEP1_INGREDIENTS.length);
+        if (chopIdx >= STEP1_INGREDIENTS.length) {
+            scheduleCookingTimeout(advanceCookingStep, 600);
+        }
+    };
+}
+
+// ============= STEP 2: 加水 =============
+// 直立容器（玻璃杯）+ 水位線。長按空白鍵 → 從底部往上注水。放開 → 評分（perfect / 還好 / 不夠水）
+function setupStep2Water() {
+    const stage = document.getElementById('cooking-stage');
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: 140px; height: 320px; display: flex; align-items: flex-end; justify-content: center;';
+
+    const jar = document.createElement('div');
+    jar.className = 'water-jar';
+    jar.innerHTML = `
+        <div class="water-fill"></div>
+        <div class="water-target-line" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;"></div>
+        <span class="water-lvl-label" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;">lvl</span>
+    `;
+    stage.appendChild(jar);
+    const fillEl = jar.querySelector('.water-fill');
+
+    let level = 0;
+    let pressStart = 0;
+    let timerId = null;
+    let done = false;
+
+    const stopFill = () => { if (timerId) { clearInterval(timerId); timerId = null; } };
+    registerCookingCleanup(stopFill);
+
+    cookingKey.down = () => {
+        if (done) return;
+        pressStart = performance.now();
+        stopFill();
+        timerId = setInterval(() => {
+            const elapsed = performance.now() - pressStart;
+            const cur = Math.min(1, level + elapsed / STEP2_FILL_MS);
+            fillEl.style.height = (cur * 100) + '%';
+            if (cur >= 1) stopFill();
+        }, 16);
+    };
+    cookingKey.up = () => {
+        if (done || pressStart === 0) return;
+        const elapsed = performance.now() - pressStart;
+        level = Math.min(1, level + elapsed / STEP2_FILL_MS);
+        stopFill();
+        done = true;
+
+        let label, lvKind;
+        if (Math.abs(level - STEP2_TARGET_LEVEL) <= STEP2_PERFECT_TOL) { label = 'Perfect！'; lvKind = 'perfect'; }
+        else if (level >= STEP2_OKAY_FLOOR)                            { label = '還好';      lvKind = 'okay';    }
+        else                                                            { label = '不夠水';    lvKind = 'fail';    }
+
+        showCookingFeedback(label, lvKind);
+        updateCookingBoxFill(cookingStepIndex, level);
+        scheduleCookingTimeout(advanceCookingStep, 1300);
+    };
+}
+
+// ============= STEP 3: 開火 =============
+// 橫向 bar + perfect 區間。長按空白鍵 → 從左側填滿。放開時看 fill 結尾在哪
+function setupStep3Fire() {
+    const stage = document.getElementById('cooking-stage');
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(460px, 92vw); height: 200px; display: flex; align-items: center; justify-content: center;';
+
+    const bar = document.createElement('div');
+    bar.className = 'fire-bar';
+    bar.innerHTML = `
+        <div class="fire-fill"></div>
+        <div class="fire-perfect-zone"
+             style="left: ${STEP3_PERFECT_MIN * 100}%; width: ${(STEP3_PERFECT_MAX - STEP3_PERFECT_MIN) * 100}%;"></div>
+        <span class="fire-zone-label" style="left: ${(STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2 * 100}%;">perfect</span>
+    `;
+    stage.appendChild(bar);
+    const fillEl = bar.querySelector('.fire-fill');
+
+    let level = 0;
+    let pressStart = 0;
+    let timerId = null;
+    let done = false;
+
+    const stopFill = () => { if (timerId) { clearInterval(timerId); timerId = null; } };
+    registerCookingCleanup(stopFill);
+
+    cookingKey.down = () => {
+        if (done) return;
+        pressStart = performance.now();
+        stopFill();
+        timerId = setInterval(() => {
+            const elapsed = performance.now() - pressStart;
+            const cur = Math.min(1, level + elapsed / STEP3_FILL_MS);
+            fillEl.style.width = (cur * 100) + '%';
+            if (cur >= 1) stopFill();
+        }, 16);
+    };
+    cookingKey.up = () => {
+        if (done || pressStart === 0) return;
+        const elapsed = performance.now() - pressStart;
+        level = Math.min(1, level + elapsed / STEP3_FILL_MS);
+        stopFill();
+        done = true;
+
+        const center = (STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2;
+        let label, lvKind;
+        if (level >= STEP3_PERFECT_MIN && level <= STEP3_PERFECT_MAX) { label = 'Perfect！'; lvKind = 'perfect'; }
+        else if (Math.abs(level - center) <= STEP3_OKAY_TOL)          { label = '還好';      lvKind = 'okay';    }
+        else if (level < STEP3_PERFECT_MIN)                            { label = '火不夠';    lvKind = 'fail';    }
+        else                                                            { label = '火太大';    lvKind = 'fail';    }
+
+        showCookingFeedback(label, lvKind);
+        updateCookingBoxFill(cookingStepIndex, level);
+        scheduleCookingTimeout(advanceCookingStep, 1300);
+    };
+}
+
+// ============= STEP 4: 撈去浮沫（俯視） =============
+// 圓形鍋面 + 5 顆浮沫散落在勺子的 orbit 圓周上。勺子定速轉，按空白鍵時撈起最近的浮沫
+function setupStep4Skim() {
+    const stage = document.getElementById('cooking-stage');
+    const POT = 320;
+    stage.style.cssText = `position: relative; margin: 0 auto; width: ${POT}px; height: ${POT}px;`;
+
+    const pot = document.createElement('div');
+    pot.className = 'pot-top';
+    stage.appendChild(pot);
+
+    const cx = POT / 2, cy = POT / 2;
+    const orbitR = POT * 0.40;
+
+    // 把浮沫放在 orbit 圓周附近，角度盡量分散
+    const angles = [];
+    let tries = 0;
+    while (angles.length < STEP4_FOAM_COUNT && tries < 300) {
+        const a = Math.random() * Math.PI * 2;
+        const tooClose = angles.some(b => {
+            let d = Math.abs(a - b);
+            d = Math.min(d, Math.PI * 2 - d);
+            return d < Math.PI / 5;
+        });
+        if (!tooClose) angles.push(a);
+        tries++;
+    }
+    while (angles.length < STEP4_FOAM_COUNT) angles.push(Math.random() * Math.PI * 2);
+
+    const foams = angles.map((a, i) => {
+        const r = orbitR * (0.92 + Math.random() * 0.16);
+        const x = cx + Math.cos(a) * r;
+        const y = cy + Math.sin(a) * r;
+        const el = document.createElement('div');
+        el.className = 'foam-mark';
+        el.style.left = (x - 18) + 'px';
+        el.style.top  = (y - 18) + 'px';
+        stage.appendChild(el);
+        gsap.fromTo(el,
+            { opacity: 0, scale: 0 },
+            { opacity: 1, scale: 1, duration: 0.4, delay: 0.1 + i * 0.06, ease: 'back.out(2)' }
+        );
+        return { el, x, y, popped: false };
+    });
+
+    const spoon = document.createElement('div');
+    spoon.className = 'pot-spoon';
+    stage.appendChild(spoon);
+
+    let stopped = false;
+    const spoonStart = performance.now();
+    let spoonX = cx, spoonY = cy - orbitR;
+
+    const tick = () => {
+        if (stopped) return;
+        const elapsed = performance.now() - spoonStart;
+        const angle = (elapsed % STEP4_SPOON_PERIOD_MS) / STEP4_SPOON_PERIOD_MS * Math.PI * 2 - Math.PI / 2;
+        spoonX = cx + Math.cos(angle) * orbitR;
+        spoonY = cy + Math.sin(angle) * orbitR;
+        spoon.style.left = (spoonX - 22) + 'px';
+        spoon.style.top  = (spoonY - 10) + 'px';
+        spoon.style.transform = `rotate(${angle * 180 / Math.PI + 90}deg)`;
+        requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    registerCookingCleanup(() => { stopped = true; });
+
+    let popped = 0;
+    cookingKey.down = () => {
+        let nearest = null, nearestD = Infinity;
+        foams.forEach(f => {
+            if (f.popped) return;
+            const d = Math.hypot(f.x - spoonX, f.y - spoonY);
+            if (d < nearestD) { nearestD = d; nearest = f; }
+        });
+        if (!nearest || nearestD > STEP4_HIT_RADIUS_PX) return;
+        nearest.popped = true;
+        popped++;
+        gsap.killTweensOf(nearest.el);
+        gsap.to(nearest.el, {
+            scale: 1.6, opacity: 0, duration: 0.3, ease: 'power2.out',
+            onComplete: () => nearest.el.remove()
+        });
+        updateCookingBoxFill(cookingStepIndex, popped / STEP4_FOAM_COUNT);
+        if (popped >= STEP4_FOAM_COUNT) scheduleCookingTimeout(advanceCookingStep, 500);
+    };
+}
+
+// ============= STEP 5: 撒調味料（節奏：太鼓達人風）=============
+// 跑道從右往左滾，notes 一顆顆飛向左側的判定圈。在判定圈附近按空白鍵 = 命中
+function setupStep5Season() {
+    const stage = document.getElementById('cooking-stage');
+    const W = 520, H = 100;
+    const SPAWN_X = W - 30, HIT_X = 60;
+    stage.style.cssText = `position: relative; margin: 0 auto; width: min(${W}px, 92vw); height: ${H}px;`;
+
+    const lane = document.createElement('div');
+    lane.className = 'rhythm-lane';
+    stage.appendChild(lane);
+
+    const hitZone = document.createElement('div');
+    hitZone.className = 'rhythm-hitzone';
+    stage.appendChild(hitZone);
+
+    const distance = SPAWN_X - HIT_X;
+    const startTime = performance.now();
+    const totalNotes = STEP5_NOTE_SPAWN_TIMES.length;
+
+    const notes = STEP5_NOTE_SPAWN_TIMES.map((spawnTime, idx) => {
+        const el = document.createElement('div');
+        el.className = 'rhythm-note';
+        el.style.left = SPAWN_X + 'px';
+        el.style.opacity = 0;
+        stage.appendChild(el);
+        return { el, spawnTime, idx, hit: false, missed: false };
+    });
+
+    let resolved = 0;
+    let stopped = false;
+    registerCookingCleanup(() => { stopped = true; });
+
+    const tick = () => {
+        if (stopped) return;
+        const t = performance.now() - startTime;
+        notes.forEach(n => {
+            if (n.hit || n.missed) return;
+            const localT = t - n.spawnTime;
+            if (localT < 0) return;
+            // 飛過判定圈太久 → miss
+            if (localT > STEP5_NOTE_TRAVEL_MS + STEP5_HIT_GOOD_MS) {
+                n.missed = true;
+                gsap.to(n.el, { opacity: 0, duration: 0.2, onComplete: () => n.el.remove() });
+                resolved++;
+                showCookingFeedback('miss', 'fail');
+                updateCookingBoxFill(cookingStepIndex, resolved / totalNotes);
+                if (resolved >= totalNotes) scheduleCookingTimeout(advanceCookingStep, 600);
+                return;
+            }
+            const progress = Math.min(1.05, localT / STEP5_NOTE_TRAVEL_MS);
+            n.el.style.left = (SPAWN_X - progress * distance) + 'px';
+            n.el.style.opacity = 1;
+        });
+        requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+
+    cookingKey.down = () => {
+        const t = performance.now() - startTime;
+        let target = null, bestDelta = Infinity;
+        notes.forEach(n => {
+            if (n.hit || n.missed) return;
+            const noteAtHit = n.spawnTime + STEP5_NOTE_TRAVEL_MS;
+            const delta = Math.abs(t - noteAtHit);
+            if (delta < bestDelta) { bestDelta = delta; target = n; }
+        });
+        if (!target || bestDelta > STEP5_HIT_GOOD_MS + 80) return;
+        target.hit = true;
+        gsap.killTweensOf(target.el);
+        gsap.to(target.el, {
+            scale: 1.8, opacity: 0, duration: 0.25, ease: 'power2.out',
+            onComplete: () => target.el.remove()
+        });
+        const lvKind = bestDelta <= STEP5_HIT_PERFECT_MS ? 'perfect' : 'okay';
+        const label  = bestDelta <= STEP5_HIT_PERFECT_MS ? 'Perfect！' : 'Good';
+        showCookingFeedback(label, lvKind);
+        resolved++;
+        updateCookingBoxFill(cookingStepIndex, resolved / totalNotes);
+        if (resolved >= totalNotes) scheduleCookingTimeout(advanceCookingStep, 600);
+    };
+}
+
+// ========== NFC hold 揭曉（掃描對應瓶子需 hold 5 秒才揭曉）==========
+const REVEAL_HOLD_MS = 5000;
+let revealHoldMatchedUID = null;
+let revealHoldMode       = null;  // 'scan' | 'panel'
+let revealHoldStartTime  = 0;
+let revealHoldAccum      = 0;
+let revealHoldTicker     = null;
+
+function showRevealHoldUI(mode) {
+    const id = mode === 'panel' ? 'quote-panel-reveal-hold' : 'scan-reveal-hold';
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+}
+
+function hideRevealHoldUI() {
+    ['scan-reveal-hold', 'quote-panel-reveal-hold'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+        const fill = el && el.querySelector('.reveal-hold-fill');
+        if (fill) fill.style.width = '0%';
+    });
+}
+
+function updateRevealHoldUI(fraction) {
+    ['scan-reveal-hold', 'quote-panel-reveal-hold'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.style.display === 'none') return;
+        const fill = el.querySelector('.reveal-hold-fill');
+        if (fill) fill.style.width = (Math.min(1, fraction) * 100) + '%';
+    });
+}
+
+function clearRevealHold() {
+    if (revealHoldTicker) { clearInterval(revealHoldTicker); revealHoldTicker = null; }
+    revealHoldMatchedUID = null;
+    revealHoldMode = null;
+    revealHoldAccum = 0;
+    hideRevealHoldUI();
+    // 也把燈條進度歸零（但不切模式，保留 await_scan 等前端決定）
+    sendLedProgress(0);
+}
+
+// ========== ESP 燈條控制：透過 WebSocket 推狀態 / hold 進度 ==========
+// 狀態：idle（白色呼吸）、await_scan（琥珀、隨進度變亮）、revealed（穩定白光）
+function sendLedMode(mode) {
+    if (!window.nfcManager || !window.nfcManager.ws || !window.nfcManager.isConnected) return;
+    try {
+        window.nfcManager.ws.send(JSON.stringify({ type: 'led_mode', mode }));
+    } catch (e) {}
+}
+
+// 進度 0~1，推得太頻繁會塞爆 WS → 最多每 100ms 送一次
+let _lastLedProgressSend = 0;
+let _lastLedProgressValue = -1;
+function sendLedProgress(value) {
+    if (!window.nfcManager || !window.nfcManager.ws || !window.nfcManager.isConnected) return;
+    const now = performance.now();
+    // 極端值（0 / 1）或距上次 >=100ms 且數值有變化才送
+    if (value !== 0 && value !== 1 &&
+        (now - _lastLedProgressSend < 100 || Math.abs(value - _lastLedProgressValue) < 0.02)) {
         return;
     }
-    renderCookingStep();
+    _lastLedProgressSend = now;
+    _lastLedProgressValue = value;
+    try {
+        window.nfcManager.ws.send(JSON.stringify({ type: 'led_progress', value }));
+    } catch (e) {}
+}
+window.sendLedMode = sendLedMode;
+window.sendLedProgress = sendLedProgress;
+
+// 由 nfc.js 在掃到「對應正確瓶子」時呼叫；mode: 'scan' | 'panel'
+window.startRevealHold = function(uid, mode) {
+    // 如果已在 hold 同一張卡 → 忽略（避免重複）
+    if (revealHoldTicker && revealHoldMatchedUID === uid && revealHoldMode === mode) return;
+
+    // 若換卡或換模式 → 重置累積
+    if (revealHoldMatchedUID !== uid || revealHoldMode !== mode) {
+        revealHoldAccum = 0;
+    }
+
+    revealHoldMatchedUID = uid;
+    revealHoldMode = mode;
+    revealHoldStartTime = performance.now();
+    showRevealHoldUI(mode);
+    updateRevealHoldUI(revealHoldAccum / REVEAL_HOLD_MS);
+
+    if (revealHoldTicker) clearInterval(revealHoldTicker);
+    revealHoldTicker = setInterval(() => {
+        const elapsed = performance.now() - revealHoldStartTime;
+        const total = Math.min(revealHoldAccum + elapsed, REVEAL_HOLD_MS);
+        const frac = total / REVEAL_HOLD_MS;
+        updateRevealHoldUI(frac);
+        sendLedProgress(frac);  // 推給 ESP 讓琥珀燈跟著變亮
+
+        if (total >= REVEAL_HOLD_MS) {
+            clearInterval(revealHoldTicker); revealHoldTicker = null;
+            const doReveal = mode === 'panel' ? window.revealQuoteInPanel : window.revealQuote;
+            revealHoldMatchedUID = null;
+            revealHoldMode = null;
+            revealHoldAccum = 0;
+            hideRevealHoldUI();
+            sendLedProgress(1);          // 滿進度
+            if (typeof doReveal === 'function') doReveal();
+        }
+    }, 50);
 };
+
+window.cancelRevealHold = clearRevealHold;
+
+// NFC 卡離開：暫停 hold（保留累積進度，給觀眾重放繼續）
+window.onNfcHoldEnd = function() {
+    if (!revealHoldTicker) return;
+    const elapsed = performance.now() - revealHoldStartTime;
+    revealHoldAccum = Math.min(revealHoldAccum + elapsed, REVEAL_HOLD_MS - 1);
+    clearInterval(revealHoldTicker); revealHoldTicker = null;
+    // 燈條回到「等待中」的暗呼吸（不會掉到 idle 白色，因為 led_mode 還是 await_scan）
+    sendLedProgress(0);
+};
+
+// 熬製已改為純 UI；NFC hold_start 目前只保留作為相容 hook，不做事
+window.onNfcHoldStart = function() {};
 
 // ========== 雞湯成品（內容可切換成「差最後一步」掃描提示） ==========
 let soupViewMode = 'soup'; // 'soup' | 'scan'
@@ -664,6 +1257,7 @@ let soupViewMode = 'soup'; // 'soup' | 'scan'
 function showSoupResult() {
     if (!finalQuizResult) return;
     soupViewMode = 'soup';
+    window.soupViewMode = soupViewMode;
     renderSoupView();
     showView('soup-result-view');
 }
@@ -679,8 +1273,8 @@ function renderSoupView() {
     const soupName = q.soupName || `#${q.number} 雞湯`;
 
     if (soupViewMode === 'soup') {
-        topEl.textContent = '';
-        topEl.style.display = 'none';
+        topEl.textContent = '得到了一鍋';
+        topEl.style.display = '';
         nameEl.textContent = soupName;
         nameEl.style.fontSize = '2.5rem';
         if (q.soupDesc) {
@@ -691,15 +1285,16 @@ function renderSoupView() {
             descEl.style.display = 'none';
         }
         btn.textContent = '下一步';
+        btn.style.display = '';
     } else {
-        // scan 模式：差最後一步
+        // scan 模式：差最後一步（沒按鈕，等觀眾實體掃描對應編號 NFC）
         topEl.textContent = '';
         topEl.style.display = 'none';
         nameEl.textContent = '差最後一步了！';
         nameEl.style.fontSize = '2.5rem';
         descEl.textContent = `請拿右邊#${q.number}瓶子掃描鍋子以接住萃取後的${soupName}`;
         descEl.style.display = '';
-        btn.textContent = '模擬掃描 NFC（測試用）';
+        btn.style.display = 'none';
     }
 }
 
@@ -713,7 +1308,11 @@ window.advanceFromSoup = function() {
             opacity: 0, duration: 0.35, ease: 'power2.in',
             onComplete: () => {
                 soupViewMode = 'scan';
+                window.soupViewMode = soupViewMode;
                 renderSoupView();
+                // 進入「掃描」階段 → 燈條換琥珀、從最暗開始
+                sendLedMode('await_scan');
+                sendLedProgress(0);
                 gsap.fromTo(nodes,
                     { opacity: 0, y: 10 },
                     { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', stagger: 0.08 }
@@ -915,6 +1514,11 @@ function stopParticles() {
 // 開啟 slide panel
 function openQuotePanel(quote) {
     window.currentOpenedQuoteNumber = quote.number;
+    // 進入「掃描查脈絡」階段 → 燈條琥珀色，從最暗開始
+    if (typeof sendLedMode === 'function') {
+        sendLedMode('await_scan');
+        sendLedProgress(0);
+    }
     const panel = document.getElementById('quote-slide-panel');
     const nfcSection = document.getElementById('quote-panel-nfc');
     const revealSection = document.getElementById('quote-panel-reveal');
@@ -946,6 +1550,9 @@ function openQuotePanel(quote) {
 function closeQuotePanel() {
     window.currentOpenedQuoteNumber = null;
     stopParticles();
+    if (typeof window.cancelRevealHold === 'function') window.cancelRevealHold();
+    // 離開「掃描查脈絡」 → 燈條回 idle 白色呼吸
+    if (typeof sendLedMode === 'function') sendLedMode('idle');
     document.getElementById('quote-panel-zh').style.color = '';
     document.getElementById('quote-panel-en').style.color = '';
     document.getElementById('quote-slide-panel').classList.remove('open');
@@ -1032,6 +1639,7 @@ function dissolveParticles(onComplete) {
 
 // NFC 掃描成功後，粒子 scatter 並 reveal（供 nfc.js 呼叫）
 window.revealQuoteInPanel = function() {
+    if (typeof window.sendLedMode === 'function') window.sendLedMode('revealed');
     // 立刻顯示 zh/en 文字（粒子在透明底上叠加，慢慢透出）
     document.getElementById('quote-panel-zh').style.color = '';
     document.getElementById('quote-panel-en').style.color = '';
@@ -1053,6 +1661,7 @@ window.revealQuoteInPanel = function() {
 // 揭曉原句（NFC 掃描對應瓶子後呼叫）：1s 粒子鋪面 → 自動 dissolve → 按鈕上浮
 window.revealQuote = function() {
     if (!finalQuizResult) return;
+    if (typeof window.sendLedMode === 'function') window.sendLedMode('revealed');
     const q = finalQuizResult.quote;
     const numEl = document.getElementById('reveal-number');
     const zhEl = document.getElementById('reveal-zh');
@@ -1067,6 +1676,13 @@ window.revealQuote = function() {
     zhEl.style.color = '#f2f2f2';
     enEl.style.color = '#f2f2f2';
     gsap.set(buttons, { opacity: 0, y: 20, pointerEvents: 'none' });
+
+    // 右下角雞湯王提示先藏起來
+    const mascotHint = document.getElementById('reveal-mascot-hint');
+    if (mascotHint) {
+        mascotHint.style.display = 'none';
+        gsap.set(mascotHint, { opacity: 0 });
+    }
 
     showView('quote-reveal-view');
 
@@ -1083,6 +1699,11 @@ window.revealQuote = function() {
                     opacity: 1, y: 0, pointerEvents: 'auto',
                     duration: 0.6, stagger: 0.15, ease: 'power2.out'
                 });
+                // 粒子散完後，右下角雞湯王 + 提示跟著 fade in
+                if (mascotHint) {
+                    mascotHint.style.display = 'flex';
+                    gsap.to(mascotHint, { opacity: 1, duration: 0.6, delay: 0.8, ease: 'power2.out' });
+                }
             });
         }, 1000);
     }, 400);
@@ -1154,22 +1775,36 @@ function showChatResult() {
         enEl.style.display = chatAIResult.textEN ? '' : 'none';
     }
 
-    // 脈絡、客製化按鈕預設藏起來（NFC reveal 後才出現）
+    // 脈絡、客製化 dock 預設藏起來（NFC reveal 後才出現）
     if (ctxEl)  { ctxEl.textContent = ''; ctxEl.style.display = 'none'; }
-    if (custBtn) custBtn.style.display = 'none';
 
     hintEl.style.opacity = '0.5';
     hintEl.textContent = '掃描裝置以解讀這句雞湯';
     hintEl.style.display = '';
 
     document.getElementById('chat-result-actions').style.display = 'none';
-    document.getElementById('chat-params-panel').style.display = 'none';
+
+    // 重置右下角 dock：整塊藏起來、內部 panel 也藏起來、按鈕回到可見狀態
+    const dock = document.getElementById('chat-customize-dock');
+    const panel = document.getElementById('chat-params-panel');
+    if (dock) {
+        dock.style.display = 'none';
+        gsap.set(dock, { height: 'auto', opacity: 1 });
+    }
+    if (panel) panel.style.display = 'none';
+    if (custBtn) { custBtn.style.display = 'block'; gsap.set(custBtn, { opacity: 1 }); }
 
     // 文字先隱藏，粒子蓋上去
     textEl.style.color = '#f2f2f2';
     if (enEl && enEl.style.display !== 'none') enEl.style.color = '#f2f2f2';
 
     showView('chat-result-view');
+
+    // 進入「等待掃描裝置」階段 → 燈條琥珀色，從最暗開始呼吸
+    if (typeof sendLedMode === 'function') {
+        sendLedMode('await_scan');
+        sendLedProgress(0);
+    }
 
     // showView 有 300ms fade，等 view active 再量尺寸畫粒子
     setTimeout(() => {
@@ -1225,6 +1860,7 @@ window.initChatView = function() {
         container.appendChild(msg);
         gsap.fromTo(msg, { opacity: 0, y: 10 },
             { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+        shrinkBubbleToContent(msg.querySelector('.chat-bubble'));
     }
     const wrapper = document.getElementById('chat-input-wrapper');
     if (wrapper) {
@@ -1273,6 +1909,43 @@ function buildChatThinking() {
     return msg;
 }
 
+// 量測泡泡內文字實際換行後最寬的那行，把泡泡 width 設成「最寬一行 + padding + border」
+// 為什麼用 JS：CSS 的 fit-content 在內容被 max-width 觸發換行後，box 仍會停在 max-width 不會 shrink
+// 因為 text-wrap: balance 會在新寬度下重排，需要疊代量測直到收斂
+function shrinkBubbleToContent(bubbleEl) {
+    if (!bubbleEl) return;
+    bubbleEl.style.width = '';
+    let waitAttempts = 0;
+    let lastWidth = -1;
+    let passes = 0;
+
+    const styles = () => getComputedStyle(bubbleEl);
+    const measure = () => {
+        // 若父層 view 還沒 active（display 影響 layout），等一下再量
+        if ((bubbleEl.offsetParent === null || bubbleEl.offsetWidth === 0) && waitAttempts < 30) {
+            waitAttempts++;
+            setTimeout(measure, 100);
+            return;
+        }
+        const range = document.createRange();
+        range.selectNodeContents(bubbleEl);
+        const rects = range.getClientRects();
+        if (rects.length === 0) return;
+        let maxWidth = 0;
+        for (const r of rects) if (r.width > maxWidth) maxWidth = r.width;
+        const s = styles();
+        const padX = parseFloat(s.paddingLeft) + parseFloat(s.paddingRight);
+        const borderX = parseFloat(s.borderLeftWidth) + parseFloat(s.borderRightWidth);
+        const newWidth = Math.ceil(maxWidth + padX + borderX);
+        // 收斂：寬度沒變 / 變大就停（balance 在新寬度下可能重排造成微小變化）
+        if (newWidth === lastWidth || newWidth > lastWidth && lastWidth !== -1) return;
+        lastWidth = newWidth;
+        bubbleEl.style.width = newWidth + 'px';
+        if (++passes < 4) requestAnimationFrame(measure);
+    };
+    requestAnimationFrame(measure);
+}
+
 function appendChatMessage(role, content) {
     const container = document.getElementById('chat-messages');
     if (!container) return null;
@@ -1281,6 +1954,7 @@ function appendChatMessage(role, content) {
     gsap.fromTo(msg, { opacity: 0, y: 10 },
         { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
     container.scrollTop = container.scrollHeight;
+    shrinkBubbleToContent(msg.querySelector('.chat-bubble'));
     return msg;
 }
 
@@ -1350,25 +2024,10 @@ async function fetchChatResult(text) {
     }
 }
 
-// 產生學徒的 thinking 腳本（根據觀眾輸入 + 問答結果）— 4 拍、5 秒內
+// 產生學徒的 thinking 腳本（根據觀眾輸入 + 問答結果）— 3 拍
 function buildThinkingScript(userText) {
     const truncate = (s, n) => (s && s.length > n) ? s.slice(0, n) + '...' : (s || '');
     const preview = truncate(userText, 12);
-
-    // 四象限總分
-    const sb = { IP: 0, IR: 0, SP: 0, SR: 0 };
-    userAnswers.forEach(opt => {
-        if (opt && opt.scores) {
-            Object.entries(opt.scores).forEach(([k, v]) => { if (sb[k] !== undefined) sb[k] += v; });
-        }
-    });
-    const top = Object.entries(sb).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const quadrantHint = {
-        IP: '你還在往前衝',
-        IR: '你想喘口氣',
-        SP: '你在乎身邊的人',
-        SR: '你想清靜一下',
-    }[top] || '我再感覺一下';
 
     // 取兩個單選題的答案（避開 container-choice）
     const refs = questions
@@ -1385,7 +2044,6 @@ function buildThinkingScript(userText) {
     return [
         `你說「${preview}」......`,
         refLine,
-        `嗯...... ${quadrantHint}`,
         `讓我想想怎麼熬......`,
     ];
 }
@@ -1429,45 +2087,53 @@ window.submitChat = async function() {
         }
     }
 
-    // 5. 進入生成中畫面，並繼續等 API
+    // 5. 共用工具：把 thinking 泡泡換成學徒對話泡泡 + 重新啟用輸入
+    const thinkingMsg = thinkingEl ? thinkingEl.closest('.chat-msg') : null;
+    const replyAsApprenticeBubble = (content) => {
+        if (thinkingMsg) thinkingMsg.remove();
+        appendChatMessage('apprentice', content);
+        if (wrapper) gsap.to(wrapper, { opacity: 1, pointerEvents: 'auto', duration: 0.35, ease: 'power2.out' });
+        const inputEl = document.getElementById('chat-input');
+        if (inputEl) {
+            inputEl.disabled = false;
+            inputEl.value = lastChatMessage;
+            inputEl.focus();
+        }
+    };
+    const goRetryView = () => {
+        showView('chat-loading-view');
+        showRetryPrompt();
+    };
+
+    // 6. 在 chat-view 等 API 回來再決定 view（亂打的情況不會閃過 loading view）
+    //    若 API 比 thinking 慢，使用者會看到最後一句 thinking 留在畫面上幾秒，再轉場
+    let apiData = null;
+    let apiErr = null;
+    try { apiData = await apiPromise; } catch (err) { apiErr = err; }
+
+    if (apiErr) {
+        console.error('Fetch error:', apiErr);
+        goRetryView();
+        return;
+    }
+    const { ok, result } = apiData;
+    if (!ok || result.error) {
+        console.error('API error:', result.error, 'detail:', result.detail);
+        goRetryView();
+        return;
+    }
+    if (!result.valid) {
+        // 亂打/太短：直接在 chat-view 用對話泡泡回應，永遠不切到 loading view
+        replyAsApprenticeBubble(result.retry_message || '可以再多說一點嗎？');
+        return;
+    }
+    // valid:true：到這一步才切到 loading view，至少顯示 1.2 秒讓「雞湯生成中」露臉
     showView('chat-loading-view');
     startLoadingAnim();
-
-    try {
-        const { ok, result } = await apiPromise;
-        stopLoadingAnim();
-
-        if (!ok || result.error) {
-            console.error('API error:', result.error, 'detail:', result.detail);
-            showRetryPrompt();
-            return;
-        }
-
-        if (!result.valid) {
-            // 太短或亂打：回聊天畫面，附上 retry 提示
-            initChatView();
-            const retryHint = document.getElementById('chat-retry-hint');
-            if (retryHint) {
-                retryHint.textContent = result.retry_message || '可以再多說一點嗎？';
-                retryHint.style.display = '';
-                gsap.fromTo(retryHint, { opacity: 0, y: 8 }, { opacity: 0.7, y: 0, duration: 0.5, ease: 'power2.out' });
-            }
-            showView('chat-view');
-            const inputEl = document.getElementById('chat-input');
-            if (inputEl) {
-                inputEl.value = lastChatMessage;
-                inputEl.focus();
-            }
-            return;
-        }
-
-        chatAIResult = result;
-        showChatResult();
-    } catch (err) {
-        console.error('Fetch error:', err);
-        stopLoadingAnim();
-        showRetryPrompt();
-    }
+    await sleep(1200);
+    stopLoadingAnim();
+    chatAIResult = result;
+    showChatResult();
 };
 
 // 顯示重試提示（在 loading 頁面）
@@ -1495,10 +2161,12 @@ window.revealChatQuote = function() {
     const hintEl = document.getElementById('chat-result-hint');
     if (hintEl && hintEl.style.display === 'none') return;
 
+    // 揭曉 → 燈條切回穩定白光（reveal mode）
+    if (typeof window.sendLedMode === 'function') window.sendLedMode('revealed');
+
     const textEl   = document.getElementById('chat-translation-text');
     const enEl     = document.getElementById('chat-en-text');
     const ctxEl    = document.getElementById('chat-context');
-    const custBtn  = document.getElementById('chat-customize-btn');
     const actions  = document.getElementById('chat-result-actions');
 
     // 文字恢復顏色，粒子散開
@@ -1506,13 +2174,12 @@ window.revealChatQuote = function() {
     if (enEl && enEl.style.display !== 'none') enEl.style.color = '';
 
     dissolveParticles(() => {
-        // 粒子散完：藏 hint、顯示脈絡 + 客製化按鈕 + 左上角導航
+        // 粒子散完：藏 hint、顯示脈絡 + 客製化 dock（只露按鈕）+ 左上角導航
         gsap.to(hintEl, {
             opacity: 0, duration: 0.3, ease: 'power2.out',
             onComplete: () => { hintEl.style.display = 'none'; }
         });
 
-        // 脈絡：用 AI 給的 translation（原本是籤文式的轉譯）當這句話的背景
         const reasoning = chatAIResult.reasoning || chatAIResult.translation;
         if (ctxEl && reasoning) {
             ctxEl.textContent = reasoning;
@@ -1521,10 +2188,11 @@ window.revealChatQuote = function() {
                 { opacity: 0.7, y: 0, duration: 0.6, delay: 0.3, ease: 'power2.out' });
         }
 
-        // 客製化按鈕
-        if (custBtn) {
-            custBtn.style.display = '';
-            gsap.fromTo(custBtn, { opacity: 0, y: 10 },
+        // 右下角 dock：初始只露「開始客製化」按鈕
+        const dock = document.getElementById('chat-customize-dock');
+        if (dock) {
+            dock.style.display = 'block';
+            gsap.fromTo(dock, { opacity: 0, y: 10 },
                 { opacity: 1, y: 0, duration: 0.5, delay: 0.8, ease: 'power2.out' });
         }
 
@@ -1536,26 +2204,47 @@ window.revealChatQuote = function() {
     });
 };
 
-// 點「開始客製化」→ 隱藏脈絡與按鈕，顯示右下角參數面板
+// 點「開始客製化」→ 按鈕 fade out，dock 高度向上 extend 成 panel
 window.enterChatCustomize = function() {
-    const ctxEl   = document.getElementById('chat-context');
-    const custBtn = document.getElementById('chat-customize-btn');
-    const panel   = document.getElementById('chat-params-panel');
+    const ctxEl = document.getElementById('chat-context');
+    const btn   = document.getElementById('chat-customize-btn');
+    const panel = document.getElementById('chat-params-panel');
+    const dock  = document.getElementById('chat-customize-dock');
+    if (!dock || !btn || !panel) return;
 
     if (ctxEl) {
         gsap.to(ctxEl, { opacity: 0, duration: 0.3, ease: 'power2.in',
             onComplete: () => { ctxEl.style.display = 'none'; } });
     }
-    if (custBtn) {
-        gsap.to(custBtn, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.in',
-            onComplete: () => { custBtn.style.display = 'none'; } });
-    }
-    if (panel) {
-        gsap.fromTo(panel,
-            { display: 'flex', opacity: 0, y: 16 },
-            { opacity: 1, y: 0, duration: 0.5, delay: 0.2, ease: 'power2.out' }
-        );
-    }
+
+    // 鎖住 dock 當前高度（= 按鈕高度）
+    const h0 = dock.offsetHeight;
+    dock.style.height = h0 + 'px';
+
+    // 顯示 panel 但透明
+    panel.style.display = 'flex';
+    gsap.set(panel, { opacity: 0 });
+
+    // 量展開後的目標高度：暫時藏按鈕 + 解鎖高度 → 讀 offsetHeight → 復原
+    const prevBtnDisplay = btn.style.display || 'block';
+    btn.style.display = 'none';
+    dock.style.height = '';
+    const targetH = dock.offsetHeight;
+    dock.style.height = h0 + 'px';
+    btn.style.display = prevBtnDisplay;
+
+    // 按鈕 fade out → 隱藏
+    gsap.to(btn, {
+        opacity: 0, duration: 0.25, ease: 'power2.in',
+        onComplete: () => { btn.style.display = 'none'; }
+    });
+    // dock 高度上長
+    gsap.to(dock, {
+        height: targetH, duration: 0.5, ease: 'power2.inOut', delay: 0.1,
+        onComplete: () => { dock.style.height = 'auto'; }
+    });
+    // panel fade in
+    gsap.to(panel, { opacity: 1, duration: 0.4, delay: 0.3, ease: 'power2.out' });
 };
 
 // ========= 收藏雞湯卡片 =========
@@ -1606,6 +2295,11 @@ function applySaveCardStyle() {
 window.saveChatQuote = function() {
     if (!chatAIResult) return;
     document.getElementById('save-card-text').textContent = chatAIResult.textCN || '';
+    const enEl = document.getElementById('save-card-text-en');
+    if (enEl) {
+        enEl.textContent = chatAIResult.textEN || '';
+        enEl.style.display = chatAIResult.textEN ? '' : 'none';
+    }
     document.getElementById('save-email').value = '';
     document.getElementById('save-status').textContent = '';
     document.getElementById('save-send-btn').disabled = false;
@@ -1689,6 +2383,91 @@ window.sendSaveCard = async function() {
         statusEl.textContent = '寄送失敗：' + err.message;
         btn.disabled = false;
     }
+};
+
+// 收到 ESP8266 回報「觀眾已感應到」→ 收尾 UI
+window.onNFCEmulateRead = function () {
+    clearTimeout(window._nfcShareTimeout);
+    const btn = document.getElementById('save-nfc-btn');
+    const statusEl = document.getElementById('save-nfc-status');
+    if (btn) { btn.disabled = false; btn.textContent = '感應手機帶走'; }
+    if (statusEl) {
+        statusEl.style.color = '';
+        statusEl.textContent = '送出了！觀眾手機應該已經開啟卡片';
+        setTimeout(() => { statusEl.textContent = ''; }, 4000);
+    }
+};
+
+// ESP8266 回報超時未感應
+window.onNFCEmulateTimeout = function () {
+    clearTimeout(window._nfcShareTimeout);
+    const btn = document.getElementById('save-nfc-btn');
+    const statusEl = document.getElementById('save-nfc-status');
+    if (btn) { btn.disabled = false; btn.textContent = '感應手機帶走'; }
+    if (statusEl) {
+        statusEl.style.color = '#c00';
+        statusEl.textContent = '超時了，再按一次試試';
+    }
+};
+
+// 把卡片資料 + 當前樣式 base64 編進 URL，透過 WebSocket 丟給 ESP8266 做 NFC 模擬
+window.shareCardViaNFC = function () {
+    if (!chatAIResult) return;
+    const statusEl = document.getElementById('save-nfc-status');
+    const btn = document.getElementById('save-nfc-btn');
+
+    if (!window.nfcManager || !nfcManager.isConnected) {
+        statusEl.style.color = '#c00';
+        statusEl.textContent = '裝置未連線，先檢查 WebSocket';
+        return;
+    }
+
+    const payload = {
+        cn: chatAIResult.textCN || '',
+        en: chatAIResult.textEN || '',
+        r: chatAIResult.reasoning || '',
+        bg: document.getElementById('save-bg-color')?.value || SAVE_DEFAULTS.bg,
+        txt: document.getElementById('save-text-color')?.value || SAVE_DEFAULTS.text,
+        bd: document.getElementById('save-border-color')?.value || SAVE_DEFAULTS.border,
+        nb: document.getElementById('save-no-border')?.checked ? 1 : 0,
+    };
+
+    // UTF-8 → base64url
+    const utf8 = new TextEncoder().encode(JSON.stringify(payload));
+    let binary = '';
+    for (const b of utf8) binary += String.fromCharCode(b);
+    const b64 = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+
+    const origin = location.origin.includes('http') ? location.origin : 'https://chicken-soup-quote.vercel.app';
+    const url = `${origin}/card.html#d=${b64}`;
+
+    console.log('[shareCardViaNFC] URL 長度:', url.length, 'URL:', url);
+
+    if (url.length > 840) {
+        statusEl.style.color = '#c00';
+        statusEl.textContent = '資料太長，NFC 卡塞不下（' + url.length + ' bytes）';
+        return;
+    }
+
+    const sent = nfcManager.emulateNDEF(url);
+    if (!sent) {
+        statusEl.style.color = '#c00';
+        statusEl.textContent = '指令送不出去，再試一次';
+        return;
+    }
+
+    statusEl.style.color = '';
+    statusEl.textContent = '把手機靠近裝置（約 30 秒內）...';
+    btn.disabled = true;
+    btn.textContent = '等待感應中...';
+
+    // 30 秒後自動重置
+    clearTimeout(window._nfcShareTimeout);
+    window._nfcShareTimeout = setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '感應手機帶走';
+        statusEl.textContent = '';
+    }, 30000);
 };
 
 // 控制面板變動即時更新預覽
@@ -2068,6 +2847,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (window.nfcManager) {
         console.log('準備連接 WebSocket...');
+        // WS 連線後推一次 idle 狀態給 ESP（ESP 剛開機不知道 app 在哪個階段）
+        nfcManager.onConnect(() => {
+            setTimeout(() => { if (typeof sendLedMode === 'function') sendLedMode('idle'); }, 100);
+        });
         nfcManager.connect();
     } else {
         console.error('錯誤：nfcManager 未定義！');

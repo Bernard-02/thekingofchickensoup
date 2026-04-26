@@ -36,9 +36,9 @@ module.exports = async function handler(req, res) {
         return res.status(500).json({ error: 'No API keys configured' });
     }
 
-    // 強制 Gemini 優先；Claude 僅作為 Gemini 全部失敗時的 backup
-    // （如果要切回 Claude 優先，改成讀 process.env.AI_PROVIDER）
-    const claudeFirst = false;
+    // Claude 優先；Gemini 作為 Claude 全部失敗時的 backup
+    // （要切回 Gemini 優先就把這行改成 false）
+    const claudeFirst = true;
 
     const { userMessage, scores, tone, length, retranslateOnly, existingCN, avoidCN } = req.body;
     if (!userMessage || !userMessage.trim()) {
@@ -214,8 +214,41 @@ ${profile}
         }
     }
 
+    // 解析 + 正規化一段文字為 result 物件（回 null 代表解析失敗）
+    const parseToResult = (text) => {
+        let cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, '')
+                          .replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) return null;
+        try {
+            const result = JSON.parse(jsonMatch[0]);
+            if (result.valid) {
+                if (!Array.isArray(result.tonesCN) || result.tonesCN.length !== 5) {
+                    const fb = result.textCN || (Array.isArray(result.tonesCN) ? result.tonesCN[0] : '') || '';
+                    result.tonesCN = new Array(5).fill(fb);
+                }
+                result.textCN = result.tonesCN[toneIdx] || result.tonesCN[2];
+            }
+            return result;
+        } catch {
+            return null;
+        }
+    };
+
+    // 避免重複判斷：新產出的 5 個版本 vs avoidCN，任一有雷同就視為重複
+    const normalize = (s) => (s || '').replace(/\s+/g, '').replace(/[，。！？、…]/g, '');
+    const isDuplicate = (result) => {
+        if (!Array.isArray(avoidCN) || avoidCN.length === 0) return false;
+        if (!result || !result.valid) return false;
+        const tones = Array.isArray(result.tonesCN) ? result.tonesCN : [];
+        if (tones.length === 0) return false;
+        const avoidSet = new Set(avoidCN.filter(Boolean).map(normalize));
+        return tones.some(t => avoidSet.has(normalize(t)));
+    };
+
     try {
-        const text = await tryBothProviders(
+        // 先走 primary（Gemini 預設）
+        const primaryText = await tryBothProviders(
             claudeFirst,
             () => callGemini(apiKeys, userContext, systemPrompt, true),
             () => callClaude(claudeKey, userContext, systemPrompt, true),
@@ -224,30 +257,38 @@ ${profile}
             'full-gen'
         );
 
-        // 嘗試解析 JSON（jsonMode 已經要求 Gemini 直接回 JSON，但保留清理邏輯做保底）
-        let cleaned = text;
-        cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/g, '');
-        cleaned = cleaned.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            console.error('[chat] Cannot parse Gemini response. Raw text:', text);
-            return res.status(502).json({ error: 'Cannot parse Gemini response', detail: text });
+        let result = parseToResult(primaryText);
+        if (!result) {
+            console.error('[chat] Cannot parse primary response. Raw text:', primaryText);
+            return res.status(502).json({ error: 'Cannot parse response', detail: primaryText });
         }
 
-        try {
-            const result = JSON.parse(jsonMatch[0]);
-            // 保底：確保 tonesCN 是長度 5 的陣列
-            if (result.valid) {
-                if (!Array.isArray(result.tonesCN) || result.tonesCN.length !== 5) {
-                    const fallback = result.textCN || (Array.isArray(result.tonesCN) ? result.tonesCN[0] : '') || '';
-                    result.tonesCN = new Array(5).fill(fallback);
+        // 重複 → 換另一家 provider 重寫一次（不管哪家是 primary，都 try 對方）
+        if (isDuplicate(result)) {
+            const backupName = claudeFirst ? 'Gemini' : 'Claude';
+            const backupAvailable = claudeFirst ? apiKeys.length > 0 : !!claudeKey;
+            const backupFn = claudeFirst
+                ? () => callGemini(apiKeys, userContext, systemPrompt, true)
+                : () => callClaude(claudeKey, userContext, systemPrompt, true);
+
+            if (backupAvailable) {
+                console.log(`[chat] primary hit avoidCN — falling back to ${backupName}`);
+                try {
+                    const backupText = await backupFn();
+                    const backupResult = parseToResult(backupText);
+                    if (backupResult) {
+                        if (isDuplicate(backupResult)) {
+                            console.log(`[chat] ${backupName} also duplicated — using ${backupName} result anyway`);
+                        }
+                        result = backupResult;
+                    }
+                } catch (e) {
+                    console.warn(`[chat] ${backupName} fallback failed, keeping primary result:`, e.message);
                 }
-                result.textCN = result.tonesCN[toneIdx] || result.tonesCN[2];
             }
-            return res.status(200).json(result);
-        } catch (parseErr) {
-            return res.status(502).json({ error: 'JSON parse failed', detail: text });
         }
+
+        return res.status(200).json(result);
     } catch (err) {
         return res.status(502).json({ error: err.message });
     }

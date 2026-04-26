@@ -1,5 +1,16 @@
 // NFC WebSocket 通訊模組
 
+// 把 UID 對應的編號回傳給 ESP，讓它印在 Serial Monitor 上
+// 方便測試時對照實體卡 / quotes-selected.json 的標號
+function logScanToEsp(uid, matchText) {
+    if (!window.nfcManager || !window.nfcManager.ws || !window.nfcManager.isConnected) return;
+    try {
+        window.nfcManager.ws.send(JSON.stringify({
+            type: 'log_scan', uid, match: matchText
+        }));
+    } catch (e) {}
+}
+
 class NFCManager {
     constructor() {
         this.ws = null;
@@ -27,6 +38,7 @@ class NFCManager {
                 log('WebSocket 連線成功', 'info');
                 this.isConnected = true;
                 this.reconnectAttempts = 0; // 重置重連計數器
+                this.lastMessageTime = Date.now();
                 this.updateUIStatus(true);
                 this.startHeartbeat();
 
@@ -36,6 +48,7 @@ class NFCManager {
             };
 
             this.ws.onmessage = (event) => {
+                this.lastMessageTime = Date.now();
                 this.handleMessage(event.data);
             };
 
@@ -72,9 +85,21 @@ class NFCManager {
                 case 'connected':
                     log('ESP8266 連線確認', 'info');
                     break;
+                case 'nfc_hold_start':
+                    // 觸發卡剛被放上去 → 通知熬製頁開始 5 秒 hold 計時
+                    if (typeof window.onNfcHoldStart === 'function') window.onNfcHoldStart();
+                    break;
+                case 'nfc_hold_end':
+                    // 觸發卡離開 → 暫停 hold 計時（保留目前進度）
+                    if (typeof window.onNfcHoldEnd === 'function') window.onNfcHoldEnd();
+                    break;
                 case 'random_quote':
-                    // 處理隨機抽雞湯（傳遞訊息資料以取得 UID）
+                    // 萬用卡：隨機抽雞湯 / soup / panel 階段當任意瓶子
                     this.handleRandomQuote(message);
+                    break;
+                case 'ai_reveal':
+                    // AI 解鎖卡：只在 chat-result-view 揭曉 AI 原句
+                    this.handleAIReveal();
                     break;
                 case 'category_selected':
                     // 處理分類選擇（保留向下相容）
@@ -109,6 +134,18 @@ class NFCManager {
                 case 'nfc_write_error':
                     this.handleNFCWriteError(message.data);
                     break;
+                case 'nfc_emulate_ready':
+                    // 韌體已切成模擬模式，等待觀眾感應
+                    if (typeof window.onNFCEmulateReady === 'function') window.onNFCEmulateReady();
+                    break;
+                case 'nfc_emulate_read':
+                    // 觀眾手機讀到了 → 通知前端收尾
+                    if (typeof window.onNFCEmulateRead === 'function') window.onNFCEmulateRead();
+                    break;
+                case 'nfc_emulate_timeout':
+                    // 模擬模式超時，回到 reader 模式
+                    if (typeof window.onNFCEmulateTimeout === 'function') window.onNFCEmulateTimeout();
+                    break;
                 case 'heartbeat':
                     // 心跳回應
                     break;
@@ -120,18 +157,37 @@ class NFCManager {
         }
     }
 
-    // 處理隨機抽雞湯（唯一抽籤卡專用，只從前 50 句選擇）
+    // 處理萬用卡（抽籤 + soup/panel 階段當任意瓶子）
     async handleRandomQuote(message = {}) {
-        log('收到隨機抽雞湯指令（唯一抽籤卡）', 'info');
+        log('收到萬用卡掃描指令', 'info');
+        logScanToEsp('(wildcard)', '萬用卡');
 
-        // AI 路線：在 chat-result-view 時，改成解碼 AI 原句
-        const chatResultView = document.getElementById('chat-result-view');
-        if (chatResultView && chatResultView.classList.contains('active')) {
-            log('在 AI 結果頁，觸發解碼 AI 原句', 'info');
-            if (typeof window.revealChatQuote === 'function') {
-                window.revealChatQuote();
-            } else {
-                log('警告：revealChatQuote 函數未定義', 'warn');
+        // 熬製頁（fallback 舊韌體沒發 nfc_hold_start）：當成 hold_start 啟動計時
+        const cookingView = document.getElementById('cooking-view');
+        if (cookingView && cookingView.classList.contains('active')) {
+            log('在熬製頁：把 wildcard 當成 hold_start', 'info');
+            if (typeof window.onNfcHoldStart === 'function') window.onNfcHoldStart();
+            return;
+        }
+
+        // 展覽行為：萬用卡——
+        // 在 soup-result-view scan 模式（差最後一步）掃到萬用卡
+        // → 當成正確瓶子已掃到，啟動 5 秒 reveal hold
+        const soupView = document.getElementById('soup-result-view');
+        if (soupView && soupView.classList.contains('active') && window.soupViewMode === 'scan') {
+            log('soup scan 頁掃到萬用卡：啟動 reveal hold', 'info');
+            if (typeof window.startRevealHold === 'function') {
+                window.startRevealHold('WILDCARD', 'scan');
+            }
+            return;
+        }
+
+        // 展覽行為：quote panel 已開時掃萬用卡 → 一樣當成匹配，啟動 reveal hold
+        const panel = document.getElementById('quote-slide-panel');
+        if (panel && panel.classList.contains('open')) {
+            log('quote panel 已開、掃到萬用卡：啟動 reveal hold', 'info');
+            if (typeof window.startRevealHold === 'function') {
+                window.startRevealHold('WILDCARD', 'panel');
             }
             return;
         }
@@ -153,8 +209,8 @@ class NFCManager {
                 return;
             }
 
-            // 只從 selected 的前 50 筆中選（= 有實體 NFC 卡的那 50 句）
-            quotes = quotes.slice(0, 50);
+            // 從 selected 的 100 筆中選（= 有實體 NFC 卡的那 100 句）
+            quotes = quotes.slice(0, 100);
 
             // 🧠 匯入我們的 3D 計分邏輯大腦
             const { getQuizResult } = await import('./quizLogic.js');
@@ -205,6 +261,25 @@ class NFCManager {
         } catch (error) {
             log(`載入雞湯失敗: ${error}`, 'error');
         }
+    }
+
+    // 處理 AI 解鎖卡：只在 chat-result-view 有效，揭曉 AI 生成的原句
+    handleAIReveal() {
+        log('收到 AI 解鎖卡掃描指令', 'info');
+        logScanToEsp('(ai)', 'AI 解鎖卡');
+
+        const chatResultView = document.getElementById('chat-result-view');
+        if (chatResultView && chatResultView.classList.contains('active')) {
+            log('在 AI 結果頁，觸發解碼 AI 原句', 'info');
+            if (typeof window.revealChatQuote === 'function') {
+                window.revealChatQuote();
+            } else {
+                log('警告：revealChatQuote 函數未定義', 'warn');
+            }
+            return;
+        }
+
+        log('不在 chat-result-view，AI 卡掃描忽略（這張卡只能用來解鎖 AI 雞湯）', 'info');
     }
 
     // 處理分類選擇（保留向下相容）
@@ -259,20 +334,25 @@ class NFCManager {
 
             if (!matchedQuote) {
                 log(`找不到匹配的雞湯，UID: ${uid}`, 'warn');
+                logScanToEsp(uid, '(未登錄)');
                 return;
             }
 
             log(`✓ 找到匹配的雞湯: #${matchedQuote.number}`, 'info');
+            logScanToEsp(uid, `#${matchedQuote.number}`);
 
-            // 在掃描提示頁（translation-view）且 UID 匹配抽中瓶號 → 揭曉原句
-            const translationView = document.getElementById('translation-view');
-            if (translationView && translationView.classList.contains('active')) {
+            // 在「差最後一步」掃描提示頁（soup-result-view scan 模式）
+            // UID 對上抽中的瓶號 → 啟動 5 秒 hold，hold 滿才揭曉
+            const soupView = document.getElementById('soup-result-view');
+            const inScanPrompt =
+                soupView && soupView.classList.contains('active') && window.soupViewMode === 'scan';
+            if (inScanPrompt) {
                 const expected = window.finalQuizResult && window.finalQuizResult.quote
                     ? window.finalQuizResult.quote.number
                     : null;
                 if (expected === matchedQuote.number) {
-                    if (typeof window.revealQuote === 'function') {
-                        window.revealQuote();
+                    if (typeof window.startRevealHold === 'function') {
+                        window.startRevealHold(uid, 'scan');
                     }
                 } else {
                     log(`⚠ 錯誤的瓶子：應掃 #${expected}，掃的是 #${matchedQuote.number}`, 'warn');
@@ -290,11 +370,11 @@ class NFCManager {
                 return;
             }
 
-            // panel 已開 → UID 完全對應才 reveal，否則 shake 錯誤提示
+            // panel 已開 → UID 完全對應 → 啟動 5 秒 hold
             const openedNumber = window.currentOpenedQuoteNumber;
             if (openedNumber === matchedQuote.number) {
-                if (typeof window.revealQuoteInPanel === 'function') {
-                    window.revealQuoteInPanel();
+                if (typeof window.startRevealHold === 'function') {
+                    window.startRevealHold(uid, 'panel');
                 }
             } else {
                 log(`⚠ 錯誤的瓶子：面板是 #${openedNumber}，掃的是 #${matchedQuote.number}`, 'warn');
@@ -662,18 +742,49 @@ class NFCManager {
         return this.send('nfc_write', { content });
     }
 
+    // 要求 ESP8266 進入 NFC tag 模擬模式，把 url 當成 NDEF 給觀眾手機讀
+    // 成功後韌體會發 { type: 'nfc_emulate_read' }；timeout 會發 { type: 'nfc_emulate_timeout' }
+    emulateNDEF(url) {
+        if (!this.isConnected || !this.ws) {
+            log('未連線，無法進入模擬模式', 'error');
+            return false;
+        }
+        try {
+            // 為了和既有 firmware 訊息格式相容，直接平攤欄位到頂層
+            const msg = JSON.stringify({ type: 'emulate_ndef', url });
+            this.ws.send(msg);
+            log(`發送模擬指令: ${msg}`, 'sent');
+            return true;
+        } catch (e) {
+            log(`模擬指令失敗: ${e}`, 'error');
+            return false;
+        }
+    }
+
     // 請求讀取 NFC
     requestRead() {
         return this.send('nfc_read_request');
     }
 
-    // 心跳
+    // 心跳：定期主動 ping ESP；watchdog 同時檢查 ESP 是否還有回任何訊息
     startHeartbeat() {
+        const interval = CONFIG.websocket.heartbeatInterval;
+        const timeout  = CONFIG.websocket.heartbeatTimeoutMs || (interval * 3);
+
         this.heartbeatTimer = setInterval(() => {
-            if (this.isConnected) {
-                this.send('heartbeat');
+            if (this.isConnected) this.send('heartbeat');
+        }, interval);
+
+        // Watchdog：如果 ESP 太久沒送任何東西回來（含 onmessage 回應），
+        // 直接 close → 觸發重連，不要等 OS 層級 ws timeout（往往要 30s+）
+        this.heartbeatWatchdog = setInterval(() => {
+            if (!this.isConnected) return;
+            const idle = Date.now() - (this.lastMessageTime || 0);
+            if (idle > timeout) {
+                log(`ESP ${idle}ms 沒回應，強制重連`, 'warn');
+                try { this.ws && this.ws.close(); } catch (e) {}
             }
-        }, CONFIG.websocket.heartbeatInterval);
+        }, 1000);
     }
 
     stopHeartbeat() {
@@ -681,16 +792,22 @@ class NFCManager {
             clearInterval(this.heartbeatTimer);
             this.heartbeatTimer = null;
         }
+        if (this.heartbeatWatchdog) {
+            clearInterval(this.heartbeatWatchdog);
+            this.heartbeatWatchdog = null;
+        }
     }
 
-    // 重新連線
+    // 重新連線：指數 backoff（min × 2^(attempts-1)，cap 在 max）
+    // 第 1 次很快試（200ms），失敗才慢慢拉長到 3000ms
     scheduleReconnect() {
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
         }
 
-        // 檢查是否達到最大重連次數
-        const maxAttempts = CONFIG.websocket.maxReconnectAttempts || 10;
+        const maxAttempts = CONFIG.websocket.maxReconnectAttempts || 30;
+        const minMs = CONFIG.websocket.reconnectMinInterval || 200;
+        const maxMs = CONFIG.websocket.reconnectMaxInterval || 3000;
 
         if (this.reconnectAttempts >= maxAttempts) {
             log(`已達最大重連次數 (${maxAttempts})，暫停重連。請檢查 ESP8266 是否運行中。`, 'warn');
@@ -699,9 +816,12 @@ class NFCManager {
         }
 
         this.reconnectAttempts++;
-        const delay = CONFIG.websocket.reconnectInterval;
+        const backoff = Math.min(maxMs, minMs * Math.pow(2, this.reconnectAttempts - 1));
+        // 加一點 jitter（±15%），避免多個 client 同時重連的 thundering herd
+        const jitter = backoff * (0.85 + Math.random() * 0.30);
+        const delay = Math.round(jitter);
 
-        log(`嘗試重新連線... (${this.reconnectAttempts}/${maxAttempts})`, 'info');
+        log(`嘗試重新連線... (${this.reconnectAttempts}/${maxAttempts}) ${delay}ms 後`, 'info');
 
         this.reconnectTimer = setTimeout(() => {
             this.connect();
@@ -709,7 +829,9 @@ class NFCManager {
     }
 
     // 更新 UI 狀態
+    // 展覽行為：連線正常時整個指示器隱藏（觀眾看不到），只有斷線/錯誤時才浮出來
     updateUIStatus(connected, customMessage = null) {
+        const container = document.getElementById('ws-status-container');
         const statusDot = document.getElementById('ws-status');
         const statusText = document.getElementById('ws-status-text');
 
@@ -725,6 +847,11 @@ class NFCManager {
             } else {
                 statusText.textContent = connected ? '已連線' : '未連線';
             }
+        }
+
+        if (container) {
+            // 已連線且沒有 custom 警示訊息 → 整塊藏起來
+            container.style.display = (connected && !customMessage) ? 'none' : 'flex';
         }
     }
 

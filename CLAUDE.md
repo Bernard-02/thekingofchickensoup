@@ -116,6 +116,43 @@ Q8 分叉：
 - 目前連接 `ws://192.168.137.223:81`（需根據實際環境調整）
 - NFC 掃描邏輯在 `js/nfc.js`，資料來源統一從 `CONFIG.dataFiles.quotes` 讀取
 
+### 特殊 NFC 卡片
+| 角色 | UID | 功能 |
+|------|-----|------|
+| 萬用卡 | `04:83:D5:22:BF:2A:81` | 在「等待抽籤」抽一句雞湯；在 soup scan / quote panel 階段也能當任意瓶子完成解鎖 |
+| AI 解鎖卡 | `04:A4:68:97:CC:2A:81` | 「只」在 chat-result-view 揭曉 AI 原句，其他頁面掃了會忽略 |
+| 100 張瓶身卡 | 各自登錄在 `data/quotes-selected.json` 的 `nfcUID` | 解鎖各自對應編號的雞湯（在 scan 頁掃對的編號才會啟動 5 秒 reveal hold）|
+
+韌體分派：萬用卡 → `random_quote`；AI 卡 → `ai_reveal`；其他 → `show_context`（前端用 UID 對應到雞湯）。
+
+### NodeMCU (ESP8266) 腳位配置
+
+**PN532 NFC 模組（SPI 介面）**
+| PN532 | NodeMCU | GPIO |
+|-------|---------|------|
+| SCK   | D5      | GPIO14 |
+| MISO  | D6      | GPIO12 |
+| MOSI  | D7      | GPIO13 |
+| SS / CS | D2    | GPIO4 |
+| VCC   | 3V3     | — |
+| GND   | GND     | — |
+
+**WS2812 燈條（兩條，同步控制）**
+| 燈條  | DIN | NodeMCU | GPIO | 韌體驅動方式 |
+|-------|-----|---------|------|--------------|
+| 左條  | DIN | D1      | GPIO5 | NeoPixelBus BitBang（CPU 軟體 bit-bang，可能受 WiFi 中斷干擾偶爾跳色） |
+| 右條  | DIN | D4      | **GPIO2 鎖死** | NeoPixelBus **UART1** 硬體驅動（不受任何中斷干擾，乾淨穩定） |
+
+- **D4 不能改成其他腳位** — UART1 TX 在 ESP8266 上硬體就是 GPIO2，要換腳就要把韌體 method 改成 BitBang
+- 兩條燈條的 5V / GND 與 ESP 共用（**必須共地**，沒共地會整條不亮）
+- 每條 5 顆 LED（`LED_COUNT_L = LED_COUNT_R = 5`）
+- D4 的板上藍色 LED 跟 GPIO2 共用，更新時微閃為正常
+
+**避用腳位**
+- D5 / D6 / D7：被 PN532 SPI 佔用
+- D2：PN532 CS
+- D8 / D3：boot strap 風險（開機會拉 high/low，可能害 ESP 起不來或第一顆 LED 亮錯色）
+
 ---
 
 ## 待完成事項

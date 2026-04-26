@@ -1,38 +1,38 @@
 [
   {
     "id": "q1",
-    "text": "嗨，其實也沒什麼大道理，只是想問你最近過得怎麼樣？",
+    "text": "嗨，想問你最近過得怎麼樣？",
     "type": "single",
     "tag": "mood",
     "options": [
-      { "value": "ip", "text": "在弄一些事情，整個人都在動",                 "scores": { "IP": 1 } },
-      { "value": "ir", "text": "有點累，想喘口氣",                               "scores": { "IR": 1 } },
-      { "value": "sp", "text": "有些人際的事想好好經營",                         "scores": { "SP": 1 } },
-      { "value": "sr", "text": "被一些人煩到，想清靜一下",                       "scores": { "SR": 1 } }
+      { "value": "ir", "text": "有點累",                                         "keyword": "疲憊", "scores": { "IR": 1 } },
+      { "value": "sp", "text": "過得還行",                                       "keyword": "平穩", "scores": { "SP": 1 } },
+      { "value": "sr", "text": "覺得有點無奈",                                   "keyword": "無力", "scores": { "SR": 1 } },
+      { "value": "ip", "text": "感覺超棒的",                                     "keyword": "高昂", "scores": { "IP": 1 } }
     ]
   },
   {
     "id": "q2",
-    "text": "原來如此。如果順著這個感覺，要你具體形容一下，腦海裡一直出現的念頭是什麼？",
+    "text": "這個感覺讓你腦海裡\n一直出現的念頭是什麼？",
     "type": "single",
     "tag": "thought",
     "options": [
-      { "value": "ip", "text": "「我到底做得夠不夠？」",                           "scores": { "IP": 1 } },
-      { "value": "ir", "text": "「好像該讓自己休息了」",                           "scores": { "IR": 1 } },
-      { "value": "sp", "text": "「那個人最近還好嗎？」",                           "scores": { "SP": 1 } },
-      { "value": "sr", "text": "「為什麼要一直在意那些聲音？」",                   "scores": { "SR": 1 } }
+      { "value": "ir", "text": "「好像該讓自己休息了」",                           "keyword": "放鬆", "scores": { "IR": 1 } },
+      { "value": "sp", "text": "「想多陪陪在乎的人」",                             "keyword": "掛念", "scores": { "SP": 1 } },
+      { "value": "sr", "text": "「想自己安靜一下」",                               "keyword": "抽離", "scores": { "SR": 1 } },
+      { "value": "ip", "text": "「好期待每天會發生的事」",                         "keyword": "幹勁", "scores": { "IP": 1 } }
     ]
   },
   {
     "id": "q3",
-    "text": "當這些念頭讓你累了或煩了的時候，你通常會怎麼讓自己好過一點？",
+    "text": "順著這些念頭，你通常會做什麼？",
     "type": "single",
     "tag": "coping",
     "options": [
-      { "value": "ip", "text": "動起來，做點什麼新的事",                           "scores": { "IP": 1 } },
-      { "value": "ir", "text": "什麼都不做，讓腦袋放空",                           "scores": { "IR": 1 } },
-      { "value": "sp", "text": "找個人聊聊天，不一定要有什麽建議",                         "scores": { "SP": 1 } },
-      { "value": "sr", "text": "把外界聲音靜音，自己待著",                         "scores": { "SR": 1 } }
+      { "value": "ip", "text": "動起來做點事情",                                   "keyword": "行動", "scores": { "IP": 1 } },
+      { "value": "ir", "text": "什麼都不想做",                                     "keyword": "放空", "scores": { "IR": 1 } },
+      { "value": "sp", "text": "找個人聊聊天",                                     "keyword": "傾訴", "scores": { "SP": 1 } },
+      { "value": "sr", "text": "自己待著",                                         "keyword": "獨處", "scores": { "SR": 1 } }
     ]
   },
   {
@@ -41,27 +41,27 @@
     "type": "single",
     "tag": "evaluation",
     "options": [
-      { "value": "ip", "text": "會在乎，但會拿來督促自己",                         "scores": { "IP": 1 } },
-      { "value": "ir", "text": "會想，但會提醒自己別太糾結",                       "scores": { "IR": 1 } },
-      { "value": "sp", "text": "對我重要的人的看法才算數",                         "scores": { "SP": 1 } },
-      { "value": "sr", "text": "沒那麽重要，我自己開心才更重要",                       "scores": { "SR": 1 } }
+      { "value": "ip", "text": "會在乎，但會拿來督促自己",                         "keyword": "自律", "scores": { "IP": 1 } },
+      { "value": "ir", "text": "會想，但會提醒自己別太糾結",                       "keyword": "看淡", "scores": { "IR": 1 } },
+      { "value": "sp", "text": "對我重要的人的看法才算數",                         "keyword": "親近", "scores": { "SP": 1 } },
+      { "value": "sr", "text": "沒那麽重要，我自己開心才更重要",                   "keyword": "自在", "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q5",
-    "text": "那如果講到「未來」或「以後」，你的感覺是？",
+    "text": "那如果講到「以後」，你的感覺是？",
     "type": "single",
     "tag": "future",
     "options": [
-      { "value": "ip", "text": "有些目標，現在充滿幹勁",                           "scores": { "IP": 1 } },
-      { "value": "ir", "text": "別想太多，先把今天過好",                           "scores": { "IR": 1 } },
-      { "value": "sp", "text": "想跟重要的人一起走下去",                           "scores": { "SP": 1 } },
-      { "value": "sr", "text": "有點焦慮，不太想面對",                             "scores": { "SR": 1 } }
+      { "value": "ip", "text": "有些目標，現在充滿幹勁",                           "keyword": "衝勁", "scores": { "IP": 1 } },
+      { "value": "ir", "text": "別想太多，先把今天過好",                           "keyword": "當下", "scores": { "IR": 1 } },
+      { "value": "sp", "text": "想跟重要的人一起走下去",                           "keyword": "陪伴", "scores": { "SP": 1 } },
+      { "value": "sr", "text": "有點焦慮，不太想面對",                             "keyword": "迴避", "scores": { "SR": 1 } }
     ]
   },
   {
     "id": "q6",
-    "text": "原料已準備好了，接下來請選擇你的熬製容器",
+    "text": "原料已準備好了，接下來請選擇你的鍋子",
     "type": "container-choice",
     "tag": "container",
     "options": [

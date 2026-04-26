@@ -48,8 +48,9 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="w-full max-w-2xl mx-auto text-center">
                 <img id="guide-image" src="Images/雞湯王出場.png" alt="" class="mx-auto mb-10" style="width: 100%; max-width: 360px; height: 150px; object-fit: contain;">
-                <h2 id="guide-text" class="font-medium mb-12" style="white-space: pre-line; line-break: strict; text-align: center;">歡迎來到雞湯王的雞湯熬製秘所，
-現在請跟著我的步伐獲得專屬於你的雞湯！</h2>
+                <h2 id="guide-text" class="font-medium mb-12" style="white-space: pre-line; line-break: strict; text-align: center; line-height: 1.4;">歡迎來到雞湯王的熬製秘所，
+現在請跟著我的步伐
+獲得專屬於你的雞湯！</h2>
                 <button id="guide-btn" class="primary-btn" onclick="advanceGuide()">下一步</button>
             </div>
         </div>
@@ -60,7 +61,7 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-2xl mx-auto text-center w-full">
                 <p id="question-progress" class="en font-normal mb-6">1 / 8</p>
-                <h2 id="question-text" class="font-medium mb-16" style="text-wrap: balance; line-break: strict; word-break: keep-all;"></h2>
+                <h2 id="question-text" class="font-medium mb-16" style="text-wrap: balance; line-break: strict; word-break: keep-all; white-space: pre-line;"></h2>
                 <h4 id="question-text-en" class="en font-normal mb-12" style="display:none;"></h4>
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
@@ -127,31 +128,38 @@
                 <h4 id="chat-en-text" class="en font-normal text-black mb-8" style="display: none; text-wrap: balance;"></h4>
                 <p id="chat-context" class="text-black mt-6 mb-8" style="display: none; text-wrap: balance; font-size: 1rem; line-height: 1.7; opacity: 0.7;"></p>
                 <p id="chat-result-hint" class="mt-12 mb-4 opacity-50" style="font-size: 1rem;">掃描裝置以解讀這句雞湯</p>
-                <button id="chat-customize-btn" class="primary-btn btn-solid" style="display: none;" onclick="enterChatCustomize()">開始客製化</button>
             </div>
 
-            <!-- 右下角：參數調整 -->
-            <div id="chat-params-panel" class="absolute border border-black p-5 flex flex-col gap-5" style="display: none; bottom: clamp(12px, 3vw, 32px); right: clamp(12px, 3vw, 32px); width: min(300px, calc(100vw - 24px));">
-                <!-- 語氣 -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between">
-                        <span class="text-xs">更說教</span>
-                        <span class="text-xs">更雞湯</span>
+            <!-- 右下角：客製化入口（先顯示按鈕 → 點擊展開成參數 panel，寬度一致） -->
+            <div id="chat-customize-dock" class="absolute border border-black" style="display: none; background: transparent; bottom: clamp(12px, 3vw, 32px); right: clamp(12px, 3vw, 32px); width: min(300px, calc(100vw - 24px)); overflow: hidden;">
+                <!-- 摺疊狀態：整塊當成按鈕 -->
+                <button id="chat-customize-btn" onclick="enterChatCustomize()"
+                    style="display: block; width: 100%; background: transparent; border: none; padding: 14px 16px; cursor: pointer; font-size: 1rem; color: #000; font-family: 'Noto Sans TC', sans-serif;">
+                    開始客製化
+                </button>
+                <!-- 展開狀態：參數內容，初始藏起來 -->
+                <div id="chat-params-panel" class="flex flex-col gap-5 p-5" style="display: none;">
+                    <!-- 語氣 -->
+                    <div class="flex flex-col gap-3">
+                        <div class="flex justify-between">
+                            <span class="text-xs">更說教</span>
+                            <span class="text-xs">更雞湯</span>
+                        </div>
+                        <input id="param-tone" type="range" min="0" max="100" step="25" value="50" class="param-slider">
                     </div>
-                    <input id="param-tone" type="range" min="0" max="100" step="25" value="50" class="param-slider">
-                </div>
-                <!-- 長度 -->
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between">
-                        <span class="text-xs">更短</span>
-                        <span class="text-xs">更長</span>
+                    <!-- 長度 -->
+                    <div class="flex flex-col gap-3">
+                        <div class="flex justify-between">
+                            <span class="text-xs">更短</span>
+                            <span class="text-xs">更長</span>
+                        </div>
+                        <input id="param-length" type="range" min="0" max="100" step="25" value="25" class="param-slider">
                     </div>
-                    <input id="param-length" type="range" min="0" max="100" step="25" value="25" class="param-slider">
+                    <!-- 英文開關：已移除，英文固定顯示 -->
+                    <input id="param-en-toggle" type="checkbox" checked style="display: none;">
+                    <!-- 收藏 CTA -->
+                    <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%;">收藏</button>
                 </div>
-                <!-- 英文開關：已移除，英文固定顯示 -->
-                <input id="param-en-toggle" type="checkbox" checked style="display: none;">
-                <!-- 收藏 CTA -->
-                <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%;">收藏</button>
             </div>
         </div>
     </div>
@@ -177,13 +185,23 @@
         </div>
     </div>
 
-    <!-- 熬製過程（同頁，下方 4 box 進度條） -->
+    <!-- 熬製過程（同頁，4 步驟小遊戲 + 下方進度條） -->
     <div id="cooking-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
-                <h2 id="cooking-step-title" class="font-medium text-black mb-10"></h2>
-                <div id="cooking-image" class="mx-auto mb-10" style="width: 240px; height: 240px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案（熬煮動畫）</div>
-                <button class="primary-btn btn-solid mb-10" onclick="advanceCooking()">模擬感應 NFC（測試用）</button>
+                <h2 id="cooking-step-title" class="font-medium text-black mb-4"></h2>
+                <p id="cooking-hint" class="mb-8" style="opacity: 0.6; font-size: 0.95rem;"></p>
+
+                <!-- 關鍵字（會短暫顯示、再轉成食材） -->
+                <p id="cooking-keyword" class="mb-4" style="min-height: 1.6em; font-size: 1.1rem; opacity: 0; font-style: italic;"></p>
+
+                <!-- 鍋子 + 食材 drop-in 區（也用來放浮沫 / 蒸氣 overlay） -->
+                <div id="cooking-stage" class="mx-auto mb-6" style="position: relative; width: 260px; height: 260px;"></div>
+
+                <!-- 小遊戲的控制區（食材按鈕 / 加熱按鈕 / 調味罐）-->
+                <div id="cooking-controls" class="mb-8"></div>
+
+                <!-- 總步驟 4 格進度（會跟著小遊戲進度慢慢 fill） -->
                 <div id="cooking-progress-boxes" class="flex flex-row gap-2 justify-center"></div>
             </div>
         </div>
@@ -193,23 +211,17 @@
     <div id="soup-result-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
-                <p id="soup-top-label" class="en font-normal mb-4" style="opacity: 0.5;">你熬出了一碗</p>
+                <p id="soup-top-label" class="font-medium" style="font-size: 2.5rem; line-height: 1.3; margin: 0 0 0.2rem;">得到了一鍋</p>
                 <h2 id="soup-name" class="font-medium text-black mb-8" style="text-wrap: balance; font-size: 2.5rem;"></h2>
-                <div id="soup-image" class="mx-auto mb-10" style="width: 200px; height: 200px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案</div>
-                <p id="soup-desc" class="font-normal text-black mb-12" style="text-wrap: balance; font-size: 1.1rem; line-height: 1.7;"></p>
-                <button id="soup-btn" class="primary-btn btn-solid" onclick="advanceFromSoup()">下一步</button>
-            </div>
-        </div>
-    </div>
+                <img id="soup-image" src="Images/煮好的雞湯.png" alt="" class="mx-auto mb-10" style="width: 240px; height: 240px; object-fit: contain;">
+                <p id="soup-desc" class="font-normal text-black mb-8" style="text-wrap: balance; font-size: 1.1rem; line-height: 1.7;"></p>
 
-    <!-- 轉譯頁面：掃描提示 -->
-    <div id="translation-view" class="view-container">
-        <div class="flex flex-col items-center justify-center min-h-screen p-8">
-            <div class="max-w-2xl mx-auto text-center w-full">
-                <h2 class="font-medium text-black mb-8" style="text-wrap: balance;">差最後一步了！</h2>
-                <div id="translation-image" class="mx-auto mb-8" style="width: 180px; height: 180px; border: 1px dashed rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; color: rgba(0,0,0,0.3);">圖案</div>
-                <p id="translation-text" class="font-medium text-black" style="text-wrap: balance; font-size: 1.25rem; line-height: 1.6;"></p>
-                <button class="primary-btn btn-solid mt-12" onclick="revealQuote()">模擬掃描 NFC（測試用）</button>
+                <!-- 掃描 hold 5 秒進度條（僅在 scan 模式、hold 中時顯示）-->
+                <div id="scan-reveal-hold" class="reveal-hold-bar mb-8" style="display:none;">
+                    <div class="reveal-hold-fill"></div>
+                </div>
+
+                <button id="soup-btn" class="primary-btn btn-solid" onclick="advanceFromSoup()">下一步</button>
             </div>
         </div>
     </div>
@@ -225,6 +237,11 @@
                     <button class="primary-btn en" onclick="restart()">Start over</button>
                     <button class="primary-btn btn-solid en" onclick="goToWebsite()">Explore</button>
                 </div>
+            </div>
+            <!-- 右下角雞湯王：提示翻書查脈絡 -->
+            <div id="reveal-mascot-hint" style="position: fixed; bottom: 28px; right: 28px; display: none; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none;">
+                <p style="background: transparent; color: rgba(0,0,0,0.6); font-size: 0.95rem; text-wrap: balance; text-align: right; margin: 0;">翻閱書本<br>查看這句話的脈絡</p>
+                <img src="Images/雞湯王.png" alt="" style="width: 160px; height: auto;">
             </div>
         </div>
     </div>
@@ -275,6 +292,10 @@
                         <p id="quote-panel-zh" class="font-medium mb-3" style="font-size:2rem; line-height:1.3;"></p>
                         <p id="quote-panel-en" class="en font-normal" style="font-size:2rem; line-height:1.3;"></p>
                         <p id="quote-panel-hint" class="mt-8 opacity-50" style="font-size:1rem; line-height:1.5;">請掃描對應編號的瓶子以查看原句</p>
+                        <!-- 掃描 hold 5 秒進度條（hold 中才顯示）-->
+                        <div id="quote-panel-reveal-hold" class="reveal-hold-bar mt-4" style="display:none;">
+                            <div class="reveal-hold-fill"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -562,9 +583,12 @@
             <!-- 左側 70%：預覽（白底）-->
             <div style="flex:7 1 0; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#ffffff; padding:32px;">
                 <div id="save-preview-wrapper" style="display:flex; align-items:center; justify-content:center; max-width:100%; max-height:100%;">
-                    <div id="save-card" style="position:relative; background:#f2f2f2; color:#000000; display:flex; align-items:center; justify-content:center; padding:10% 12%; box-sizing:border-box; overflow:hidden;">
-                        <p id="save-card-text" style="font-size:2rem; font-weight:500; line-height:1.4; text-align:center; text-wrap:balance; line-break:strict; word-break:keep-all; margin:0;"></p>
-                        <img id="save-card-logo" src="Logo/雞湯Logo White.png" alt="logo" style="position:absolute; right:30px; bottom:30px; height:50px; opacity:1; filter:invert(0);" />
+                    <div id="save-card" style="position:relative; background:#f2f2f2; color:#000000; display:flex; align-items:center; justify-content:center; box-sizing:border-box; overflow:hidden;">
+                        <div id="save-card-content" style="width:720px; max-width:85%; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+                            <p id="save-card-text" style="font-size:36px; font-weight:500; line-height:1.4; text-wrap:balance; line-break:strict; margin:0;"></p>
+                            <p id="save-card-text-en" class="en" style="font-size:22px; font-weight:400; line-height:1.4; text-wrap:balance; margin:0; opacity:0.75;"></p>
+                        </div>
+                        <img id="save-card-logo" src="Logo/雞湯Logo White.png" alt="logo" style="position:absolute; right:60px; bottom:60px; height:56px; opacity:1; filter:invert(0);" />
                     </div>
                 </div>
             </div>
@@ -613,6 +637,12 @@
                         <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </button>
                 </div>
+
+                <!-- NFC 感應帶走 -->
+                <button id="save-nfc-btn" onclick="shareCardViaNFC()" style="background:transparent; color:#000; border:1px solid #000; padding:10px 16px; cursor:pointer; font-size:0.875rem; margin-top:8px;">
+                    感應手機帶走
+                </button>
+                <p id="save-nfc-status" style="font-size:0.8rem; opacity:0.7; min-height:1.2em; text-align:center;"></p>
 
                 <!-- Reset / Cancel：文字連結風格 -->
                 <div class="flex flex-col items-start gap-3">
