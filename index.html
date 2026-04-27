@@ -74,23 +74,29 @@
 
     <!-- 聊天：自由輸入（學徒對話） -->
     <div id="chat-view" class="view-container">
-        <div class="min-h-screen flex flex-col p-6 max-w-2xl mx-auto w-full" style="padding-bottom: 110px;">
-            <!-- 對話區：新訊息由下往上堆疊 -->
-            <div id="chat-messages" class="flex-1 flex flex-col gap-5 py-6 overflow-y-auto justify-end" style="min-height: 0;"></div>
-            <!-- 輸入框 -->
-            <div id="chat-input-wrapper" class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
-                <p id="chat-retry-hint" class="mb-2 opacity-70" style="font-size:0.9rem; line-height:1.5; display:none; text-wrap:balance;"></p>
-                <textarea id="chat-input"
-                    class="w-full text-base leading-relaxed resize-none"
-                    style="background: transparent; border: none; outline: none; overflow: hidden; padding: 0;"
-                    rows="1"
-                    maxlength="400"
-                    placeholder="說些什麼吧"></textarea>
-                <div class="flex justify-end">
-                    <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center gap-2" style="padding: 6px 14px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 0.875rem;">
-                        <span>下一步</span>
-                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </button>
+        <div class="h-screen flex flex-col w-full" style="padding-bottom: 110px;">
+            <!-- 對話區：可滾動，但隱藏 scrollbar（保留滑鼠/觸控滑動行為）-->
+            <div id="chat-messages" class="flex-1 overflow-y-auto overscroll-contain no-scrollbar" style="min-height: 0;">
+                <div class="min-h-full max-w-2xl mx-auto px-6 py-6 flex flex-col">
+                    <div id="chat-messages-inner" class="mt-auto flex flex-col gap-5"></div>
+                </div>
+            </div>
+            <!-- 輸入框：對話內容置中對齊，跟 scrollbar 區隔開 -->
+            <div class="max-w-2xl mx-auto w-full px-6">
+                <div id="chat-input-wrapper" class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
+                    <p id="chat-retry-hint" class="mb-2 opacity-70" style="font-size:0.9rem; line-height:1.5; display:none; text-wrap:balance;"></p>
+                    <textarea id="chat-input"
+                        class="w-full text-base leading-relaxed resize-none"
+                        style="background: transparent; border: none; outline: none; overflow: hidden; padding: 0;"
+                        rows="1"
+                        maxlength="400"
+                        placeholder="說些什麼吧"></textarea>
+                    <div class="flex justify-end">
+                        <button id="chat-send-btn" onclick="submitChat()" class="flex items-center justify-center gap-2" style="padding: 6px 14px; background: #000; color: #fff; border: none; cursor: pointer; font-size: 0.875rem;">
+                            <span>下一步</span>
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8H14M14 8L8 2M14 8L8 14" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

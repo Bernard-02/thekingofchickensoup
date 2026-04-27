@@ -112,9 +112,23 @@ Q8 分叉：
 
 ## 硬體設定
 
-- WebSocket URL 設定在 `js/config.js` 的 `CONFIG.websocket.url`
-- 目前連接 `ws://192.168.137.223:81`（需根據實際環境調整）
-- NFC 掃描邏輯在 `js/nfc.js`，資料來源統一從 `CONFIG.dataFiles.quotes` 讀取
+### 開機流程（固定 3 步）
+1. 開 Windows 行動熱點
+2. 插 ESP（看 Serial Monitor 印的 IP）
+3. 對照 `js/config.js` 第 7 行，IP 不一樣就改一個數字
+
+### 為什麼是這個流程
+- Windows 行動熱點 (ICS) 不接受 client 用 `WiFi.config` 強制固定 IP，會擋掉
+- 所以韌體放棄固定 IP，乖乖用 DHCP
+- ICS 對同一個 MAC 通常給同一個 IP，所以「貼一次」展演整天不用再改
+- 如果換真的 router，到 router 後台設 DHCP 保留即可一勞永逸
+
+### 設定點
+- WebSocket URL：`js/config.js` 第 7 行（單一一個地方）
+- Hotspot SSID/密碼：`src/main.cpp` 的 `sta_ssid` / `sta_password`，目前是 `BERNARD-LAPTOP` / `550V1!5t`，2.4GHz
+- WebSocket client 上限：`platformio.ini` 的 `WEBSOCKETS_SERVER_CLIENT_MAX=10`（撐多次刷新留下的殭屍連線）
+- 頁面 refresh 主動 close socket：`js/main.js` 的 `beforeunload` listener
+- NFC 掃描邏輯在 `js/nfc.js`，資料來源從 `CONFIG.dataFiles.quotes` 讀取
 
 ### 特殊 NFC 卡片
 | 角色 | UID | 功能 |

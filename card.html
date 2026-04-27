@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>你的雞湯 — The King of Chicken Soup</title>
+    <link rel="icon" type="image/png" href="Logo/Website Favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <style>
+        html, body {
+            background: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 24px 16px;
+            box-sizing: border-box;
+        }
+        #card-wrap {
+            width: min(92vw, 420px);
+            aspect-ratio: 3 / 4;
+            position: relative;
+        }
+        #card {
+            width: 100%;
+            height: 100%;
+            background: #f2f2f2;
+            color: #000;
+            border: 1px solid #000;
+            box-sizing: border-box;
+            padding: 32px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 18px;
+        }
+        #card.no-border { border: none; }
+        #card-cn {
+            font-size: clamp(1.2rem, 5vw, 1.6rem);
+            line-height: 1.6;
+            font-weight: 500;
+            text-wrap: balance;
+            word-break: keep-all;
+            line-break: strict;
+        }
+        #card-en {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+            line-height: 1.5;
+            font-weight: 400;
+            opacity: 0.85;
+            text-wrap: balance;
+        }
+        #card-reasoning {
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
+            line-height: 1.7;
+            opacity: 0.65;
+            margin-top: 8px;
+            text-wrap: balance;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .actions button {
+            background: #000;
+            color: #f2f2f2;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .actions button.secondary {
+            background: transparent;
+            color: #000;
+            border: 1px solid #000;
+        }
+        .hint {
+            font-size: 0.875rem;
+            color: #000;
+            opacity: 0.6;
+            text-align: center;
+            max-width: 320px;
+            line-height: 1.6;
+        }
+        .brand {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 0.75rem;
+            opacity: 0.5;
+            letter-spacing: 0.08em;
+        }
+        .error {
+            font-size: 0.95rem;
+            color: #c00;
+            text-align: center;
+            max-width: 320px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div id="error-msg" class="error" style="display:none;"></div>
+
+        <div id="card-wrap" style="display:none;">
+            <div id="card">
+                <p id="card-cn"></p>
+                <p id="card-en" style="display:none;"></p>
+                <p id="card-reasoning" style="display:none;"></p>
+                <span class="brand">The King of Chicken Soup</span>
+            </div>
+        </div>
+
+        <div id="actions" class="actions" style="display:none;">
+            <button id="save-btn" onclick="savePNG()">存成圖片</button>
+            <button class="secondary" onclick="location.href='/'">回首頁</button>
+        </div>
+
+        <p id="hint" class="hint" style="display:none;">長按圖片可以直接存到相簿</p>
+    </div>
+
+    <script src="js/card.js"></script>
+</body>
+</html>

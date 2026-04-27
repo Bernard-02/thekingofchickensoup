@@ -1199,7 +1199,8 @@ function sendLedProgress(value) {
 window.sendLedMode = sendLedMode;
 window.sendLedProgress = sendLedProgress;
 
-// 由 nfc.js 在掃到「對應正確瓶子」時呼叫；mode: 'scan' | 'panel'
+// 由 nfc.js 在掃到「對應正確瓶子」時呼叫；mode: 'scan' | 'panel' | 'ai'
+// 'ai' mode：在 chat-result-view 揭曉 AI 雞湯，hold 滿 5 秒呼叫 revealChatQuote
 window.startRevealHold = function(uid, mode) {
     // 如果已在 hold 同一張卡 → 忽略（避免重複）
     if (revealHoldTicker && revealHoldMatchedUID === uid && revealHoldMode === mode) return;
@@ -1225,7 +1226,9 @@ window.startRevealHold = function(uid, mode) {
 
         if (total >= REVEAL_HOLD_MS) {
             clearInterval(revealHoldTicker); revealHoldTicker = null;
-            const doReveal = mode === 'panel' ? window.revealQuoteInPanel : window.revealQuote;
+            const doReveal = mode === 'panel' ? window.revealQuoteInPanel
+                           : mode === 'ai'    ? window.revealChatQuote
+                           :                    window.revealQuote;
             revealHoldMatchedUID = null;
             revealHoldMode = null;
             revealHoldAccum = 0;
@@ -1853,11 +1856,13 @@ function stopLoadingAnim() {
 
 // 初始化聊天畫面（回到學徒的第一個問候）
 window.initChatView = function() {
-    const container = document.getElementById('chat-messages');
-    if (container) {
-        container.innerHTML = '';
+    // ⚠ messages 要加到 chat-messages-inner（max-w-2xl 容器內），不是 chat-messages（外層 scrollable）
+    // 加錯地方訊息會跑到 viewport 邊緣 (DevTools 開時特別明顯)
+    const inner = document.getElementById('chat-messages-inner');
+    if (inner) {
+        inner.innerHTML = '';
         const msg = buildChatMessage('apprentice', '最近你一直在想什麼事呢？');
-        container.appendChild(msg);
+        inner.appendChild(msg);
         gsap.fromTo(msg, { opacity: 0, y: 10 },
             { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
         shrinkBubbleToContent(msg.querySelector('.chat-bubble'));
@@ -1947,25 +1952,27 @@ function shrinkBubbleToContent(bubbleEl) {
 }
 
 function appendChatMessage(role, content) {
-    const container = document.getElementById('chat-messages');
-    if (!container) return null;
+    const inner = document.getElementById('chat-messages-inner');
+    const scroller = document.getElementById('chat-messages');
+    if (!inner) return null;
     const msg = buildChatMessage(role, content);
-    container.appendChild(msg);
+    inner.appendChild(msg);
     gsap.fromTo(msg, { opacity: 0, y: 10 },
         { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
-    container.scrollTop = container.scrollHeight;
+    if (scroller) scroller.scrollTop = scroller.scrollHeight;
     shrinkBubbleToContent(msg.querySelector('.chat-bubble'));
     return msg;
 }
 
 function appendChatThinking() {
-    const container = document.getElementById('chat-messages');
-    if (!container) return null;
+    const inner = document.getElementById('chat-messages-inner');
+    const scroller = document.getElementById('chat-messages');
+    if (!inner) return null;
     const msg = buildChatThinking();
-    container.appendChild(msg);
+    inner.appendChild(msg);
     gsap.fromTo(msg, { opacity: 0, y: 10 },
         { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
-    container.scrollTop = container.scrollHeight;
+    if (scroller) scroller.scrollTop = scroller.scrollHeight;
     return msg.querySelector('.chat-thinking-text');
 }
 

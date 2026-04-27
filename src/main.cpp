@@ -81,9 +81,8 @@ bool waitingForBlankNFC = false;  // 是否等待空白 NFC 卡片進行寫入
 #define LED_PIN_R      D4   // 註：UART1 method 不會用到這個 #define，pin 是硬體固定的
 #define LED_COUNT_L    5
 #define LED_COUNT_R    5
-// 亮度 peak（0.0 ~ 1.0），在公式裡直接算，保留完整解析度
-// 5 顆 LED 在小空間裡 0.40 偏刺眼，改 0.20 比較柔和；想再亮就拉到 0.30
-#define LED_PEAK       0.20f
+// 亮度 peak（0.0 ~ 1.0），0.20 柔和、0.30 亮一些（目前用）、0.40 偏刺眼
+#define LED_PEAK       0.30f
 // 呼吸到最暗時保留多少底光（0~1）。太低 + gamma 校正後會接近熄滅；想永不熄滅拉到 0.35+
 #define LED_FLOOR      0.30f
 
@@ -113,6 +112,7 @@ float ledHoldProgress = 0.0f;
 // 顏色 (RGB)
 const uint8_t IDLE_R = 255, IDLE_G = 255, IDLE_B = 255;       // 白色
 const uint8_t AMBER_R = 230, AMBER_G = 160, AMBER_B = 60;     // 暖琥珀
+// （await_scan 階段的整體亮度由 amp range 控制，目前 0.55~0.85）
 
 // ===== NFC Tag 模擬狀態 =====
 // 收到 WebSocket 指令後，PN532 切成 Type 4 tag，讓觀眾手機讀取 URL
@@ -234,11 +234,12 @@ void updateLeds() {
       // 偵測到 NFC → 直接切滿亮度（避免琥珀色在低 PWM 偏紅的色偏問題）
       amp = 1.0f;
     } else {
-      // 等待掃描：比 IDLE 更暗的琥珀呼吸
+      // 等待掃描：琥珀色呼吸
+      // amp 範圍 0.55 ~ 0.85（之前 0.30 ~ 0.60，把暗端跟亮端都拉高 ~25 個百分點）
       float phase = (now % 3500) / 3500.0f * 2.0f * (float)PI;
       float raw = expf(sinf(phase)) - 0.36787944f;
       float breath = raw / 2.35040239f;
-      amp = 0.30f + 0.30f * breath;   // amp 約 0.30 ~ 0.60，偏暗
+      amp = 0.55f + 0.30f * breath;
     }
   } else {
     // REVEALED：穩定白光（輕微呼吸讓它不死板）
@@ -300,26 +301,16 @@ void setupWiFi() {
     Serial.println("========================================");
 
     WiFi.mode(WIFI_STA);
-    WiFi.setSleepMode(WIFI_NONE_SLEEP);  // 關閉省電模式 → WebSocket 延遲大幅降低
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.setAutoReconnect(true);
-    WiFi.setAutoConnect(true);           // 開機時 ROM 用 flash 內 cache 即時自動重連
-    WiFi.persistent(true);               // 連線成功後寫入 flash → 下次重啟可走 cache 路徑
-    WiFi.setOutputPower(20.5f);          // 最大發射功率（dBm），弱信號也比較撐得住
-    // ⚠ 不要 WiFi.disconnect()，會把 cache 清掉、害下次重啟反而要重新 scan
+    WiFi.setAutoConnect(true);
+    WiFi.persistent(true);
+    WiFi.setOutputPower(20.5f);
 
-    // 固定 IP（配合 Windows 行動熱點 192.168.137.x 網段）
-    // 前端 js/config.js 寫 ws://192.168.137.200:81 就永遠對上
-    // 用固定 IP = 跳過 DHCP discover/offer/ack（省 1~3 秒）
-    IPAddress staticIP(192, 168, 137, 200);
-    IPAddress gateway(192, 168, 137, 1);
-    IPAddress subnet(255, 255, 255, 0);
-    IPAddress dns(8, 8, 8, 8);
-    WiFi.config(staticIP, gateway, subnet, dns);
+    // 不用 WiFi.config 強制固定 IP — Windows 行動熱點 (ICS) 會擋掉
+    // 改用 DHCP，連上後印 IP，貼到 js/config.js 即可
 
-    Serial.printf("正在連接到: %s\n", sta_ssid);
-    Serial.printf("密碼長度: %d\n", strlen(sta_password));
-    Serial.print("連線中");
-
+    Serial.printf("連線中: %s", sta_ssid);
     WiFi.begin(sta_ssid, sta_password);
 
     // 每 200ms poll 一次（比原本 500ms 反應更快）；最多 ~6 秒
@@ -341,18 +332,8 @@ void setupWiFi() {
     Serial.println();
 
     if (WiFi.status() == WL_CONNECTED) {
-      IPAddress IP = WiFi.localIP();
-      Serial.println("\n✓ WiFi 連線成功！");
-      Serial.println("----------------------------------------");
-      Serial.printf("已連接到:  %s\n", sta_ssid);
-      Serial.printf("ESP8266 IP: %s\n", IP.toString().c_str());
-      Serial.println("----------------------------------------");
-      Serial.println("\n使用步驟:");
-      Serial.println("1. 確保你的電腦也連接到相同的熱點");
-      Serial.println("2. 開啟瀏覽器輸入上方的 ESP8266 IP");
-      Serial.printf("3. WebSocket URL: ws://%s:81\n", IP.toString().c_str());
-      Serial.println("4. 記得更新網頁 js/config.js 中的 IP！");
-      Serial.println("========================================\n");
+      Serial.printf("\n>>> IP: %s   ← 貼到 js/config.js 第 7 行\n\n",
+                    WiFi.localIP().toString().c_str());
     } else {
       Serial.println("\n✗ WiFi 連線失敗！");
       Serial.println("----------------------------------------");

@@ -1,5 +1,30 @@
 // NFC WebSocket 通訊模組
 
+// 連續 5 秒連不上 ESP 時，在頁面頂端跳紅色橫幅提醒——通常是 ESP IP 變了
+// 點橫幅可關閉。連上後會自動隱藏。
+function showDisconnectBanner(url) {
+    let el = document.getElementById('ws-disconnect-banner');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ws-disconnect-banner';
+        el.style.cssText =
+            'position:fixed; top:0; left:0; right:0; background:#c00; color:#fff;' +
+            'padding:10px 20px; text-align:center; font-size:14px; line-height:1.6;' +
+            'z-index:99999; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+        el.onclick = () => el.remove();
+        document.body.appendChild(el);
+    }
+    el.innerHTML =
+        '<strong>ESP 連不上：' + url + '</strong>　 ' +
+        '可能 IP 變了——看 Serial Monitor 印的 IP，改 <code>js/config.js</code> 第 7 行' +
+        '<span style="font-size:12px; opacity:0.7; margin-left:12px;">（點此關閉）</span>';
+    el.style.display = '';
+}
+function hideDisconnectBanner() {
+    const el = document.getElementById('ws-disconnect-banner');
+    if (el) el.remove();
+}
+
 // 把 UID 對應的編號回傳給 ESP，讓它印在 Serial Monitor 上
 // 方便測試時對照實體卡 / quotes-selected.json 的標號
 function logScanToEsp(uid, matchText) {
@@ -28,58 +53,42 @@ class NFCManager {
         this.onRemoveCallback = null;
     }
 
-    // 連線到 ESP8266
-    // 用 pladaria/reconnecting-websocket（index.html 引入的 CDN library）。
-    // 它內建：指數 backoff、connection timeout、jitter、自動重連——
-    // 我們不用再自己刻 scheduleReconnect / reconnectAttempts。
-    // 仍保留：heartbeat 主動 ping ESP + watchdog 偵測 ESP 死活
+    // 連線到 ESP8266 — 最樸素的 vanilla WebSocket
+    // 開 → 用 → 斷了 setTimeout 2 秒重連，沒了
+    // 沒有 library、沒有 heartbeat watchdog、沒有複雜的重連邏輯
     connect(url = CONFIG.websocket.url) {
-        log(`嘗試連線到 ${url}`);
-
-        const Ctor = window.ReconnectingWebSocket || WebSocket; // CDN 沒載到時 fallback
-        if (!window.ReconnectingWebSocket) {
-            log('警告：ReconnectingWebSocket library 沒載到，退回原生 WebSocket（不會自動重連）', 'warn');
-        }
-
-        this.ws = new Ctor(url, [], {
-            minReconnectionDelay: CONFIG.websocket.reconnectMinInterval || 200,
-            maxReconnectionDelay: CONFIG.websocket.reconnectMaxInterval || 3000,
-            reconnectionDelayGrowFactor: 2,    // 200 → 400 → 800 → 1600 → 3000(cap)
-            connectionTimeout: 4000,           // 4s 還沒 open 就放棄、重試
-            maxRetries: CONFIG.websocket.maxReconnectAttempts || 30,
-            debug: false,
-            // 強制用原生 WebSocket（瀏覽器環境本來就有），避免 library 找不到
-            WebSocket: window.WebSocket,
-        });
+        log(`連線到 ${url}`);
+        this._url = url;
+        this.ws = new WebSocket(url);
 
         this.ws.addEventListener('open', () => {
             log('WebSocket 連線成功', 'info');
             this.isConnected = true;
-            this.lastMessageTime = Date.now();
             this.updateUIStatus(true);
-            this.startHeartbeat();
-
+            // 連上 → 取消「IP 可能變了」橫幅
+            if (this._bannerTimer) { clearTimeout(this._bannerTimer); this._bannerTimer = null; }
+            hideDisconnectBanner();
             if (this.onConnectCallback) this.onConnectCallback();
         });
 
         this.ws.addEventListener('message', (event) => {
-            this.lastMessageTime = Date.now();
             this.handleMessage(event.data);
         });
 
-        this.ws.addEventListener('error', () => {
-            // ReconnectingWebSocket 本身會處理錯誤並安排重連，這裡只記 log
-            log(`WebSocket 錯誤（library 會自動重連）`, 'warn');
-        });
-
         this.ws.addEventListener('close', () => {
-            log('WebSocket 連線關閉，library 排程重連中', 'warn');
+            log('WebSocket 連線關閉，2 秒後重連', 'warn');
             this.isConnected = false;
             this.updateUIStatus(false);
-            this.stopHeartbeat();
-
             if (this.onDisconnectCallback) this.onDisconnectCallback();
+            // 連續 5 秒連不上才顯示提示橫幅（避免短暫網路抖動就跳）
+            if (!this._bannerTimer) {
+                this._bannerTimer = setTimeout(() => showDisconnectBanner(this._url), 5000);
+            }
+            // 純粹斷了再連，沒有指數 backoff、沒有 retry limit
+            setTimeout(() => this.connect(this._url), 2000);
         });
+
+        // error 不用處理 — close 會跟著 fire，重連在那邊做就好
     }
 
     // 處理接收到的訊息
@@ -773,37 +782,9 @@ class NFCManager {
         return this.send('nfc_read_request');
     }
 
-    // 心跳：定期主動 ping ESP；watchdog 同時檢查 ESP 是否還有回任何訊息
-    startHeartbeat() {
-        const interval = CONFIG.websocket.heartbeatInterval;
-        const timeout  = CONFIG.websocket.heartbeatTimeoutMs || (interval * 3);
-
-        this.heartbeatTimer = setInterval(() => {
-            if (this.isConnected) this.send('heartbeat');
-        }, interval);
-
-        // Watchdog：如果 ESP 太久沒送任何東西回來（含 onmessage 回應），
-        // 直接 close → 觸發重連，不要等 OS 層級 ws timeout（往往要 30s+）
-        this.heartbeatWatchdog = setInterval(() => {
-            if (!this.isConnected) return;
-            const idle = Date.now() - (this.lastMessageTime || 0);
-            if (idle > timeout) {
-                log(`ESP ${idle}ms 沒回應，強制重連`, 'warn');
-                try { this.ws && this.ws.close(); } catch (e) {}
-            }
-        }, 1000);
-    }
-
-    stopHeartbeat() {
-        if (this.heartbeatTimer) {
-            clearInterval(this.heartbeatTimer);
-            this.heartbeatTimer = null;
-        }
-        if (this.heartbeatWatchdog) {
-            clearInterval(this.heartbeatWatchdog);
-            this.heartbeatWatchdog = null;
-        }
-    }
+    // 不再用 heartbeat — vanilla WebSocket 斷了 onclose 就會 fire，重連邏輯在 connect() 裡
+    startHeartbeat() {}
+    stopHeartbeat() {}
 
     // 更新 UI 狀態
     // 展覽行為：整個指示器永遠隱藏，觀眾不會看到任何「已連線/未連線」的提示

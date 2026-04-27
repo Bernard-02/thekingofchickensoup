@@ -3,15 +3,14 @@
 window.CONFIG = {
     // WebSocket 設定
     websocket: {
-        // ESP8266 的 IP 位址（連接到 BERNARD-LAPTOP）
-        url: 'ws://192.168.137.200:81',
-        // 指數 backoff：第 1 次很快試（200ms），失敗就拉長，最多 3000ms
-        // 適合「ESP 剛上電、幾秒後才上線」的情境——前面幾次重連抓得快
+        // ⚠ ESP 的 IP — 開機後從 Serial Monitor 或 Windows「行動熱點」看 ESP 拿到的 IP，貼這
+        //   只要這行一個地方
+        url: 'ws://192.168.137.218:81',
         reconnectMinInterval: 200,
         reconnectMaxInterval: 3000,
-        heartbeatInterval: 3000,         // 心跳間隔（毫秒）— 越短越快偵測斷線
-        heartbeatTimeoutMs: 9000,        // 連續 ~3 次心跳沒回應就認定斷線、強制重連
-        maxReconnectAttempts: 30         // 最多重連次數（之後暫停）
+        heartbeatInterval: 3000,
+        heartbeatTimeoutMs: 9000,
+        maxReconnectAttempts: 30
     },
 
     // NFC 分類對應
