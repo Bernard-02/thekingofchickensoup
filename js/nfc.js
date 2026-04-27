@@ -15,9 +15,9 @@ class NFCManager {
     constructor() {
         this.ws = null;
         this.isConnected = false;
-        this.reconnectTimer = null;
         this.heartbeatTimer = null;
-        this.reconnectAttempts = 0; // 重連嘗試次數
+        this.heartbeatWatchdog = null;
+        this.lastMessageTime = 0;
         this.currentQuoteNumber = -1; // 當前顯示的雞湯編號
 
         // 事件回調
@@ -29,50 +29,57 @@ class NFCManager {
     }
 
     // 連線到 ESP8266
+    // 用 pladaria/reconnecting-websocket（index.html 引入的 CDN library）。
+    // 它內建：指數 backoff、connection timeout、jitter、自動重連——
+    // 我們不用再自己刻 scheduleReconnect / reconnectAttempts。
+    // 仍保留：heartbeat 主動 ping ESP + watchdog 偵測 ESP 死活
     connect(url = CONFIG.websocket.url) {
-        try {
-            log(`嘗試連線到 ${url}`);
-            this.ws = new WebSocket(url);
+        log(`嘗試連線到 ${url}`);
 
-            this.ws.onopen = () => {
-                log('WebSocket 連線成功', 'info');
-                this.isConnected = true;
-                this.reconnectAttempts = 0; // 重置重連計數器
-                this.lastMessageTime = Date.now();
-                this.updateUIStatus(true);
-                this.startHeartbeat();
-
-                if (this.onConnectCallback) {
-                    this.onConnectCallback();
-                }
-            };
-
-            this.ws.onmessage = (event) => {
-                this.lastMessageTime = Date.now();
-                this.handleMessage(event.data);
-            };
-
-            this.ws.onerror = (error) => {
-                log(`WebSocket 錯誤: ${error}`, 'error');
-            };
-
-            this.ws.onclose = () => {
-                log('WebSocket 連線關閉', 'warn');
-                this.isConnected = false;
-                this.updateUIStatus(false);
-                this.stopHeartbeat();
-
-                if (this.onDisconnectCallback) {
-                    this.onDisconnectCallback();
-                }
-
-                // 自動重連
-                this.scheduleReconnect();
-            };
-
-        } catch (error) {
-            log(`連線失敗: ${error}`, 'error');
+        const Ctor = window.ReconnectingWebSocket || WebSocket; // CDN 沒載到時 fallback
+        if (!window.ReconnectingWebSocket) {
+            log('警告：ReconnectingWebSocket library 沒載到，退回原生 WebSocket（不會自動重連）', 'warn');
         }
+
+        this.ws = new Ctor(url, [], {
+            minReconnectionDelay: CONFIG.websocket.reconnectMinInterval || 200,
+            maxReconnectionDelay: CONFIG.websocket.reconnectMaxInterval || 3000,
+            reconnectionDelayGrowFactor: 2,    // 200 → 400 → 800 → 1600 → 3000(cap)
+            connectionTimeout: 4000,           // 4s 還沒 open 就放棄、重試
+            maxRetries: CONFIG.websocket.maxReconnectAttempts || 30,
+            debug: false,
+            // 強制用原生 WebSocket（瀏覽器環境本來就有），避免 library 找不到
+            WebSocket: window.WebSocket,
+        });
+
+        this.ws.addEventListener('open', () => {
+            log('WebSocket 連線成功', 'info');
+            this.isConnected = true;
+            this.lastMessageTime = Date.now();
+            this.updateUIStatus(true);
+            this.startHeartbeat();
+
+            if (this.onConnectCallback) this.onConnectCallback();
+        });
+
+        this.ws.addEventListener('message', (event) => {
+            this.lastMessageTime = Date.now();
+            this.handleMessage(event.data);
+        });
+
+        this.ws.addEventListener('error', () => {
+            // ReconnectingWebSocket 本身會處理錯誤並安排重連，這裡只記 log
+            log(`WebSocket 錯誤（library 會自動重連）`, 'warn');
+        });
+
+        this.ws.addEventListener('close', () => {
+            log('WebSocket 連線關閉，library 排程重連中', 'warn');
+            this.isConnected = false;
+            this.updateUIStatus(false);
+            this.stopHeartbeat();
+
+            if (this.onDisconnectCallback) this.onDisconnectCallback();
+        });
     }
 
     // 處理接收到的訊息
@@ -798,38 +805,9 @@ class NFCManager {
         }
     }
 
-    // 重新連線：指數 backoff（min × 2^(attempts-1)，cap 在 max）
-    // 第 1 次很快試（200ms），失敗才慢慢拉長到 3000ms
-    scheduleReconnect() {
-        if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
-        }
-
-        const maxAttempts = CONFIG.websocket.maxReconnectAttempts || 30;
-        const minMs = CONFIG.websocket.reconnectMinInterval || 200;
-        const maxMs = CONFIG.websocket.reconnectMaxInterval || 3000;
-
-        if (this.reconnectAttempts >= maxAttempts) {
-            log(`已達最大重連次數 (${maxAttempts})，暫停重連。請檢查 ESP8266 是否運行中。`, 'warn');
-            this.updateUIStatus(false, '連線失敗');
-            return;
-        }
-
-        this.reconnectAttempts++;
-        const backoff = Math.min(maxMs, minMs * Math.pow(2, this.reconnectAttempts - 1));
-        // 加一點 jitter（±15%），避免多個 client 同時重連的 thundering herd
-        const jitter = backoff * (0.85 + Math.random() * 0.30);
-        const delay = Math.round(jitter);
-
-        log(`嘗試重新連線... (${this.reconnectAttempts}/${maxAttempts}) ${delay}ms 後`, 'info');
-
-        this.reconnectTimer = setTimeout(() => {
-            this.connect();
-        }, delay);
-    }
-
     // 更新 UI 狀態
-    // 展覽行為：連線正常時整個指示器隱藏（觀眾看不到），只有斷線/錯誤時才浮出來
+    // 展覽行為：整個指示器永遠隱藏，觀眾不會看到任何「已連線/未連線」的提示
+    // 要除錯時直接看 console log（log 還會繼續印），或臨時把下面那行 display = 'none' 換成 'flex'
     updateUIStatus(connected, customMessage = null) {
         const container = document.getElementById('ws-status-container');
         const statusDot = document.getElementById('ws-status');
@@ -850,20 +828,16 @@ class NFCManager {
         }
 
         if (container) {
-            // 已連線且沒有 custom 警示訊息 → 整塊藏起來
-            container.style.display = (connected && !customMessage) ? 'none' : 'flex';
+            container.style.display = 'none';
         }
     }
 
-    // 斷線
+    // 主動斷線：用 library 的 close()，這樣它就不會再自動重連
     disconnect() {
         if (this.ws) {
             this.ws.close();
         }
         this.stopHeartbeat();
-        if (this.reconnectTimer) {
-            clearTimeout(this.reconnectTimer);
-        }
     }
 
     // 設定事件監聽器
