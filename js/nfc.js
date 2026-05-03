@@ -1,30 +1,5 @@
 // NFC WebSocket 通訊模組
 
-// 連續 5 秒連不上 ESP 時，在頁面頂端跳紅色橫幅提醒——通常是 ESP IP 變了
-// 點橫幅可關閉。連上後會自動隱藏。
-function showDisconnectBanner(url) {
-    let el = document.getElementById('ws-disconnect-banner');
-    if (!el) {
-        el = document.createElement('div');
-        el.id = 'ws-disconnect-banner';
-        el.style.cssText =
-            'position:fixed; top:0; left:0; right:0; background:#c00; color:#fff;' +
-            'padding:10px 20px; text-align:center; font-size:14px; line-height:1.6;' +
-            'z-index:99999; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.3);';
-        el.onclick = () => el.remove();
-        document.body.appendChild(el);
-    }
-    el.innerHTML =
-        '<strong>ESP 連不上：' + url + '</strong>　 ' +
-        '可能 IP 變了——看 Serial Monitor 印的 IP，改 <code>js/config.js</code> 第 7 行' +
-        '<span style="font-size:12px; opacity:0.7; margin-left:12px;">（點此關閉）</span>';
-    el.style.display = '';
-}
-function hideDisconnectBanner() {
-    const el = document.getElementById('ws-disconnect-banner');
-    if (el) el.remove();
-}
-
 // 把 UID 對應的編號回傳給 ESP，讓它印在 Serial Monitor 上
 // 方便測試時對照實體卡 / quotes-selected.json 的標號
 function logScanToEsp(uid, matchText) {
@@ -65,9 +40,6 @@ class NFCManager {
             log('WebSocket 連線成功', 'info');
             this.isConnected = true;
             this.updateUIStatus(true);
-            // 連上 → 取消「IP 可能變了」橫幅
-            if (this._bannerTimer) { clearTimeout(this._bannerTimer); this._bannerTimer = null; }
-            hideDisconnectBanner();
             if (this.onConnectCallback) this.onConnectCallback();
         });
 
@@ -80,10 +52,6 @@ class NFCManager {
             this.isConnected = false;
             this.updateUIStatus(false);
             if (this.onDisconnectCallback) this.onDisconnectCallback();
-            // 連續 5 秒連不上才顯示提示橫幅（避免短暫網路抖動就跳）
-            if (!this._bannerTimer) {
-                this._bannerTimer = setTimeout(() => showDisconnectBanner(this._url), 5000);
-            }
             // 純粹斷了再連，沒有指數 backoff、沒有 retry limit
             setTimeout(() => this.connect(this._url), 2000);
         });
@@ -789,27 +757,16 @@ class NFCManager {
     // 更新 UI 狀態
     // 展覽行為：整個指示器永遠隱藏，觀眾不會看到任何「已連線/未連線」的提示
     // 要除錯時直接看 console log（log 還會繼續印），或臨時把下面那行 display = 'none' 換成 'flex'
+    // 右下角小指示器（CSS 預設半透明，hover 才滿不透明）
+    // 點 / 紅 = 沒連線、綠 = 已連線。觀眾不太會注意到，給你後台 debug 用
     updateUIStatus(connected, customMessage = null) {
-        const container = document.getElementById('ws-status-container');
         const statusDot = document.getElementById('ws-status');
         const statusText = document.getElementById('ws-status-text');
 
-        if (statusDot) {
-            statusDot.className = connected
-                ? 'w-4 h-4 rounded-full bg-green-500'
-                : 'w-4 h-4 rounded-full bg-red-500';
-        }
+        if (statusDot) statusDot.classList.toggle('connected', connected);
 
         if (statusText) {
-            if (customMessage) {
-                statusText.textContent = customMessage;
-            } else {
-                statusText.textContent = connected ? '已連線' : '未連線';
-            }
-        }
-
-        if (container) {
-            container.style.display = 'none';
+            statusText.textContent = customMessage || (connected ? '已連線' : '未連線');
         }
     }
 

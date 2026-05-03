@@ -359,7 +359,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     font-size: 1.375rem; /* h4 — 22px */
     background: transparent;
     border: none;
-    color: #000;
+    color: rgba(0,0,0,0.5);    /* 預設 50% 黑（沒 active 時） */
     cursor: pointer;
     padding: 0;
     opacity: 1;
@@ -368,11 +368,13 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     display: inline-block;
     width: fit-content;
     align-self: flex-start;
+    transition: color 0.2s ease;
 }
 
-.info-nav-btn:hover {
+.info-nav-btn:hover,
+.info-nav-btn.active-tab {
     background: transparent;
-    color: #000;
+    color: #000;            /* hover 或 active 才滿黑 */
 }
 
 .info-nav-btn::after {
@@ -400,7 +402,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 /* Research anchor 連結 */
 .research-anchor-btn {
     font-size: 1.375rem; /* h4 — 與導航 btn 同 */
-    color: #000;
+    color: rgba(0,0,0,0.5);   /* 預設 50% 黑（沒 active 時） */
     text-decoration: none;
     cursor: pointer;
     display: inline-block;
@@ -409,10 +411,12 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     position: relative;
     width: fit-content;
     align-self: flex-start;
+    transition: color 0.2s ease;
 }
 
-.research-anchor-btn:hover {
-    color: #000;
+.research-anchor-btn:hover,
+.research-anchor-btn.active-anchor {
+    color: #000;          /* hover 或 active 才滿黑 */
     text-decoration: none;
 }
 
@@ -833,6 +837,51 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 #ws-status-text {
     font-size: 14px;
     color: #000000;
+}
+
+/* 測試面板 — 用按鈕模擬 NFC 掃描 */
+.test-panel {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: #fff;
+    border: 1.5px solid #000;
+    padding: 10px 12px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: 12px;
+    display: none;            /* 預設隱藏，class .show 時才顯示 */
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    min-width: 160px;
+}
+.test-panel.show {
+    display: flex;
+}
+.test-panel-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+.test-panel-hint {
+    font-weight: 400;
+    opacity: 0.5;
+    font-size: 10px;
+    margin-left: 4px;
+}
+.test-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+}
+.test-btn:hover {
+    background: #333;
 }
 
 /* 狀態指示燈 */
@@ -1314,12 +1363,25 @@ button {
     overflow: visible;
 }
 .fire-fill {
+    /* 已不使用，舊版的填滿條保留樣式以防其他地方還在用 */
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     width: 0%;
     background: rgba(220, 110, 40, 0.5);
+}
+/* 賽車起跑式：自動往返掃的指針 */
+.fire-indicator {
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    left: 0%;
+    width: 3px;
+    background: #000;
+    transform: translateX(-50%);
+    pointer-events: none;
+    /* 不用 transition，由 JS 每 16ms 直接更新 left，平滑度由 framerate 來 */
 }
 .fire-perfect-zone {
     position: absolute;
@@ -1455,8 +1517,7 @@ button {
 }
 
 .chat-bubble {
-    border: 1px solid #000;
-    padding: 12px 16px;
+    padding: 8px 14px;
     font-size: 1rem;
     line-height: 1.6;
     background: transparent;
@@ -1465,7 +1526,51 @@ button {
     text-wrap: balance;
 }
 
+/* 「對話卡住了？」提示 — 來回 5+ 次才出現，slide up 動畫 */
+#stuck-hint {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    background: #555;
+    color: #bbb;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    /* 預設藏起來（往下偏 + 透明），加 .show 才滑進來 */
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+#stuck-hint.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+#stuck-hint button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 0.85rem;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+#stuck-hint button:hover {
+    color: #000;        /* hover 變黑，不加底線 */
+    text-decoration: none;
+}
+
+/* 學徒：不要對話框，純文字（去掉 border / padding）*/
+.chat-msg-apprentice .chat-bubble {
+    border: none;
+    padding: 0;
+}
+
 .chat-msg-user .chat-bubble {
+    border: 1px solid #000;
     background: #000;
     color: #f2f2f2;
 }

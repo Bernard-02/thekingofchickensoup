@@ -61,7 +61,7 @@
   },
   {
     "id": "q6",
-    "text": "原料已準備好了，接下來請選擇你的鍋子",
+    "text": "原料已準備好，接下來請選擇你的鍋子",
     "type": "container-choice",
     "tag": "container",
     "options": [

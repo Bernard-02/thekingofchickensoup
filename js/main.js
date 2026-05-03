@@ -515,8 +515,8 @@ function confirmQuestion() {
             nfcManager.userAnswers = userAnswers; // 把完整的計分陣列交給 NFC Manager
         }
         if (currentSelectedValue === 'chat') {
-            initChatView();
-            showView('chat-view');
+            // 先過 intro 畫面說明要跟 AI 對話，按確定才進真正的 chat-view
+            showView('chat-intro-view');
         } else {
             // 跳過 NFC，直接計算結果並顯示轉譯
             calculateAndShowTranslation();
@@ -634,15 +634,15 @@ const STEP2_TARGET_LEVEL = 0.78;
 const STEP2_PERFECT_TOL  = 0.06;
 const STEP2_OKAY_FLOOR   = 0.55;
 
-// Step 3 開火
-const STEP3_FILL_MS      = 2400;
-const STEP3_PERFECT_MIN  = 0.62;
-const STEP3_PERFECT_MAX  = 0.80;
+// Step 3 開火（賽車起跑風格：指針自動往右跑，按空白鍵停下；perfect 區在 bar 中段）
+const STEP3_SWEEP_MS     = 2400;   // 指針從左到右掃完整條的時間
+const STEP3_PERFECT_MIN  = 0.55;
+const STEP3_PERFECT_MAX  = 0.75;
 const STEP3_OKAY_TOL     = 0.18;
 
 // Step 4 撈浮沫
 const STEP4_FOAM_COUNT      = 5;
-const STEP4_SPOON_PERIOD_MS = 3600;   // 勺子繞一圈的時間
+const STEP4_SPOON_PERIOD_MS = 5400;   // 勺子繞一圈的時間（之前 3600，放慢比較好掌握）
 const STEP4_HIT_RADIUS_PX   = 40;
 
 // Step 5 節奏調味
@@ -686,9 +686,58 @@ window.goToCooking = function() {
     cookingAdvancing = false;
     clearCookingState();
     buildCookingProgressBoxes();
-    renderCookingStep();
     showView('cooking-view');
+    // 進熬製頁不直接跑 step 0，先給觀眾看「接下來請用空白鍵互動」的提示
+    // 按一下空白鍵才正式開始
+    showCookingIntro();
 };
+
+// 熬製前的提示畫面：藏掉鍋子舞台 + 下方進度條，露提示文字 + 「確定」按鈕
+// 點按鈕 → 揭曉舞台 + 開始 step 0
+function showCookingIntro() {
+    const titleEl  = document.getElementById('cooking-step-title');
+    const hintEl   = document.getElementById('cooking-hint');
+    const kwEl     = document.getElementById('cooking-keyword');
+    const stage    = document.getElementById('cooking-stage');
+    const ctrls    = document.getElementById('cooking-controls');
+    const progress = document.getElementById('cooking-progress-boxes');
+
+    // intro 期間藏掉鍋子舞台跟下方進度條（觀眾還沒進到步驟，先別暴雷）
+    if (stage)    stage.style.visibility    = 'hidden';
+    if (progress) progress.style.visibility = 'hidden';
+
+    // 視覺順序：小副標「接下來的步驟」→ 大標「請用空白鍵進行互動」
+    // DOM 自然順序是 title 先 hint 後，這裡暫時把 hint 移到 title 前面
+    const parent = titleEl && titleEl.parentNode;
+    if (parent && hintEl && hintEl.parentNode === parent) {
+        parent.insertBefore(hintEl, titleEl);
+    }
+
+    if (hintEl)  hintEl.textContent  = '接下來的步驟';
+    if (titleEl) titleEl.textContent = '請用空白鍵進行互動';
+    if (kwEl)    { kwEl.textContent = ''; kwEl.style.opacity = 0; }
+
+    if (ctrls) {
+        ctrls.innerHTML = '';
+        const btn = document.createElement('button');
+        btn.className = 'primary-btn';   // 預設 border 樣式，hover 才填黑
+        btn.textContent = '確定';
+        btn.addEventListener('click', () => {
+            // 還原 DOM 順序，title 回到 hint 前面（讓 step 0 顯示正常的大標→小提示）
+            if (parent && titleEl && hintEl) parent.insertBefore(titleEl, hintEl);
+            // 還原舞台 + 進度條
+            if (stage)    stage.style.visibility    = '';
+            if (progress) progress.style.visibility = '';
+            renderCookingStep();
+        });
+        ctrls.appendChild(btn);
+    }
+
+    gsap.fromTo([hintEl, titleEl, ctrls],
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.1 }
+    );
+}
 
 function clearCookingState() {
     if (cookingState.cleanups) cookingState.cleanups.forEach(fn => { try { fn(); } catch (e) {} });
@@ -896,13 +945,15 @@ function setupStep2Water() {
         else                                                            { label = '不夠水';    lvKind = 'fail';    }
 
         showCookingFeedback(label, lvKind);
-        updateCookingBoxFill(cookingStepIndex, level);
+        // 不再用 level 更新進度條（會看到 75% 卡一下才滿）
+        // 進度條維持 0，advanceCookingStep 會直接拉到 1（從 0 → 滿，乾淨）
         scheduleCookingTimeout(advanceCookingStep, 1300);
     };
 }
 
-// ============= STEP 3: 開火 =============
-// 橫向 bar + perfect 區間。長按空白鍵 → 從左側填滿。放開時看 fill 結尾在哪
+// ============= STEP 3: 開火（賽車起跑式）=============
+// 橫向 bar + perfect 區間。指針自動從左掃到右，按一下空白鍵停下。
+// 停在 perfect 區 = 火力剛好；其他位置就 perfect=否
 function setupStep3Fire() {
     const stage = document.getElementById('cooking-stage');
     stage.style.cssText = 'position: relative; margin: 0 auto; width: min(460px, 92vw); height: 200px; display: flex; align-items: center; justify-content: center;';
@@ -910,39 +961,37 @@ function setupStep3Fire() {
     const bar = document.createElement('div');
     bar.className = 'fire-bar';
     bar.innerHTML = `
-        <div class="fire-fill"></div>
         <div class="fire-perfect-zone"
              style="left: ${STEP3_PERFECT_MIN * 100}%; width: ${(STEP3_PERFECT_MAX - STEP3_PERFECT_MIN) * 100}%;"></div>
         <span class="fire-zone-label" style="left: ${(STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2 * 100}%;">perfect</span>
+        <div class="fire-indicator"></div>
     `;
     stage.appendChild(bar);
-    const fillEl = bar.querySelector('.fire-fill');
+    const indicator = bar.querySelector('.fire-indicator');
 
-    let level = 0;
-    let pressStart = 0;
+    let startTime = performance.now();
     let timerId = null;
     let done = false;
+    let position = 0;   // 0~1 指針目前在哪
 
-    const stopFill = () => { if (timerId) { clearInterval(timerId); timerId = null; } };
-    registerCookingCleanup(stopFill);
+    const tick = () => {
+        if (done) return;
+        const elapsed = performance.now() - startTime;
+        position = (elapsed % STEP3_SWEEP_MS) / STEP3_SWEEP_MS;
+        // 來回掃：0→1→0 連續循環，給觀眾多次機會（節奏感更像 pre-start）
+        const phase = (elapsed / STEP3_SWEEP_MS) % 2;
+        const visualPos = phase <= 1 ? phase : 2 - phase;
+        position = visualPos;
+        indicator.style.left = (visualPos * 100) + '%';
+    };
+    timerId = setInterval(tick, 16);
+    registerCookingCleanup(() => { if (timerId) { clearInterval(timerId); timerId = null; } });
 
     cookingKey.down = () => {
         if (done) return;
-        pressStart = performance.now();
-        stopFill();
-        timerId = setInterval(() => {
-            const elapsed = performance.now() - pressStart;
-            const cur = Math.min(1, level + elapsed / STEP3_FILL_MS);
-            fillEl.style.width = (cur * 100) + '%';
-            if (cur >= 1) stopFill();
-        }, 16);
-    };
-    cookingKey.up = () => {
-        if (done || pressStart === 0) return;
-        const elapsed = performance.now() - pressStart;
-        level = Math.min(1, level + elapsed / STEP3_FILL_MS);
-        stopFill();
         done = true;
+        if (timerId) { clearInterval(timerId); timerId = null; }
+        const level = position;
 
         const center = (STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2;
         let label, lvKind;
@@ -952,9 +1001,10 @@ function setupStep3Fire() {
         else                                                            { label = '火太大';    lvKind = 'fail';    }
 
         showCookingFeedback(label, lvKind);
-        updateCookingBoxFill(cookingStepIndex, level);
+        // 進度條維持 0，advanceCookingStep 會直接拉到 1
         scheduleCookingTimeout(advanceCookingStep, 1300);
     };
+    cookingKey.up = null;   // 不用 up handler；只看單次 down
 }
 
 // ============= STEP 4: 撈去浮沫（俯視） =============
@@ -1675,38 +1725,37 @@ window.revealQuote = function() {
     zhEl.textContent = q.textCN || '';
     enEl.textContent = q.textEN || '';
 
-    // 文字先隱藏（粒子蓋住）、按鈕藏起來
+    // 文字先隱藏（粒子蓋住）、雞湯王/按鈕藏起來
     zhEl.style.color = '#f2f2f2';
     enEl.style.color = '#f2f2f2';
     gsap.set(buttons, { opacity: 0, y: 20, pointerEvents: 'none' });
 
-    // 右下角雞湯王提示先藏起來
     const mascotHint = document.getElementById('reveal-mascot-hint');
     if (mascotHint) {
-        mascotHint.style.display = 'none';
-        gsap.set(mascotHint, { opacity: 0 });
+        mascotHint.style.display = 'flex';
+        gsap.set(mascotHint, { opacity: 0, y: 12 });
     }
 
     showView('quote-reveal-view');
 
     // showView 有 300ms fade，等 view active 再量尺寸畫粒子
     setTimeout(() => {
-        startParticles([zhEl, enEl]);
+        startParticles([zhEl, enEl]);             // 中文 + 英文一起被粒子蓋住
 
-        // 停留 1s 後自動 reveal
         setTimeout(() => {
+            // Stage 1：中英文同時揭曉（粒子散開 → 字色還原）
             zhEl.style.color = '';
             enEl.style.color = '';
             dissolveParticles(() => {
+                // Stage 2：雞湯王 + 翻書提示 fade-in
+                if (mascotHint) {
+                    gsap.to(mascotHint, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+                }
+                // Stage 3：兩顆按鈕最後 fade-in
                 gsap.to(buttons, {
                     opacity: 1, y: 0, pointerEvents: 'auto',
-                    duration: 0.6, stagger: 0.15, ease: 'power2.out'
+                    duration: 0.6, delay: 0.5, stagger: 0.12, ease: 'power2.out'
                 });
-                // 粒子散完後，右下角雞湯王 + 提示跟著 fade in
-                if (mascotHint) {
-                    mascotHint.style.display = 'flex';
-                    gsap.to(mascotHint, { opacity: 1, duration: 0.6, delay: 0.8, ease: 'power2.out' });
-                }
             });
         }, 1000);
     }, 400);
@@ -1854,8 +1903,25 @@ function stopLoadingAnim() {
     }
 }
 
+// chat-intro-view 的「確定」按鈕：觀眾看完提示後正式進入 chat-view
+window.enterChatView = function() {
+    initChatView();
+    showView('chat-view');
+};
+
+// 監看對話累計次數：第 5 則使用者訊息後讓「對話卡住了？」提示 slide up
+function maybeShowStuckHint() {
+    const userMsgCount = document.querySelectorAll('#chat-messages-inner .chat-msg-user').length;
+    const hint = document.getElementById('stuck-hint');
+    if (hint && userMsgCount >= 5) hint.classList.add('show');
+}
+
 // 初始化聊天畫面（回到學徒的第一個問候）
 window.initChatView = function() {
+    // 重啟對話 → 把「卡住提示」藏回去（重新累計到 5 才會再出現）
+    const stuckHint = document.getElementById('stuck-hint');
+    if (stuckHint) stuckHint.classList.remove('show');
+
     // ⚠ messages 要加到 chat-messages-inner（max-w-2xl 容器內），不是 chat-messages（外層 scrollable）
     // 加錯地方訊息會跑到 viewport 邊緣 (DevTools 開時特別明顯)
     const inner = document.getElementById('chat-messages-inner');
@@ -2067,6 +2133,8 @@ window.submitChat = async function() {
 
     // 1. 觀眾的回覆 → 右邊泡泡
     appendChatMessage('user', text);
+    // 來回 5+ 次後 slide up「對話卡住了？」提示
+    maybeShowStuckHint();
 
     // 2. 清空輸入框（保留可見但停用、50% 不透明）
     input.value = '';
@@ -2103,7 +2171,8 @@ window.submitChat = async function() {
         const inputEl = document.getElementById('chat-input');
         if (inputEl) {
             inputEl.disabled = false;
-            inputEl.value = lastChatMessage;
+            inputEl.value = '';     // 學徒回完訊息 → 輸入框淨空，等觀眾打新內容
+            inputEl.style.height = 'auto';
             inputEl.focus();
         }
     };
@@ -2158,6 +2227,25 @@ window.retryLastChat = function() {
     document.getElementById('chat-retry-section').style.display = 'none';
     document.getElementById('chat-input').value = lastChatMessage;
     submitChat();
+};
+
+// 從「熬太久」回到對話（保留所有現有訊息，讓觀眾用不同說法再試）
+window.goBackToChat = function() {
+    document.getElementById('chat-retry-section').style.display = 'none';
+    // 把學徒的 thinking 泡泡（如果還掛著）清掉
+    const thinkingMsgs = document.querySelectorAll('.chat-msg .chat-thinking-text');
+    thinkingMsgs.forEach(t => { const m = t.closest('.chat-msg'); if (m) m.remove(); });
+    // 重啟輸入框
+    const wrapper = document.getElementById('chat-input-wrapper');
+    if (wrapper) gsap.to(wrapper, { opacity: 1, pointerEvents: 'auto', duration: 0.35, ease: 'power2.out' });
+    const input = document.getElementById('chat-input');
+    if (input) {
+        input.disabled = false;
+        input.value = '';
+        input.style.height = 'auto';
+        input.focus();
+    }
+    showView('chat-view');
 };
 
 // NFC 解碼 AI 生成的原句（粒子散開 → 顯示脈絡 + 客製化按鈕）
@@ -2494,6 +2582,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// 換鍋子：保留前 5 題答案，把 q6 的選擇清掉，回到題目頁讓觀眾重選分岔
+// 用在 chat-result-view（拿到 AI 雞湯後想換成雞湯王熬製）
+// 也用在 chat-view（聊到一半反悔）
+window.goBackToFork = function() {
+    // 清掉 q6 之後的所有結果
+    chatAIResult = null;
+    finalQuizResult = null;
+    window.finalQuizResult = null;
+    lastChatMessage = '';
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) { chatInput.value = ''; chatInput.style.height = 'auto'; }
+
+    // 把 q6（最後一題）的紀錄拔掉，前面 5 題答案保留
+    const lastIdx = questions.length - 1;
+    const lastQ   = questions[lastIdx];
+    if (lastQ && userSelection[lastQ.id]) delete userSelection[lastQ.id];
+    if (userAnswers.length > lastIdx) userAnswers = userAnswers.slice(0, lastIdx);
+
+    // 回到 q6 頁面讓觀眾重選
+    currentQuestionIndex = lastIdx;
+    currentSelectedValue = null;
+    currentSelectedOption = null;
+    renderQuestion(currentQuestionIndex);
+    showView('question-view');
+};
 
 // 再回答一次
 window.retryChatInput = function() {

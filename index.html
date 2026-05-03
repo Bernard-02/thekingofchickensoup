@@ -17,6 +17,9 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
 
+    <!-- FontAwesome icons (社群圖示用) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -73,6 +76,22 @@
     </div>
 
     <!-- 聊天：自由輸入（學徒對話） -->
+    <!-- 聊天前提示：第一次進雞湯學徒路線時，先說明接下來要跟 AI 對話 -->
+    <div id="chat-intro-view" class="view-container">
+        <div class="flex flex-col items-center justify-center min-h-screen p-8">
+            <div class="max-w-2xl mx-auto text-center w-full">
+                <p class="mb-2" style="opacity: 0.6; font-size: 0.95rem;">接下來</p>
+                <h2 class="font-medium text-black mb-10" style="text-wrap: balance;">請跟雞湯學徒對話</h2>
+                <p class="mb-12" style="opacity: 0.7; line-height: 1.8; text-wrap: balance;">
+                    說說你最近的狀況，<br>
+                    學徒會根據你的故事，<br>
+                    熬一句專屬於你的雞湯。
+                </p>
+                <button class="primary-btn" onclick="enterChatView()">確定</button>
+            </div>
+        </div>
+    </div>
+
     <div id="chat-view" class="view-container">
         <div class="h-screen flex flex-col w-full" style="padding-bottom: 110px;">
             <!-- 對話區：可滾動，但隱藏 scrollbar（保留滑鼠/觸控滑動行為）-->
@@ -83,6 +102,11 @@
             </div>
             <!-- 輸入框：對話內容置中對齊，跟 scrollbar 區隔開 -->
             <div class="max-w-2xl mx-auto w-full px-6">
+                <!-- 對話卡住時的逃脫提示：來回 5+ 次後 slide up 出現 -->
+                <div id="stuck-hint">
+                    <span>對話卡住了？</span>
+                    <button onclick="retryChatInput()">重新開始這個對話</button>
+                </div>
                 <div id="chat-input-wrapper" class="w-full border border-black flex flex-col gap-3 p-4" style="background: transparent;">
                     <p id="chat-retry-hint" class="mb-2 opacity-70" style="font-size:0.9rem; line-height:1.5; display:none; text-wrap:balance;"></p>
                     <textarea id="chat-input"
@@ -112,7 +136,7 @@
                     <p class="mb-4 opacity-50" style="font-size: 1rem;">雞湯熬太久了，再試一次？</p>
                     <div class="flex gap-4 justify-center">
                         <button onclick="retryLastChat()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">再試一次</button>
-                        <button onclick="restart()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">回到首頁</button>
+                        <button onclick="goBackToChat()" class="primary-btn transition-colors" style="background-color: transparent; color: #000; border: 1px solid #000;" onmouseenter="this.style.backgroundColor='#000';this.style.color='#fff'" onmouseleave="this.style.backgroundColor='transparent';this.style.color='#000'">回到對話</button>
                     </div>
                 </div>
             </div>
@@ -126,6 +150,7 @@
             <div id="chat-result-actions" class="absolute flex flex-col items-start gap-2" style="display: none; top: clamp(12px, 3vw, 32px); left: clamp(12px, 3vw, 32px);">
                 <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="restart()">← Start Over</button>
                 <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="retryChatInput()">← Try Again</button>
+                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="goBackToFork()">← Back to Fork</button>
             </div>
 
             <!-- 中央：雞湯文字 -->
@@ -237,17 +262,20 @@
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
                 <p id="reveal-number" class="en font-normal mb-4" style="font-size: 2rem;"></p>
-                <h2 id="reveal-zh" class="font-medium text-black mb-4" style="text-wrap: balance; line-break: strict;"></h2>
-                <h4 id="reveal-en" class="en font-normal text-black mb-12" style="text-wrap: balance;"></h4>
-                <div class="flex flex-row items-center justify-center gap-4">
-                    <button class="primary-btn en" onclick="restart()">Start over</button>
-                    <button class="primary-btn btn-solid en" onclick="goToWebsite()">Explore</button>
+                <h2 id="reveal-zh" class="font-medium text-black mb-6" style="text-wrap: balance; line-break: strict;"></h2>
+
+                <h4 id="reveal-en" class="en font-normal text-black mb-8" style="text-wrap: balance;"></h4>
+
+                <!-- 雞湯王 + 翻書提示（縮小、置中、mascot 在左、文字在右、單行不換行）-->
+                <div id="reveal-mascot-hint" class="flex items-center justify-center gap-3 mb-12" style="display: none;">
+                    <img src="Images/雞湯王.png" alt="" style="width: 80px; height: auto;">
+                    <p style="background: transparent; color: rgba(0,0,0,0.6); font-size: 1.15rem; text-align: left; margin: 0; line-height: 1.5; white-space: nowrap;">翻閱書本查看這句話的脈絡</p>
                 </div>
-            </div>
-            <!-- 右下角雞湯王：提示翻書查脈絡 -->
-            <div id="reveal-mascot-hint" style="position: fixed; bottom: 28px; right: 28px; display: none; flex-direction: column; align-items: flex-end; gap: 8px; pointer-events: none;">
-                <p style="background: transparent; color: rgba(0,0,0,0.6); font-size: 0.95rem; text-wrap: balance; text-align: right; margin: 0;">翻閱書本<br>查看這句話的脈絡</p>
-                <img src="Images/雞湯王.png" alt="" style="width: 160px; height: auto;">
+
+                <div id="reveal-buttons" class="flex flex-row items-center justify-center gap-4">
+                    <button class="primary-btn en" onclick="restart()">Start over</button>
+                    <button class="primary-btn btn-solid en" onclick="goToWebsite()">Project Detail</button>
+                </div>
             </div>
         </div>
     </div>
@@ -256,12 +284,12 @@
     <div id="info-website-view" class="view-container">
         <div class="flex w-full h-screen">
             <!-- 左半邊：導航區塊 -->
-            <div class="w-1/2 h-full relative flex flex-col justify-start p-8">
-                <!-- 返回按鈕 -->
-                <button onclick="restart()" class="en hover-underline absolute top-8 left-8 text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;">← Start over</button>
+            <div class="w-1/2 h-full flex flex-col justify-start p-8 gap-12">
+                <!-- 返回按鈕（在自然流中，跟 About 同一個左邊界）-->
+                <button onclick="restart()" class="en hover-underline w-fit text-base font-normal" style="background:none;border:none;cursor:pointer;color:#000;padding:0;">← Start over</button>
 
                 <!-- 選單按鈕 -->
-                <div class="flex flex-col gap-2 mt-16" id="info-nav">
+                <div class="flex flex-col gap-2" id="info-nav">
                     <button onclick="switchInfoTab('about')" id="tab-btn-about" class="en info-nav-btn text-left font-normal">About</button>
                     <button onclick="switchInfoTab('research')" id="tab-btn-research" class="en info-nav-btn text-left font-normal">Research</button>
 
@@ -325,8 +353,15 @@
                         </div>
                         <!-- 社群連結 -->
                         <div class="flex flex-col gap-2">
-                            <button type="button" onclick="showQRCode('https://www.instagram.com/thekingofchickensoup/', 'Instagram')" class="en hover-underline w-fit" style="background:none;border:none;padding:0;color:#000;cursor:pointer;font-size:inherit;">Instagram</button>
-                            <button type="button" onclick="showQRCode('https://www.threads.com/@thekingofchickensoup', 'Threads')" class="en hover-underline w-fit" style="background:none;border:none;padding:0;color:#000;cursor:pointer;font-size:inherit;">Threads</button>
+                            <h5 class="en font-medium mb-1">Social links</h5>
+                            <button type="button" onclick="showQRCode('https://www.instagram.com/thekingofchickensoup/', 'Instagram')" class="en hover-underline w-fit social-link-btn" style="background:none;border:none;padding:0 0 0 4px;color:#000;cursor:pointer;font-size:inherit;display:inline-flex;align-items:center;gap:8px;">
+                                <i class="fa-brands fa-instagram"></i>
+                                <span>Instagram</span>
+                            </button>
+                            <button type="button" onclick="showQRCode('https://www.threads.com/@thekingofchickensoup', 'Threads')" class="en hover-underline w-fit social-link-btn" style="background:none;border:none;padding:0 0 0 4px;color:#000;cursor:pointer;font-size:inherit;display:inline-flex;align-items:center;gap:8px;">
+                                <i class="fa-brands fa-threads"></i>
+                                <span>Threads</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -579,6 +614,16 @@
         <span id="ws-status-text">未連線</span>
     </div>
 
+    <!-- 測試面板：用按鈕模擬 NFC 掃描，方便沒實體卡時開發 -->
+    <!-- 預設隱藏；按 Ctrl+Shift+T 或在 console 跑 toggleTestMode() 顯示 -->
+    <div id="test-panel" class="test-panel">
+        <div class="test-panel-title">測試 <span class="test-panel-hint">Ctrl+Shift+T 開關</span></div>
+        <button class="test-btn" onclick="testSimWildcard()">萬用卡</button>
+        <button class="test-btn" onclick="testSimAI()">AI 解鎖卡</button>
+        <button class="test-btn" onclick="testSimMatchingBottle()">對應瓶子</button>
+        <button class="test-btn" onclick="testSimHoldEnd()">卡離開（hold end）</button>
+    </div>
+
     <!-- JavaScript -->
     <!-- ReconnectingWebSocket：自動重連 + 指數 backoff + 連線 timeout，pladaria/reconnecting-websocket v4.4.0 -->
     <!-- 暴露 window.ReconnectingWebSocket，nfc.js 直接拿來用 -->
@@ -693,5 +738,6 @@
     </script>
 
     <script src="js/main.js"></script>
+    <script src="js/test-mode.js"></script>
 </body>
 </html>
