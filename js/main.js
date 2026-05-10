@@ -394,16 +394,25 @@ function renderQuestion(index) {
     const confirmBtn = document.getElementById('confirm-question');
     confirmBtn.classList.remove('visible');
 
-    // 右下角雞湯王：單選題才顯示，預設睜眼
+    // 右下角雞湯王：所有題型都顯示，預設睜眼；container-choice 預設沒輔助文字，點擊鍋子才出現
     const mascot = document.getElementById('question-mascot');
-    if (mascot) {
-        if (q.type === 'container-choice') {
-            mascot.style.display = 'none';
-        } else {
-            mascot.src = 'Images/雞湯王.png';
-            mascot.style.display = '';
-        }
+    const mascotWrap = document.getElementById('question-mascot-wrap');
+    const mascotHint = document.getElementById('question-mascot-hint');
+    if (mascot) mascot.src = 'Images/雞湯王.png';
+    if (mascotHint) {
+        mascotHint.textContent = '';
+        mascotHint.style.opacity = '0';
     }
+    if (mascotWrap) mascotWrap.style.display = 'flex';
+
+    // 左下角雞湯學徒：只在 container-choice 出現
+    const mascotWrapLeft = document.getElementById('question-mascot-wrap-left');
+    const mascotHintLeft = document.getElementById('question-mascot-hint-left');
+    if (mascotHintLeft) {
+        mascotHintLeft.textContent = '';
+        mascotHintLeft.style.opacity = '0';
+    }
+    if (mascotWrapLeft) mascotWrapLeft.style.display = (q.type === 'container-choice') ? 'flex' : 'none';
 
     // 題目 fade in 0.6s 結束後選項緊接進場
     const optionStartDelay = 0.65;
@@ -453,6 +462,19 @@ const CONTAINER_IMAGE_BY_TITLE = {
     '雞湯王的鍋子':   'Images/雞湯王的鍋子.png',
 };
 
+// 容器選擇題：點擊鍋子後，對應 mascot 旁邊顯示的說明文字
+// 學徒（左）自己講第一人稱；王（右）講自己的鍋子
+const CONTAINER_HINT_BY_TITLE = {
+    '雞湯學徒的鍋子': '我跟著雞湯王學煮雞湯已經有3個月的時間了',
+    '雞湯王的鍋子':   '我用了接近1年熬製的雞湯，還不來品嘗？',
+};
+
+// 哪個鍋子由哪一邊的 mascot 出聲（'left' = 學徒, 'right' = 王）
+const CONTAINER_SIDE_BY_TITLE = {
+    '雞湯學徒的鍋子': 'left',
+    '雞湯王的鍋子':   'right',
+};
+
 function renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay) {
     optionsContainer.classList.add('container-choice-layout');
 
@@ -496,6 +518,19 @@ function renderContainerChoice(q, optionsContainer, confirmBtn, optionStartDelay
             currentSelectedValue = opt.value;
             currentSelectedOption = opt;
             confirmBtn.classList.add('visible');
+            // 哪一邊出聲：學徒鍋子 → 左邊學徒；王鍋子 → 右邊王。另一邊清空。
+            const side = CONTAINER_SIDE_BY_TITLE[opt.title];
+            const text = CONTAINER_HINT_BY_TITLE[opt.title] || '';
+            const mascotHint = document.getElementById('question-mascot-hint');
+            const mascotHintLeft = document.getElementById('question-mascot-hint-left');
+            if (mascotHint) {
+                mascotHint.textContent = (side === 'right') ? text : '';
+                mascotHint.style.opacity = (side === 'right' && text) ? '1' : '0';
+            }
+            if (mascotHintLeft) {
+                mascotHintLeft.textContent = (side === 'left') ? text : '';
+                mascotHintLeft.style.opacity = (side === 'left' && text) ? '1' : '0';
+            }
         });
     });
 }
@@ -614,30 +649,32 @@ function showIngredientView() {
 // 之後實際出圖時，把 setup 函式內的 div / 邊框換成圖檔即可，邏輯都不需要動
 const COOKING_STEPS = [
     { title: '剁碎食材',  hint: '按一下空白鍵，把當前的食材剁好',                type: 'chop'   },
-    { title: '加水',      hint: '長按空白鍵注水，到 lvl 水位線時放開',           type: 'water'  },
-    { title: '開火',      hint: '長按空白鍵點火，火力進到 perfect 區再放開',     type: 'fire'   },
+    { title: '加水',      hint: '長按空白鍵注水',                                 type: 'water'  },
+    { title: '開火',      hint: '指標移動到最佳火候時，按空白鍵開火',             type: 'fire'   },
     { title: '撈去浮沫',  hint: '勺子轉到浮沫上時，按空白鍵把它撈起',            type: 'skim'   },
     { title: '撒調味料',  hint: '節奏對到判定圈時，按空白鍵撒下',                type: 'season' },
 ];
 
 // Step 1 食材順序（之後可以改成從 quiz 結果動態決定）
+// raw = 原始食材；chopped = 剁碎後的版本，按下空白鍵時 swap 圖片
 const STEP1_INGREDIENTS = [
-    { label: '雞肉' },
-    { label: '葱'   },
-    { label: '薑'   },
-    { label: '蒜'   },
+    { label: '雞肉', raw: 'Images/雞.png', chopped: 'Images/切了的雞.png', sizeClass: 'chop-shape--chicken' },
+    { label: '葱',   raw: 'Images/葱.png', chopped: 'Images/切了的葱.png' },
+    { label: '薑',   raw: 'Images/薑.png', chopped: 'Images/切了的薑.png', sizeClass: 'chop-shape--ginger' },
+    { label: '蒜',   raw: 'Images/蒜.png', chopped: 'Images/切了的蒜.png', sizeClass: 'chop-shape--garlic' },
 ];
 
 // Step 2 加水
-const STEP2_FILL_MS      = 1800;   // 0 → 100% 全長按時間
-const STEP2_TARGET_LEVEL = 0.78;
-const STEP2_PERFECT_TOL  = 0.06;
-const STEP2_OKAY_FLOOR   = 0.55;
+const STEP2_FILL_MS        = 1800;   // 0 → 100% 全長按時間
+const STEP2_TARGET_LEVEL   = 0.55;   // perfect 水位（鍋身中間偏低，避免逼觀眾填到接近滿）
+const STEP2_PERFECT_TOL    = 0.06;
+const STEP2_OKAY_FLOOR     = 0.40;
+const STEP2_OVERFLOW_LEVEL = 0.80;   // 超過 → 溢出來，判定 fail
 
 // Step 3 開火（賽車起跑風格：指針自動往右跑，按空白鍵停下；perfect 區在 bar 中段）
 const STEP3_SWEEP_MS     = 2400;   // 指針從左到右掃完整條的時間
-const STEP3_PERFECT_MIN  = 0.55;
-const STEP3_PERFECT_MAX  = 0.75;
+const STEP3_PERFECT_MIN  = 0.65;
+const STEP3_PERFECT_MAX  = 0.82;
 const STEP3_OKAY_TOL     = 0.18;
 
 // Step 4 撈浮沫
@@ -695,27 +732,51 @@ window.goToCooking = function() {
 // 熬製前的提示畫面：藏掉鍋子舞台 + 下方進度條，露提示文字 + 「確定」按鈕
 // 點按鈕 → 揭曉舞台 + 開始 step 0
 function showCookingIntro() {
-    const titleEl  = document.getElementById('cooking-step-title');
-    const hintEl   = document.getElementById('cooking-hint');
-    const kwEl     = document.getElementById('cooking-keyword');
-    const stage    = document.getElementById('cooking-stage');
-    const ctrls    = document.getElementById('cooking-controls');
-    const progress = document.getElementById('cooking-progress-boxes');
+    const titleEl   = document.getElementById('cooking-step-title');
+    const hintEl    = document.getElementById('cooking-hint');
+    const hintWrap  = document.getElementById('cooking-hint-wrap');
+    const hintIconEl= document.getElementById('cooking-hint-icon');
+    const kwEl      = document.getElementById('cooking-keyword');
+    const stage     = document.getElementById('cooking-stage');
+    const ctrls     = document.getElementById('cooking-controls');
+    const progress  = document.getElementById('cooking-progress-boxes');
+    const stepProg  = document.getElementById('cooking-step-progress');
 
-    // intro 期間藏掉鍋子舞台跟下方進度條（觀眾還沒進到步驟，先別暴雷）
-    if (stage)    stage.style.visibility    = 'hidden';
-    if (progress) progress.style.visibility = 'hidden';
+    // intro 期間藏掉鍋子舞台 + 下方進度條 + 上方步驟編號（還沒進到步驟，先別暴雷）
+    // 用 display:none 把佔位也收掉，避免空白鍵圖被推到下方
+    if (stage)    stage.style.display    = 'none';
+    if (progress) progress.style.display = 'none';
+    if (stepProg) stepProg.style.display = 'none';
+    // intro 不顯示左邊小雞湯王（那是步驟內的提示用）
+    if (hintIconEl) hintIconEl.style.display = 'none';
 
-    // 視覺順序：小副標「接下來的步驟」→ 大標「請用空白鍵進行互動」
-    // DOM 自然順序是 title 先 hint 後，這裡暫時把 hint 移到 title 前面
+    // 視覺順序：小副標「接下來」→ 大標「請用空白鍵進行互動」
+    // DOM 自然順序是 title 先 hint(wrap) 後，這裡暫時把 wrap 移到 title 前面
     const parent = titleEl && titleEl.parentNode;
-    if (parent && hintEl && hintEl.parentNode === parent) {
-        parent.insertBefore(hintEl, titleEl);
+    if (parent && hintWrap && hintWrap.parentNode === parent) {
+        parent.insertBefore(hintWrap, titleEl);
     }
 
-    if (hintEl)  hintEl.textContent  = '接下來的步驟';
-    if (titleEl) titleEl.textContent = '請用空白鍵進行互動';
-    if (kwEl)    { kwEl.textContent = ''; kwEl.style.opacity = 0; }
+    if (hintEl)  hintEl.textContent  = '接下來';
+    if (titleEl) {
+        titleEl.textContent = '請用空白鍵進行互動';
+        titleEl.style.marginBottom = '72px'; // intro 的標題到鍵盤圖之間留比較多空間
+    }
+    // intro 不需要 keyword 區塊，整個收掉避免留白
+    if (kwEl)    { kwEl.textContent = ''; kwEl.style.opacity = 0; kwEl.style.display = 'none'; }
+
+    // 空白鍵示意圖（只在 intro 顯示，按確定後移除）
+    let introImg = document.getElementById('cooking-intro-img');
+    if (!introImg && ctrls && ctrls.parentNode) {
+        introImg = document.createElement('img');
+        introImg.id = 'cooking-intro-img';
+        introImg.src = 'Images/空白鍵.png';
+        introImg.alt = '';
+        introImg.style.cssText = 'display: block; margin: 0 auto 32px; width: 220px; height: auto;';
+        ctrls.parentNode.insertBefore(introImg, ctrls);
+    } else if (introImg) {
+        introImg.style.display = 'block';
+    }
 
     if (ctrls) {
         ctrls.innerHTML = '';
@@ -723,17 +784,24 @@ function showCookingIntro() {
         btn.className = 'primary-btn';   // 預設 border 樣式，hover 才填黑
         btn.textContent = '確定';
         btn.addEventListener('click', () => {
-            // 還原 DOM 順序，title 回到 hint 前面（讓 step 0 顯示正常的大標→小提示）
-            if (parent && titleEl && hintEl) parent.insertBefore(titleEl, hintEl);
-            // 還原舞台 + 進度條
-            if (stage)    stage.style.visibility    = '';
-            if (progress) progress.style.visibility = '';
+            // 移除空白鍵示意圖
+            const img = document.getElementById('cooking-intro-img');
+            if (img) img.remove();
+            // 還原 DOM 順序，title 回到 hint(wrap) 前面（讓 step 0 顯示正常的大標→小提示）
+            if (parent && titleEl && hintWrap) parent.insertBefore(titleEl, hintWrap);
+            // 還原 intro 期間蓋掉的 inline 樣式
+            if (titleEl) titleEl.style.marginBottom = '';
+            if (kwEl)    kwEl.style.display = '';
+            // 還原舞台 + 進度條 + 步驟編號（renderCookingStep 會重設文字）
+            if (stage)    stage.style.display    = '';
+            if (progress) progress.style.display = '';
+            if (stepProg) stepProg.style.display = '';
             renderCookingStep();
         });
         ctrls.appendChild(btn);
     }
 
-    gsap.fromTo([hintEl, titleEl, ctrls],
+    gsap.fromTo([hintEl, titleEl, introImg, ctrls].filter(Boolean),
         { opacity: 0, y: 12 },
         { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out', stagger: 0.1 }
     );
@@ -759,40 +827,46 @@ function registerCookingCleanup(fn) {
 }
 
 function buildCookingProgressBoxes() {
-    const container = document.getElementById('cooking-progress-boxes');
-    container.innerHTML = '';
-    for (let i = 0; i < COOKING_STEPS.length; i++) {
-        const box = document.createElement('div');
-        box.className = 'cooking-progress-box';
-        const fill = document.createElement('div');
-        fill.className = 'cooking-progress-fill';
-        box.appendChild(fill);
-        container.appendChild(box);
-    }
+    // 一條長條的結構寫死在 index.html，這裡只負責把 fill / icon 重設到起點
+    const fill = document.querySelector('#cooking-progress-boxes .cooking-progress-fill');
+    const icon = document.querySelector('#cooking-progress-boxes .cooking-progress-icon');
+    if (fill) fill.style.width = '0%';
+    if (icon) icon.style.left  = '0%';
 }
 
-// 更新第 step box 的 fill 百分比（0~1），前面的 box 強制 100%、後面的 0%
+// 整體進度 = (已完成 step + 當前 step 內 fraction) / 總 step 數
+// 每個 step 各佔總長的 1/5，跑完 5 次填滿整條；icon 跟著前緣走
 function updateCookingBoxFill(step, fraction) {
-    const fills = document.querySelectorAll('#cooking-progress-boxes .cooking-progress-fill');
-    fills.forEach((f, i) => {
-        if (i < step)        f.style.width = '100%';
-        else if (i === step) f.style.width = Math.min(100, Math.max(0, fraction) * 100) + '%';
-        else                 f.style.width = '0%';
-    });
+    const fill = document.querySelector('#cooking-progress-boxes .cooking-progress-fill');
+    const icon = document.querySelector('#cooking-progress-boxes .cooking-progress-icon');
+    if (!fill) return;
+    const total = COOKING_STEPS.length;
+    const f = Math.min(1, Math.max(0, fraction));
+    const pct = ((step + f) / total) * 100;
+    fill.style.width = pct + '%';
+    if (icon) icon.style.left = pct + '%';
 }
 
 function renderCookingStep() {
     const step = COOKING_STEPS[cookingStepIndex];
     if (!step) return;
 
-    const titleEl = document.getElementById('cooking-step-title');
-    const hintEl  = document.getElementById('cooking-hint');
-    const kwEl    = document.getElementById('cooking-keyword');
-    const stage   = document.getElementById('cooking-stage');
-    const ctrls   = document.getElementById('cooking-controls');
+    const titleEl    = document.getElementById('cooking-step-title');
+    const hintEl     = document.getElementById('cooking-hint');
+    const hintIconEl = document.getElementById('cooking-hint-icon');
+    const kwEl       = document.getElementById('cooking-keyword');
+    const stage      = document.getElementById('cooking-stage');
+    const ctrls      = document.getElementById('cooking-controls');
+    const progressEl = document.getElementById('cooking-step-progress');
 
     titleEl.textContent = step.title;
     if (hintEl) hintEl.textContent = step.hint;
+    // 步驟頁顯示左邊小雞湯王 icon（intro 提示頁會藏起來）
+    if (hintIconEl) hintIconEl.style.display = '';
+    if (progressEl) {
+        progressEl.textContent = `${cookingStepIndex + 1} / ${COOKING_STEPS.length}`;
+        progressEl.style.visibility = 'visible';
+    }
     if (kwEl)  { kwEl.textContent = ''; kwEl.className = 'mb-4'; kwEl.style.opacity = 0; }
     if (ctrls) ctrls.innerHTML = '';
     if (stage) stage.innerHTML = '';
@@ -845,17 +919,17 @@ function showCookingFeedback(text, level) {
 }
 
 // ============= STEP 1: 剁碎食材 =============
-// 4 個食材並排，目前 active 的有外框 highlight。按一下空白鍵 → 刀子掉下、食材變剁碎狀，往下一個
+// 4 個食材並排：active 的有 highlight，左邊已切的會留著（看到剁碎成品）。按一下空白鍵 → 砍當前 → 移到下一個
 function setupStep1Chop() {
     const stage = document.getElementById('cooking-stage');
-    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(480px, 92vw); height: 200px; display: flex; align-items: center; justify-content: center; gap: 1.5rem;';
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(800px, 92vw); height: 240px; display: flex; align-items: center; justify-content: center; gap: 1.8rem;';
 
     const boxes = [];
     STEP1_INGREDIENTS.forEach((ing, i) => {
         const box = document.createElement('div');
         box.className = 'chop-ingredient' + (i === 0 ? ' active' : '');
         box.innerHTML = `
-            <div class="chop-shape"></div>
+            <img class="chop-shape${ing.sizeClass ? ' ' + ing.sizeClass : ''}" src="${ing.raw}" data-chopped="${ing.chopped}" alt="${ing.label}">
             <div class="chop-label">${ing.label}</div>
         `;
         stage.appendChild(box);
@@ -867,51 +941,83 @@ function setupStep1Chop() {
     });
 
     let chopIdx = 0;
+    let isChopping = false;
     cookingKey.down = () => {
+        if (isChopping) return;
         if (chopIdx >= STEP1_INGREDIENTS.length) return;
+        isChopping = true;
         const box = boxes[chopIdx];
         const shape = box.querySelector('.chop-shape');
+        const localIdx = chopIdx;
 
-        const knife = document.createElement('div');
+        const knife = document.createElement('img');
         knife.className = 'chop-knife';
+        knife.src = 'Images/菜刀.png';
+        knife.alt = '';
         box.appendChild(knife);
+        gsap.set(knife, { xPercent: -50, x: 0 });
         gsap.fromTo(knife,
-            { y: -50, opacity: 1 },
-            { y: 25, duration: 0.14, ease: 'power3.in',
+            { y: -110, opacity: 1 },
+            { y: 10, duration: 0.14, ease: 'power3.in',
               onComplete: () => {
+                  // 砍下去的瞬間：swap 圖、把 active 從當前換到下一個
+                  if (shape && shape.dataset.chopped) shape.src = shape.dataset.chopped;
                   shape.classList.add('chopped');
-                  gsap.to(knife, { y: -60, opacity: 0, duration: 0.2, ease: 'power2.out',
-                      onComplete: () => knife.remove() });
+                  box.classList.remove('active');
+                  const next = boxes[localIdx + 1];
+                  if (next) next.classList.add('active');
+
+                  gsap.to(knife, { y: -130, opacity: 0, duration: 0.2, ease: 'power2.out',
+                      onComplete: () => {
+                          knife.remove();
+                          isChopping = false;
+                      }
+                  });
                   gsap.fromTo(box, { x: -3 }, { x: 3, duration: 0.05, repeat: 3, yoyo: true, clearProps: 'x' });
               }
             }
         );
 
-        box.classList.remove('active');
         chopIdx++;
-        if (boxes[chopIdx]) boxes[chopIdx].classList.add('active');
         updateCookingBoxFill(cookingStepIndex, chopIdx / STEP1_INGREDIENTS.length);
         if (chopIdx >= STEP1_INGREDIENTS.length) {
-            scheduleCookingTimeout(advanceCookingStep, 600);
+            scheduleCookingTimeout(advanceCookingStep, 800);
         }
     };
 }
 
 // ============= STEP 2: 加水 =============
-// 直立容器（玻璃杯）+ 水位線。長按空白鍵 → 從底部往上注水。放開 → 評分（perfect / 還好 / 不夠水）
+// 鍋子 PNG 在前 + 黑色水填在鍋子後面。長按空白鍵 → 水位往上長。放開 → 評分（perfect / 還好 / 不夠水）
 function setupStep2Water() {
     const stage = document.getElementById('cooking-stage');
-    stage.style.cssText = 'position: relative; margin: 0 auto; width: 140px; height: 320px; display: flex; align-items: flex-end; justify-content: center;';
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: 360px; height: 220px;';
 
     const jar = document.createElement('div');
     jar.className = 'water-jar';
     jar.innerHTML = `
-        <div class="water-fill"></div>
+        <img class="water-fill-img" src="Images/鍋子fill.png" alt="">
+        <img class="water-pot-img" src="Images/鍋子.png" alt="">
         <div class="water-target-line" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;"></div>
-        <span class="water-lvl-label" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;">lvl</span>
+        <span class="water-lvl-label" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;">適量</span>
     `;
     stage.appendChild(jar);
-    const fillEl = jar.querySelector('.water-fill');
+    const fillEl = jar.querySelector('.water-fill-img');
+
+    // 水位用 clip-path 從鍋底往上揭曉鍋身剪影；頂部 polygon 帶微弧不會是鋒利直線
+    const setWaterLevel = (lvl) => {
+        const v = Math.min(1, Math.max(0, lvl));
+        const top = 100 - v * 100;  // 可見水面在元素裡的 y%（從上算）
+        fillEl.style.clipPath = `polygon(
+            0% 100%,
+            0% ${top + 3}%,
+            25% ${top + 1.5}%,
+            50% ${top}%,
+            75% ${top + 1.5}%,
+            100% ${top + 3}%,
+            100% 100%
+        )`;
+    };
+    setWaterLevel(0);
 
     let level = 0;
     let pressStart = 0;
@@ -928,7 +1034,7 @@ function setupStep2Water() {
         timerId = setInterval(() => {
             const elapsed = performance.now() - pressStart;
             const cur = Math.min(1, level + elapsed / STEP2_FILL_MS);
-            fillEl.style.height = (cur * 100) + '%';
+            setWaterLevel(cur);
             if (cur >= 1) stopFill();
         }, 16);
     };
@@ -940,9 +1046,11 @@ function setupStep2Water() {
         done = true;
 
         let label, lvKind;
-        if (Math.abs(level - STEP2_TARGET_LEVEL) <= STEP2_PERFECT_TOL) { label = 'Perfect！'; lvKind = 'perfect'; }
-        else if (level >= STEP2_OKAY_FLOOR)                            { label = '還好';      lvKind = 'okay';    }
-        else                                                            { label = '不夠水';    lvKind = 'fail';    }
+        if (level >= STEP2_OVERFLOW_LEVEL)                                   { label = '太多了';  lvKind = 'fail';    }
+        else if (level > STEP2_TARGET_LEVEL + STEP2_PERFECT_TOL)            { label = '有點多';  lvKind = 'okay';    }
+        else if (Math.abs(level - STEP2_TARGET_LEVEL) <= STEP2_PERFECT_TOL) { label = '剛剛好';  lvKind = 'perfect'; }
+        else if (level >= STEP2_OKAY_FLOOR)                                  { label = '有點少';  lvKind = 'okay';    }
+        else                                                                  { label = '太少了';  lvKind = 'fail';    }
 
         showCookingFeedback(label, lvKind);
         // 不再用 level 更新進度條（會看到 75% 卡一下才滿）
@@ -956,14 +1064,35 @@ function setupStep2Water() {
 // 停在 perfect 區 = 火力剛好；其他位置就 perfect=否
 function setupStep3Fire() {
     const stage = document.getElementById('cooking-stage');
-    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(460px, 92vw); height: 200px; display: flex; align-items: center; justify-content: center;';
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(460px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0;';
 
+    // 鍋子圖（側視輪廓）
+    const pot = document.createElement('img');
+    pot.src = 'Images/開火鍋子.png';
+    pot.alt = '';
+    pot.style.cssText = 'width: 200px; max-width: 90%; height: auto; object-fit: contain;';
+    stage.appendChild(pot);
+
+    // 5 個火圖示（鍋子正下方，預設半透明，結果後從中心向外點亮）
+    const fireRow = document.createElement('div');
+    fireRow.className = 'fire-icons-row';
+    const fireEls = [1, 2, 3, 4, 5].map(n => {
+        const img = document.createElement('img');
+        img.src = `Images/火0${n}.png`;
+        img.alt = '';
+        img.className = 'fire-icon';
+        fireRow.appendChild(img);
+        return img;
+    });
+    stage.appendChild(fireRow);
+
+    // 橫向 bar
     const bar = document.createElement('div');
     bar.className = 'fire-bar';
     bar.innerHTML = `
         <div class="fire-perfect-zone"
              style="left: ${STEP3_PERFECT_MIN * 100}%; width: ${(STEP3_PERFECT_MAX - STEP3_PERFECT_MIN) * 100}%;"></div>
-        <span class="fire-zone-label" style="left: ${(STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2 * 100}%;">perfect</span>
+        <span class="fire-zone-label" style="left: ${(STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2 * 100}%;">最佳火候</span>
         <div class="fire-indicator"></div>
     `;
     stage.appendChild(bar);
@@ -972,13 +1101,11 @@ function setupStep3Fire() {
     let startTime = performance.now();
     let timerId = null;
     let done = false;
-    let position = 0;   // 0~1 指針目前在哪
+    let position = 0;
 
     const tick = () => {
         if (done) return;
         const elapsed = performance.now() - startTime;
-        position = (elapsed % STEP3_SWEEP_MS) / STEP3_SWEEP_MS;
-        // 來回掃：0→1→0 連續循環，給觀眾多次機會（節奏感更像 pre-start）
         const phase = (elapsed / STEP3_SWEEP_MS) % 2;
         const visualPos = phase <= 1 ? phase : 2 - phase;
         position = visualPos;
@@ -995,16 +1122,25 @@ function setupStep3Fire() {
 
         const center = (STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2;
         let label, lvKind;
-        if (level >= STEP3_PERFECT_MIN && level <= STEP3_PERFECT_MAX) { label = 'Perfect！'; lvKind = 'perfect'; }
-        else if (Math.abs(level - center) <= STEP3_OKAY_TOL)          { label = '還好';      lvKind = 'okay';    }
-        else if (level < STEP3_PERFECT_MIN)                            { label = '火不夠';    lvKind = 'fail';    }
-        else                                                            { label = '火太大';    lvKind = 'fail';    }
+        if (level >= STEP3_PERFECT_MIN && level <= STEP3_PERFECT_MAX) { label = '剛剛好';  lvKind = 'perfect'; }
+        else if (Math.abs(level - center) <= STEP3_OKAY_TOL)          { label = '還可以';  lvKind = 'okay';    }
+        else if (level < STEP3_PERFECT_MIN)                            { label = '火不夠';  lvKind = 'fail';    }
+        else                                                            { label = '火太大';  lvKind = 'fail';    }
+
+        // 點亮火圖示：perfect=5個、okay=中間3個、fail=中間1個，從中心向外漸入
+        const litIndices = lvKind === 'perfect' ? [0,1,2,3,4]
+                         : lvKind === 'okay'    ? [1,2,3]
+                         :                        [2];
+        fireEls.forEach((el, i) => {
+            if (litIndices.includes(i)) {
+                gsap.to(el, { opacity: 1, duration: 0.3, delay: Math.abs(i - 2) * 0.12, ease: 'power2.out' });
+            }
+        });
 
         showCookingFeedback(label, lvKind);
-        // 進度條維持 0，advanceCookingStep 會直接拉到 1
-        scheduleCookingTimeout(advanceCookingStep, 1300);
+        scheduleCookingTimeout(advanceCookingStep, 1400);
     };
-    cookingKey.up = null;   // 不用 up handler；只看單次 down
+    cookingKey.up = null;
 }
 
 // ============= STEP 4: 撈去浮沫（俯視） =============
@@ -1012,47 +1148,58 @@ function setupStep3Fire() {
 function setupStep4Skim() {
     const stage = document.getElementById('cooking-stage');
     const POT = 320;
-    stage.style.cssText = `position: relative; margin: 0 auto; width: ${POT}px; height: ${POT}px;`;
+    stage.style.cssText = `position: relative; margin: 0 auto; margin-top: -40px; width: ${POT}px; height: ${POT}px;`;
 
-    const pot = document.createElement('div');
+    const pot = document.createElement('img');
+    pot.src = 'Images/俯視雞湯.png';
+    pot.alt = '';
     pot.className = 'pot-top';
     stage.appendChild(pot);
 
     const cx = POT / 2, cy = POT / 2;
-    const orbitR = POT * 0.40;
+    const orbitR = POT * 0.28;
 
-    // 把浮沫放在 orbit 圓周附近，角度盡量分散
-    const angles = [];
-    let tries = 0;
-    while (angles.length < STEP4_FOAM_COUNT && tries < 300) {
-        const a = Math.random() * Math.PI * 2;
-        const tooClose = angles.some(b => {
-            let d = Math.abs(a - b);
-            d = Math.min(d, Math.PI * 2 - d);
-            return d < Math.PI / 5;
-        });
-        if (!tooClose) angles.push(a);
-        tries++;
-    }
-    while (angles.length < STEP4_FOAM_COUNT) angles.push(Math.random() * Math.PI * 2);
+    // 浮沫從頂部（-π/2）順時針等間距排列，01 在最頂
+    const angles = Array.from({ length: STEP4_FOAM_COUNT }, (_, i) =>
+        -Math.PI / 2 + (Math.PI * 2 / STEP4_FOAM_COUNT) * i
+    );
+
+    // 濾網圖的網面中心在圖寬 28%、圖高 63% 處（依顯示尺寸 124×82px 計算）
+    const MESH_PX = 124 * 0.28;  // ≈ 35px，定位用的左偏移
+    const MESH_PY = 82 * 0.63;   // ≈ 52px，定位用的上偏移
+    // 圖中把柄方向約 -40°（右上），旋轉公式補上這個偏移讓把柄朝外
+    const SPOON_ANGLE_OFFSET = 40;
 
     const foams = angles.map((a, i) => {
-        const r = orbitR * (0.92 + Math.random() * 0.16);
-        const x = cx + Math.cos(a) * r;
-        const y = cy + Math.sin(a) * r;
-        const el = document.createElement('div');
+        const x = cx + Math.cos(a) * orbitR;
+        const y = cy + Math.sin(a) * orbitR;
+        const el = document.createElement('img');
         el.className = 'foam-mark';
-        el.style.left = (x - 18) + 'px';
-        el.style.top  = (y - 18) + 'px';
+        el.src = `Images/浮沫0${i + 1}.png`;
+        el.alt = '';
+        el.style.left = (x - 32) + 'px';
+        el.style.top  = (y - 32) + 'px';
         stage.appendChild(el);
         gsap.fromTo(el,
             { opacity: 0, scale: 0 },
-            { opacity: 1, scale: 1, duration: 0.4, delay: 0.1 + i * 0.06, ease: 'back.out(2)' }
+            { opacity: 1, scale: 1, duration: 0.4, delay: 0.1 + i * 0.06, ease: 'back.out(2)',
+              onComplete: () => {
+                gsap.to(el, {
+                    x: (Math.random() - 0.5) * 16,
+                    y: (Math.random() - 0.5) * 14,
+                    duration: 1.2 + Math.random() * 0.8,
+                    repeat: -1, yoyo: true, ease: 'sine.inOut',
+                    delay: Math.random() * 0.6
+                });
+              }
+            }
         );
         return { el, x, y, popped: false };
     });
 
-    const spoon = document.createElement('div');
+    const spoon = document.createElement('img');
+    spoon.src = 'Images/濾網.png';
+    spoon.alt = '';
     spoon.className = 'pot-spoon';
     stage.appendChild(spoon);
 
@@ -1066,9 +1213,9 @@ function setupStep4Skim() {
         const angle = (elapsed % STEP4_SPOON_PERIOD_MS) / STEP4_SPOON_PERIOD_MS * Math.PI * 2 - Math.PI / 2;
         spoonX = cx + Math.cos(angle) * orbitR;
         spoonY = cy + Math.sin(angle) * orbitR;
-        spoon.style.left = (spoonX - 22) + 'px';
-        spoon.style.top  = (spoonY - 10) + 'px';
-        spoon.style.transform = `rotate(${angle * 180 / Math.PI + 90}deg)`;
+        spoon.style.left = (spoonX - MESH_PX) + 'px';
+        spoon.style.top  = (spoonY - MESH_PY) + 'px';
+        spoon.style.transform = `rotate(${angle * 180 / Math.PI + SPOON_ANGLE_OFFSET}deg)`;
         requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -1326,7 +1473,7 @@ function renderSoupView() {
     const soupName = q.soupName || `#${q.number} 雞湯`;
 
     if (soupViewMode === 'soup') {
-        topEl.textContent = '得到了一鍋';
+        topEl.textContent = '你得到了一鍋';
         topEl.style.display = '';
         nameEl.textContent = soupName;
         nameEl.style.fontSize = '2.5rem';
@@ -1711,6 +1858,16 @@ window.revealQuoteInPanel = function() {
     });
 };
 
+// 累計每句雞湯被抽到次數（localStorage 本機累加；單機展演夠用）
+function incrementQuoteCount(quoteId) {
+    if (!quoteId) return 0;
+    let counts = {};
+    try { counts = JSON.parse(localStorage.getItem('quote_counts') || '{}'); } catch (e) { counts = {}; }
+    counts[quoteId] = (counts[quoteId] || 0) + 1;
+    try { localStorage.setItem('quote_counts', JSON.stringify(counts)); } catch (e) {}
+    return counts[quoteId];
+}
+
 // 揭曉原句（NFC 掃描對應瓶子後呼叫）：1s 粒子鋪面 → 自動 dissolve → 按鈕上浮
 window.revealQuote = function() {
     if (!finalQuizResult) return;
@@ -1724,6 +1881,11 @@ window.revealQuote = function() {
     numEl.textContent = `#${q.number}`;
     zhEl.textContent = q.textCN || '';
     enEl.textContent = q.textEN || '';
+
+    // 累計這句被抽到的次數（這次的 reveal 也算一次）→ 寫進雞湯王提示的上面那一行
+    const totalCount = incrementQuoteCount(q.id);
+    const countEl = document.getElementById('reveal-quote-count');
+    if (countEl) countEl.textContent = `有 ${totalCount} 個人也抽到了這句雞湯`;
 
     // 文字先隱藏（粒子蓋住）、雞湯王/按鈕藏起來
     zhEl.style.color = '#f2f2f2';

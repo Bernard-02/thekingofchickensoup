@@ -69,9 +69,16 @@
                 <div id="question-options"></div>
                 <button id="confirm-question" class="confirm-btn">確定</button>
             </div>
-            <!-- 右下角：雞湯王陪考（選項選到時閉眼） -->
-            <img id="question-mascot" src="Images/雞湯王.png" alt=""
-                 style="position: fixed; bottom: 24px; right: 24px; width: 160px; height: auto; pointer-events: none; display: none;">
+            <!-- 右下角：雞湯王陪考（單選題：選項選到時閉眼；container-choice：旁邊顯示鍋子說明）-->
+            <div id="question-mascot-wrap" style="position: fixed; bottom: 24px; right: 24px; display: none; align-items: center; gap: 16px; pointer-events: none;">
+                <p id="question-mascot-hint" style="margin: 0; max-width: 280px; color: #000; font-size: 1rem; line-height: 1.6; text-align: right; text-wrap: balance; opacity: 0; transition: opacity 0.3s ease;"></p>
+                <img id="question-mascot" src="Images/雞湯王.png" alt="" style="width: 160px; height: auto; flex-shrink: 0;">
+            </div>
+            <!-- 左下角：雞湯學徒（只在 container-choice 出現；點到學徒鍋子時自我介紹）-->
+            <div id="question-mascot-wrap-left" style="position: fixed; bottom: 24px; left: 24px; display: none; align-items: center; gap: 16px; pointer-events: none;">
+                <img id="question-mascot-left" src="Images/雞湯學徒.png" alt="" style="width: 160px; height: auto; flex-shrink: 0;">
+                <p id="question-mascot-hint-left" style="margin: 0; max-width: 280px; color: #000; font-size: 1rem; line-height: 1.6; text-align: left; text-wrap: balance; opacity: 0; transition: opacity 0.3s ease;"></p>
+            </div>
         </div>
     </div>
 
@@ -220,11 +227,16 @@
     <div id="cooking-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
+                <p id="cooking-step-progress" class="en font-normal mb-6"></p>
                 <h2 id="cooking-step-title" class="font-medium text-black mb-4"></h2>
-                <p id="cooking-hint" class="mb-8" style="opacity: 0.6; font-size: 0.95rem;"></p>
+                <!-- 提示文字 + 左邊小雞湯王 icon（intro 提示頁會把 icon 藏起來）-->
+                <div id="cooking-hint-wrap" class="mb-8" style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <img id="cooking-hint-icon" src="Images/雞湯王.png" alt="" style="width: 30px; height: auto; flex-shrink: 0; display: none;">
+                    <p id="cooking-hint" style="opacity: 0.6; font-size: 0.95rem; margin: 0;"></p>
+                </div>
 
                 <!-- 關鍵字（會短暫顯示、再轉成食材） -->
-                <p id="cooking-keyword" class="mb-4" style="min-height: 1.6em; font-size: 1.1rem; opacity: 0; font-style: italic;"></p>
+                <p id="cooking-keyword" class="mb-4" style="min-height: 1.6em; font-size: 1.1rem; opacity: 0;"></p>
 
                 <!-- 鍋子 + 食材 drop-in 區（也用來放浮沫 / 蒸氣 overlay） -->
                 <div id="cooking-stage" class="mx-auto mb-6" style="position: relative; width: 260px; height: 260px;"></div>
@@ -232,8 +244,13 @@
                 <!-- 小遊戲的控制區（食材按鈕 / 加熱按鈕 / 調味罐）-->
                 <div id="cooking-controls" class="mb-8"></div>
 
-                <!-- 總步驟 4 格進度（會跟著小遊戲進度慢慢 fill） -->
-                <div id="cooking-progress-boxes" class="flex flex-row gap-2 justify-center"></div>
+                <!-- 總步驟進度（一條長條，雞湯王 icon 跟著 fill 前緣走，像 YT 播放頭，5 個 step 跑完整條）-->
+                <div id="cooking-progress-boxes" class="flex flex-row items-center justify-center">
+                    <div class="cooking-progress-bar">
+                        <div class="cooking-progress-fill"></div>
+                        <img class="cooking-progress-icon" src="Images/王冠.png" alt="">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -242,7 +259,7 @@
     <div id="soup-result-view" class="view-container">
         <div class="flex flex-col items-center justify-center min-h-screen p-8">
             <div class="max-w-3xl mx-auto text-center w-full">
-                <p id="soup-top-label" class="font-medium" style="font-size: 2.5rem; line-height: 1.3; margin: 0 0 0.2rem;">得到了一鍋</p>
+                <p id="soup-top-label" class="mb-2" style="opacity: 0.6; font-size: 0.95rem;">你得到了一鍋</p>
                 <h2 id="soup-name" class="font-medium text-black mb-8" style="text-wrap: balance; font-size: 2.5rem;"></h2>
                 <img id="soup-image" src="Images/煮好的雞湯.png" alt="" class="mx-auto mb-10" style="width: 240px; height: 240px; object-fit: contain;">
                 <p id="soup-desc" class="font-normal text-black mb-8" style="text-wrap: balance; font-size: 1.1rem; line-height: 1.7;"></p>
@@ -267,9 +284,13 @@
                 <h4 id="reveal-en" class="en font-normal text-black mb-8" style="text-wrap: balance;"></h4>
 
                 <!-- 雞湯王 + 翻書提示（縮小、置中、mascot 在左、文字在右、單行不換行）-->
-                <div id="reveal-mascot-hint" class="flex items-center justify-center gap-3 mb-12" style="display: none;">
+                <!-- 文字區兩行：上面累計人數（localStorage 算的），下面翻書提示 -->
+                <div id="reveal-mascot-hint" class="flex items-center justify-center gap-8 mb-12" style="display: none;">
                     <img src="Images/雞湯王.png" alt="" style="width: 80px; height: auto;">
-                    <p style="background: transparent; color: rgba(0,0,0,0.6); font-size: 1.15rem; text-align: left; margin: 0; line-height: 1.5; white-space: nowrap;">翻閱書本查看這句話的脈絡</p>
+                    <div style="text-align: left;">
+                        <p id="reveal-quote-count" style="background: transparent; color: #000; font-size: 1.15rem; margin: 0 0 2px 0; line-height: 1.5; white-space: nowrap;"></p>
+                        <p style="background: transparent; color: #000; font-size: 1.15rem; margin: 0; line-height: 1.5; white-space: nowrap;">翻閱書本查看這句話的脈絡</p>
+                    </div>
                 </div>
 
                 <div id="reveal-buttons" class="flex flex-row items-center justify-center gap-4">
@@ -576,7 +597,7 @@
                                 <p>雞湯是一種說法，但不完全正確，因為它模糊、簡單且正向。它會隨著讀者的人生經歷、社會歷練和思想深度而產生不同的見解。不論是相信／不相信這種說法，都會深化成某種生活態度與思想。</p>
                             </div>
                         </section>
-                        <button onclick="scrollInfoToTop()" class="en hover-underline self-start" style="background:none; border:none; cursor:pointer; padding:0; color:#000; font-size:1.125rem;">↑ Back to top</button>
+                        <button onclick="scrollInfoToTop()" class="en hover-underline self-start" style="background:none; border:none; cursor:pointer; padding:0; color:#000; font-size:1.125rem;">Back to top</button>
                     </div>
                 </div>
             </div>
