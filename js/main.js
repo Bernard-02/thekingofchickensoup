@@ -652,7 +652,7 @@ const COOKING_STEPS = [
     { title: '加水',      hint: '長按空白鍵注水',                                 type: 'water'  },
     { title: '開火',      hint: '指標移動到最佳火候時，按空白鍵開火',             type: 'fire'   },
     { title: '撈去浮沫',  hint: '勺子轉到浮沫上時，按空白鍵把它撈起',            type: 'skim'   },
-    { title: '撒調味料',  hint: '節奏對到判定圈時，按空白鍵撒下',                type: 'season' },
+    { title: '撒調味料',  hint: '依序撒下三種調味料，按空白鍵撒下',              type: 'season' },
 ];
 
 // Step 1 食材順序（之後可以改成從 quiz 結果動態決定）
@@ -665,16 +665,19 @@ const STEP1_INGREDIENTS = [
 ];
 
 // Step 2 加水
-const STEP2_FILL_MS        = 1800;   // 0 → 100% 全長按時間
-const STEP2_TARGET_LEVEL   = 0.55;   // perfect 水位（鍋身中間偏低，避免逼觀眾填到接近滿）
-const STEP2_PERFECT_TOL    = 0.06;
-const STEP2_OKAY_FLOOR     = 0.40;
-const STEP2_OVERFLOW_LEVEL = 0.80;   // 超過 → 溢出來，判定 fail
+const STEP2_FILL_MS        = 3000;   // 0 → 100% 全長按時間（10 張 frame，平均每張 300ms）
+const STEP2_TARGET_LEVEL   = 0.7;    // perfect 水位（對齊 frame 07 頂部，正好填到那條線）
+const STEP2_PERFECT_TOL    = 0.05;   // perfect 區 [0.65, 0.75]：frame 07 中段 → frame 08 中段
+const STEP2_OKAY_FLOOR     = 0.45;
+const STEP2_OVERFLOW_LEVEL = 0.85;   // 超過 → 溢出來，判定 fail
+// 「適量」虛線在容器裡的視覺 % — 跟 STEP2_TARGET_LEVEL 不一樣，因為鍋身 (object-fit: contain)
+// 只佔 .water-jar 容器底部約 62%，line 要落在 frame 07 水面那條線才對得上
+const STEP2_TARGET_LINE_PCT = 0.47;
 
 // Step 3 開火（賽車起跑風格：指針自動往右跑，按空白鍵停下；perfect 區在 bar 中段）
 const STEP3_SWEEP_MS     = 2400;   // 指針從左到右掃完整條的時間
-const STEP3_PERFECT_MIN  = 0.65;
-const STEP3_PERFECT_MAX  = 0.82;
+const STEP3_PERFECT_MIN  = 0.70;
+const STEP3_PERFECT_MAX  = 0.87;
 const STEP3_OKAY_TOL     = 0.18;
 
 // Step 4 撈浮沫
@@ -682,11 +685,14 @@ const STEP4_FOAM_COUNT      = 5;
 const STEP4_SPOON_PERIOD_MS = 5400;   // 勺子繞一圈的時間（之前 3600，放慢比較好掌握）
 const STEP4_HIT_RADIUS_PX   = 40;
 
-// Step 5 節奏調味
-const STEP5_NOTE_TRAVEL_MS   = 2200;  // note 從右到判定圈的時間
-const STEP5_HIT_PERFECT_MS   = 130;
-const STEP5_HIT_GOOD_MS      = 260;
-const STEP5_NOTE_SPAWN_TIMES = [0, 600, 1100, 1600, 2300, 2800, 3500, 4200];  // ms
+// Step 5 撒調味料（鹽 → 米酒 → 胡椒，每樣按對應次數空白鍵）
+// img = 平常的小 icon；shakeImg = 按下空白鍵時瓶子/罐子搖晃的姿態；particleImg = 撒下的顆粒/米酒
+const STEP5_POT_IMG = 'Images/差調味料的雞湯.png';
+const STEP5_SEASONINGS = [
+    { id: 'salt',   name: '鹽',   count: 4, img: 'Images/鹽巴.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
+    { id: 'wine',   name: '米酒', count: 3, img: 'Images/米酒.png', shakeImg: 'Images/米酒撒.png',   particleImg: 'Images/米酒掉落.png' },
+    { id: 'pepper', name: '胡椒', count: 5, img: 'Images/胡椒.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
+];
 
 let cookingStepIndex = 0;
 let cookingAdvancing = false;
@@ -992,30 +998,38 @@ function setupStep2Water() {
     const stage = document.getElementById('cooking-stage');
     stage.style.cssText = 'position: relative; margin: 0 auto; width: 360px; height: 220px;';
 
+    // 10 張水位 frame（鍋子01 = 10%、鍋子10 = 100%），用 frame swap 取代 clip-path
+    // 不再追求 smooth，每張停 ~500ms，看起來會像水一格一格地長上來
+    const fillFrames = Array.from({ length: 10 }, (_, i) =>
+        `Images/鍋子${String(i + 1).padStart(2, '0')}.png`
+    );
+    // 預載，避免換 src 時白閃
+    fillFrames.forEach(src => { const im = new Image(); im.src = src; });
+
     const jar = document.createElement('div');
     jar.className = 'water-jar';
     jar.innerHTML = `
-        <img class="water-fill-img" src="Images/鍋子fill.png" alt="">
+        <img class="water-fill-img" src="${fillFrames[0]}" alt="">
         <img class="water-pot-img" src="Images/鍋子.png" alt="">
-        <div class="water-target-line" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;"></div>
-        <span class="water-lvl-label" style="bottom: ${STEP2_TARGET_LEVEL * 100}%;">適量</span>
+        <div class="water-target-line" style="bottom: ${STEP2_TARGET_LINE_PCT * 100}%;"></div>
+        <span class="water-lvl-label" style="bottom: ${STEP2_TARGET_LINE_PCT * 100}%;">適量</span>
     `;
     stage.appendChild(jar);
     const fillEl = jar.querySelector('.water-fill-img');
 
-    // 水位用 clip-path 從鍋底往上揭曉鍋身剪影；頂部 polygon 帶微弧不會是鋒利直線
+    // level 0 → 不顯示 fill；level (0, 0.1] → frame 01；level (0.9, 1] → frame 10
+    let currentFrame = -1;
     const setWaterLevel = (lvl) => {
         const v = Math.min(1, Math.max(0, lvl));
-        const top = 100 - v * 100;  // 可見水面在元素裡的 y%（從上算）
-        fillEl.style.clipPath = `polygon(
-            0% 100%,
-            0% ${top + 3}%,
-            25% ${top + 1.5}%,
-            50% ${top}%,
-            75% ${top + 1.5}%,
-            100% ${top + 3}%,
-            100% 100%
-        )`;
+        const frameIdx = v <= 0 ? 0 : Math.min(10, Math.ceil(v * 10));
+        if (frameIdx === currentFrame) return;
+        currentFrame = frameIdx;
+        if (frameIdx === 0) {
+            fillEl.style.visibility = 'hidden';
+        } else {
+            fillEl.style.visibility = '';
+            fillEl.src = fillFrames[frameIdx - 1];
+        }
     };
     setWaterLevel(0);
 
@@ -1122,10 +1136,10 @@ function setupStep3Fire() {
 
         const center = (STEP3_PERFECT_MIN + STEP3_PERFECT_MAX) / 2;
         let label, lvKind;
-        if (level >= STEP3_PERFECT_MIN && level <= STEP3_PERFECT_MAX) { label = '剛剛好';  lvKind = 'perfect'; }
-        else if (Math.abs(level - center) <= STEP3_OKAY_TOL)          { label = '還可以';  lvKind = 'okay';    }
-        else if (level < STEP3_PERFECT_MIN)                            { label = '火不夠';  lvKind = 'fail';    }
-        else                                                            { label = '火太大';  lvKind = 'fail';    }
+        if (level >= STEP3_PERFECT_MIN && level <= STEP3_PERFECT_MAX) { label = '火候正好';  lvKind = 'perfect'; }
+        else if (Math.abs(level - center) <= STEP3_OKAY_TOL)          { label = '可以烹煮';  lvKind = 'okay';    }
+        else if (level < STEP3_PERFECT_MIN)                            { label = '火太小';    lvKind = 'fail';    }
+        else                                                            { label = '火太大';    lvKind = 'fail';    }
 
         // 點亮火圖示：perfect=5個、okay=中間3個、fail=中間1個，從中心向外漸入
         const litIndices = lvKind === 'perfect' ? [0,1,2,3,4]
@@ -1242,86 +1256,155 @@ function setupStep4Skim() {
     };
 }
 
-// ============= STEP 5: 撒調味料（節奏：太鼓達人風）=============
-// 跑道從右往左滾，notes 一顆顆飛向左側的判定圈。在判定圈附近按空白鍵 = 命中
+// ============= STEP 5: 撒調味料（三種並排，依序撒）=============
+// 鹽 / 米酒 / 胡椒 三個並排，active 的高亮，其餘淡化。
+// 按空白鍵 → 撒下當前的，數字 - 1，到 0 切換 active 到下一個。
 function setupStep5Season() {
     const stage = document.getElementById('cooking-stage');
-    const W = 520, H = 100;
-    const SPAWN_X = W - 30, HIT_X = 60;
-    stage.style.cssText = `position: relative; margin: 0 auto; width: min(${W}px, 92vw); height: ${H}px;`;
+    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(700px, 92vw); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.4rem;';
 
-    const lane = document.createElement('div');
-    lane.className = 'rhythm-lane';
-    stage.appendChild(lane);
+    const totalRequired = STEP5_SEASONINGS.reduce((sum, s) => sum + s.count, 0);
+    let totalDone   = 0;
+    let activeIdx   = 0;
+    let isSprinkling = false;
 
-    const hitZone = document.createElement('div');
-    hitZone.className = 'rhythm-hitzone';
-    stage.appendChild(hitZone);
-
-    const distance = SPAWN_X - HIT_X;
-    const startTime = performance.now();
-    const totalNotes = STEP5_NOTE_SPAWN_TIMES.length;
-
-    const notes = STEP5_NOTE_SPAWN_TIMES.map((spawnTime, idx) => {
-        const el = document.createElement('div');
-        el.className = 'rhythm-note';
-        el.style.left = SPAWN_X + 'px';
-        el.style.opacity = 0;
-        stage.appendChild(el);
-        return { el, spawnTime, idx, hit: false, missed: false };
+    // 預載 shake / particle 圖，避免按下空白鍵時 src 切換閃一下
+    STEP5_SEASONINGS.forEach(s => {
+        [s.shakeImg, s.particleImg].forEach(src => {
+            if (src) { const i = new Image(); i.src = src; }
+        });
     });
 
-    let resolved = 0;
-    let stopped = false;
-    registerCookingCleanup(() => { stopped = true; });
+    // 上方：鍋子大圖 + 鍋上的撒下動作（搖晃的瓶子 + 落下的顆粒）
+    // 結構：
+    //   .season-sprinkler  ← 鍋子上方的灑下區（瓶子按下空白鍵才出現、搖晃、消失）
+    //     img.season-sprinkler-img  ← 一開始是 opacity:0；按下空白鍵 → 設 shake 圖 + 淡入 → 搖晃 → 淡出
+    //   img  ← 鍋子大圖
+    const pot = document.createElement('div');
+    pot.className = 'season-pot';
+    pot.innerHTML = `
+        <div class="season-sprinkler">
+            <img class="season-sprinkler-img" alt="撒下中">
+        </div>
+        <img class="season-pot-img" src="${STEP5_POT_IMG}" alt="鍋子">
+    `;
+    stage.appendChild(pot);
+    const sprinkler    = pot.querySelector('.season-sprinkler');
+    const sprinklerImg = pot.querySelector('.season-sprinkler-img');
+    // 一開始隱藏（沒按空白鍵時，鍋子上方不顯示任何圖）
+    sprinklerImg.style.opacity = '0';
+    gsap.fromTo(pot,
+        { opacity: 0, y: -8 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }
+    );
 
-    const tick = () => {
-        if (stopped) return;
-        const t = performance.now() - startTime;
-        notes.forEach(n => {
-            if (n.hit || n.missed) return;
-            const localT = t - n.spawnTime;
-            if (localT < 0) return;
-            // 飛過判定圈太久 → miss
-            if (localT > STEP5_NOTE_TRAVEL_MS + STEP5_HIT_GOOD_MS) {
-                n.missed = true;
-                gsap.to(n.el, { opacity: 0, duration: 0.2, onComplete: () => n.el.remove() });
-                resolved++;
-                showCookingFeedback('miss', 'fail');
-                updateCookingBoxFill(cookingStepIndex, resolved / totalNotes);
-                if (resolved >= totalNotes) scheduleCookingTimeout(advanceCookingStep, 600);
-                return;
-            }
-            const progress = Math.min(1.05, localT / STEP5_NOTE_TRAVEL_MS);
-            n.el.style.left = (SPAWN_X - progress * distance) + 'px';
-            n.el.style.opacity = 1;
-        });
-        requestAnimationFrame(tick);
+    // 下方：三個調味料並排
+    const row = document.createElement('div');
+    row.className = 'season-row';
+    stage.appendChild(row);
+
+    const boxes = STEP5_SEASONINGS.map((s, i) => {
+        const box = document.createElement('div');
+        box.className = 'season-ingredient' + (i === 0 ? ' active' : '');
+        const illust = s.img
+            ? `<img class="season-illust" src="${s.img}" alt="${s.name}">`
+            : `<div class="season-illust season-illust-placeholder" aria-label="${s.name} 插圖"></div>`;
+        box.innerHTML = `
+            ${illust}
+            <div class="season-label">
+                <span class="season-name">${s.name}</span>
+                <span class="season-count" data-remaining="${s.count}">×${s.count}</span>
+            </div>
+        `;
+        row.appendChild(box);
+        gsap.fromTo(box,
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.4, delay: 0.1 + i * 0.1, ease: 'power2.out' }
+        );
+        return box;
+    });
+
+    // 顆粒從瓶子下方產生，往下落入鍋口（座標系是 sprinkler 容器本身）
+    const emitParticles = (seasoning) => {
+        if (!seasoning.particleImg || !sprinkler) return;
+        const zRect = sprinkler.getBoundingClientRect();
+        const centerX = zRect.width / 2;
+        const n = 1 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < n; i++) {
+            const p = document.createElement('img');
+            p.className = 'season-particle';
+            p.src = seasoning.particleImg;
+            // 在瓶口下方水平小範圍散開（粒子寬 18px，所以扣 9px 對齊中心）
+            const spreadX = centerX + (Math.random() - 0.5) * zRect.width * 0.25;
+            p.style.left = (spreadX - 9) + 'px';
+            // 從瓶身底部開始落（灑落區高 110px，瓶子貼底，所以從 ~65px 處出發）
+            p.style.top  = Math.max(0, zRect.height - 50) + 'px';
+            sprinkler.appendChild(p);
+            gsap.to(p, {
+                y: 60 + Math.random() * 20,  // 落入鍋緣裡
+                x: (Math.random() - 0.5) * 14,
+                opacity: 0,
+                duration: 0.65 + Math.random() * 0.2,
+                ease: 'power1.in',
+                onComplete: () => p.remove(),
+            });
+        }
     };
-    requestAnimationFrame(tick);
 
     cookingKey.down = () => {
-        const t = performance.now() - startTime;
-        let target = null, bestDelta = Infinity;
-        notes.forEach(n => {
-            if (n.hit || n.missed) return;
-            const noteAtHit = n.spawnTime + STEP5_NOTE_TRAVEL_MS;
-            const delta = Math.abs(t - noteAtHit);
-            if (delta < bestDelta) { bestDelta = delta; target = n; }
+        if (isSprinkling) return;
+        if (activeIdx >= STEP5_SEASONINGS.length) return;
+        isSprinkling = true;
+
+        const s        = STEP5_SEASONINGS[activeIdx];
+        const box      = boxes[activeIdx];
+        const countEl  = box.querySelector('.season-count');
+        const remaining = Math.max(0, parseInt(countEl.dataset.remaining, 10) - 1);
+        countEl.dataset.remaining = remaining;
+        countEl.textContent = '×' + remaining;
+        totalDone++;
+
+        // 鍋子上方：每次按下都是獨立一次顯示 — 設 src → 淡入 → 搖晃 → 淡出（下方 icon 不動）
+        gsap.killTweensOf(sprinklerImg);
+        if (s.shakeImg) sprinklerImg.src = s.shakeImg;
+        gsap.set(sprinklerImg, { opacity: 1, rotation: -16 });
+        gsap.to(sprinklerImg, {
+            rotation: 16,
+            duration: 0.07,
+            yoyo: true,
+            repeat: 5,
+            onComplete: () => gsap.to(sprinklerImg, {
+                rotation: 0,
+                opacity: 0,
+                duration: 0.18,
+                ease: 'power2.out',
+            }),
         });
-        if (!target || bestDelta > STEP5_HIT_GOOD_MS + 80) return;
-        target.hit = true;
-        gsap.killTweensOf(target.el);
-        gsap.to(target.el, {
-            scale: 1.8, opacity: 0, duration: 0.25, ease: 'power2.out',
-            onComplete: () => target.el.remove()
-        });
-        const lvKind = bestDelta <= STEP5_HIT_PERFECT_MS ? 'perfect' : 'okay';
-        const label  = bestDelta <= STEP5_HIT_PERFECT_MS ? 'Perfect！' : 'Good';
-        showCookingFeedback(label, lvKind);
-        resolved++;
-        updateCookingBoxFill(cookingStepIndex, resolved / totalNotes);
-        if (resolved >= totalNotes) scheduleCookingTimeout(advanceCookingStep, 600);
+        emitParticles(s);
+        gsap.fromTo(countEl,
+            { scale: 1.25 },
+            { scale: 1, duration: 0.2, ease: 'power2.out' }
+        );
+
+        updateCookingBoxFill(cookingStepIndex, totalDone / totalRequired);
+
+        if (remaining <= 0) {
+            box.classList.remove('active');
+            box.classList.add('done');
+            const next = boxes[activeIdx + 1];
+            activeIdx++;
+            scheduleCookingTimeout(() => {
+                isSprinkling = false;
+                if (next) {
+                    next.classList.add('active');
+                    // 下一次按空白鍵時才會出現新瓶子（initial 是隱藏），這裡不必預設 src
+                } else {
+                    scheduleCookingTimeout(advanceCookingStep, 400);
+                }
+            }, 250);
+        } else {
+            scheduleCookingTimeout(() => { isSprinkling = false; }, 90);
+        }
     };
 }
 

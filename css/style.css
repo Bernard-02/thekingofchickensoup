@@ -1356,8 +1356,8 @@ button {
     background: transparent;
     overflow: visible;
 }
-/* 水：直接用「鍋子fill.png」當水的圖層，跟鍋子描邊用同樣的 contain + center bottom 對位，自動對齊
-   水位由 JS 寫 clip-path（polygon）控制 — 從底部往上揭曉，頂部帶微弧 */
+/* 水：10 張 frame（鍋子01 → 鍋子10）疊在鍋子描邊後面，跟描邊用同樣的 contain + center bottom 對位
+   水位由 JS 直接切換 src 控制，沒有 clip-path、不追求 smooth */
 .water-fill-img {
     position: absolute;
     inset: 0;
@@ -1491,35 +1491,103 @@ button {
     z-index: 2;
 }
 
-/* === Step 5: 撒調味料（節奏跑道） === */
-.rhythm-lane {
-    position: absolute;
-    inset: 0;
-    border-top: 2px solid #000;
-    border-bottom: 2px solid #000;
-    background: transparent;
+/* === Step 5: 撒調味料（上方鍋子 + 三種調味料並排） === */
+.season-pot {
+    position: relative;
+    width: 360px;            /* 鎖死寬度，等於鍋子圖寬，方便定位瓶子與粒子 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
 }
-.rhythm-hitzone {
-    position: absolute;
-    left: 30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
-    border: 2px dashed #000;
-    border-radius: 50%;
+/* 鍋子上方：搖晃的瓶子 + 粒子產生區 */
+.season-sprinkler {
+    position: relative;
+    width: 100%;
+    height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;   /* 瓶子貼著鍋口上緣 */
     pointer-events: none;
 }
-.rhythm-note {
+.season-sprinkler-img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    /* 搖晃時以瓶口附近為支點 */
+    transform-origin: 50% 20%;
+    position: relative;
+    z-index: 2;
+}
+.season-pot-img {
+    width: 360px;
+    height: auto;
+    max-height: 300px;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    position: relative;
+    z-index: 1;
+}
+.season-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2.6rem;
+}
+.season-ingredient {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.45rem;
+    position: relative;
+    padding: 0.35rem 0.45rem;
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+}
+.season-ingredient.active,
+.season-ingredient.done {
+    opacity: 1;
+}
+.season-illust {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+/* 還沒有插圖時的虛線方框占位（之後丟圖會自動覆蓋） */
+.season-illust-placeholder {
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+.season-label {
+    /* 用 inline-block + 自然寬度，整體置中在圖片正下方 */
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    color: #000;
+    text-align: center;
+}
+.season-name {
+    font-weight: 600;
+}
+.season-count {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.season-particle {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    border: 2px solid #000;
-    background: #f2f2f2;
-    border-radius: 50%;
+    width: 18px;
+    height: auto;
     pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 1;
 }
 
 /* 掃描 hold 5 秒進度條（scan 頁 + quote panel 共用） */
