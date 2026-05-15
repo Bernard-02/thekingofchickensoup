@@ -13,6 +13,7 @@
       "perspective"
     ],
     "translation": "雨還在下，有人撐傘，有人開始踩水坑。",
+    "soupName": "喝了會轉換心情的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -29,6 +30,7 @@
       "patience"
     ],
     "translation": "現在看不出來的線，之後都會接上。",
+    "soupName": "以前喝過的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -46,6 +48,7 @@
       "perspective"
     ],
     "translation": "後視鏡是用來參考的，不是用來開車的。",
+    "soupName": "一路往前的雞湯",
     "quadrant": "IR"
   },
   {
@@ -62,6 +65,7 @@
       "perspective"
     ],
     "translation": "石頭落進水裡，水紋是不會說謊的。",
+    "soupName": "十萬個為什麼雞湯",
     "quadrant": "IR"
   },
   {
@@ -77,6 +81,7 @@
       "patience"
     ],
     "translation": "放了很久的東西，你還記得它在哪嗎？",
+    "soupName": "#5",
     "quadrant": "SP"
   },
   {
@@ -92,6 +97,7 @@
       "perspective"
     ],
     "translation": "同一班車，卻剛好坐在一起。",
+    "soupName": "非常有緣的雞湯",
     "quadrant": "SP"
   },
   {
@@ -108,6 +114,7 @@
       "let-go"
     ],
     "translation": "天氣預報說有雨，但他沒帶傘，也沒淋濕。",
+    "soupName": "有點平淡的雞湯",
     "quadrant": "IR"
   },
   {
@@ -123,6 +130,7 @@
       "self-worth"
     ],
     "translation": "鏡子裡那個人，你們熟嗎？",
+    "soupName": "看得到自己的雞湯",
     "quadrant": "IP"
   },
   {
@@ -139,6 +147,7 @@
       "let-go"
     ],
     "translation": "同一條路，有人跑，有人慢慢晃，都到了。",
+    "soupName": "換了配方的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -156,6 +165,7 @@
       "let-go"
     ],
     "translation": "第一次煮的菜，有點鹹，但還是吃完了。",
+    "soupName": "少了點鹽的雞湯",
     "quadrant": "IR"
   },
   {
@@ -172,6 +182,7 @@
       "perspective"
     ],
     "translation": "信封還沒拆開，先深呼吸一下。",
+    "soupName": "可能會難喝的雞湯",
     "quadrant": "IR"
   },
   {
@@ -187,6 +198,7 @@
       "courage"
     ],
     "translation": "餓了就自己去開冰箱，沒人會幫你送過來。",
+    "soupName": "附上湯匙的雞湯",
     "quadrant": "IP"
   },
   {
@@ -203,6 +215,7 @@
       "let-go"
     ],
     "translation": "隔壁桌在聊什麼，跟你沒關係。",
+    "soupName": "不是你的雞湯",
     "quadrant": "SR"
   },
   {
@@ -219,6 +232,7 @@
       "let-go"
     ],
     "translation": "月台上的人來了又走，列車繼續往前開。",
+    "soupName": "趁熱喝的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "SP"
   },
@@ -236,6 +250,7 @@
       "perspective"
     ],
     "translation": "硬幣拋出去，正反各一半，沒什麼好驚訝的。",
+    "soupName": "時好時壞的雞湯",
     "quadrant": "IR"
   },
   {
@@ -252,6 +267,7 @@
       "let-go"
     ],
     "translation": "不是所有人都需要澆水，找對了再澆。",
+    "soupName": "媽媽煮的雞湯",
     "quadrant": "SP",
     "quadrantSecondary": "SR"
   },
@@ -268,6 +284,7 @@
       "courage"
     ],
     "translation": "筆還沒碰紙，什麼都不會發生。",
+    "soupName": "有點拙劣的雞湯",
     "quadrant": "IP"
   },
   {
@@ -284,6 +301,7 @@
       "let-go"
     ],
     "translation": "行事曆上的格子就那麼多，填進去的名字要想清楚。",
+    "soupName": "不能浪費的雞湯",
     "quadrant": "SR"
   },
   {
@@ -299,6 +317,7 @@
       "let-go"
     ],
     "translation": "那道題沒有標準答案，翻到最後一頁也找不到。",
+    "soupName": "有點渾濁的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "SR"
   },
@@ -315,6 +334,7 @@
       "perspective"
     ],
     "translation": "昨天的天氣預報，今天不一定準。",
+    "soupName": "變涼的雞湯",
     "quadrant": "IR"
   },
   {
@@ -331,6 +351,7 @@
       "self-worth"
     ],
     "translation": "有人覺得太甜，有人覺得剛好，是同一塊蛋糕。",
+    "soupName": "天枰上的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "IP"
   },
@@ -347,6 +368,7 @@
       "perspective"
     ],
     "translation": "多做一些好事，錢包沒有少任何東西。",
+    "soupName": "善良的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SP"
   },
@@ -364,6 +386,7 @@
       "courage"
     ],
     "translation": "穿錯鞋去爬山，換鞋就好，不用練腳皮。",
+    "soupName": "盛在杯子裡的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "IP"
   },
@@ -380,6 +403,7 @@
       "let-go"
     ],
     "translation": "今天天氣陰，也是天氣的一種。",
+    "soupName": "不同風味的雞湯",
     "quadrant": "IR"
   },
   {
@@ -395,6 +419,7 @@
       "perspective"
     ],
     "translation": "有人一出生手裡就握著金湯匙，有人是銀的，有人則需要用手吃飯。",
+    "soupName": "沒盛滿的雞湯",
     "quadrant": "IR"
   },
   {
@@ -410,6 +435,7 @@
       "courage"
     ],
     "translation": "你看我，我看你。彼此都等了很久，但沒有人想要先說話。",
+    "soupName": "會講話的雞湯",
     "quadrant": "SP"
   },
   {
@@ -425,6 +451,7 @@
       "perspective"
     ],
     "translation": "睡前翻開小本子，今天有什麼值得寫的？",
+    "soupName": "加了幸運餅乾的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -441,6 +468,7 @@
       "action"
     ],
     "translation": "有人記得你上次說過的那件小事。",
+    "soupName": "用心做的雞湯",
     "quadrant": "SP"
   },
   {
@@ -457,6 +485,7 @@
       "let-go"
     ],
     "translation": "鞋子不合腳，有人換鞋，有人繼續磨。",
+    "soupName": "改變自己的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -474,6 +503,7 @@
       "perspective"
     ],
     "translation": "說完對不起，他轉身就走了。",
+    "soupName": "面對音樂的雞湯",
     "quadrant": "IP"
   },
   {
@@ -489,6 +519,7 @@
       "perspective"
     ],
     "translation": "他本來有別的事，但還是來了。",
+    "soupName": "飲水思源的雞湯",
     "quadrant": "SP"
   },
   {
@@ -505,6 +536,7 @@
       "let-go"
     ],
     "translation": "有些話說給三個人聽就夠了，不用廣播。",
+    "soupName": "低調的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "SP"
   },
@@ -522,6 +554,7 @@
       "perspective"
     ],
     "translation": "深夜有人傳訊息：最近好嗎？",
+    "soupName": "樂於分享的雞湯",
     "quadrant": "SP"
   },
   {
@@ -538,6 +571,7 @@
       "patience"
     ],
     "translation": "麵包還在烤，時間到了自然會好。",
+    "soupName": "熬很久的雞湯",
     "quadrant": "IR"
   },
   {
@@ -554,6 +588,7 @@
       "let-go"
     ],
     "translation": "地圖上的路是直的，實際走起來有幾個彎。",
+    "soupName": "每次都不一樣的雞湯",
     "quadrant": "IR"
   },
   {
@@ -570,6 +605,7 @@
       "courage"
     ],
     "translation": "同一片土，有人種出花，有人說土不好。",
+    "soupName": "在發光的雞湯",
     "quadrant": "IP"
   },
   {
@@ -586,6 +622,7 @@
       "perspective"
     ],
     "translation": "跑道上只有一個你，跟昨天的你比就好。",
+    "soupName": "比上一代還好喝的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -603,6 +640,7 @@
       "perspective"
     ],
     "translation": "同一條路，有人看到終點，有人只看到坡。",
+    "soupName": "需要攪拌一下的雞湯",
     "quadrant": "IR"
   },
   {
@@ -619,6 +657,7 @@
       "let-go"
     ],
     "translation": "氣球吹得越大，破掉的聲音越響。先有個底。",
+    "soupName": "米其林雞湯",
     "quadrant": "IR"
   },
   {
@@ -635,6 +674,7 @@
       "courage"
     ],
     "translation": "想說的話，今天說比明天說好。",
+    "soupName": "有點溫溫的雞湯",
     "quadrant": "SP"
   },
   {
@@ -651,6 +691,7 @@
       "courage"
     ],
     "translation": "竹子彎下去，風停了還是站回來。",
+    "soupName": "很柔軟的雞湯",
     "quadrant": "IP"
   },
   {
@@ -666,6 +707,7 @@
       "let-go"
     ],
     "translation": "鹽放太多不行，太少也不行，嚐一口就知道。",
+    "soupName": "剛剛好的雞湯",
     "quadrant": "IR"
   },
   {
@@ -681,6 +723,7 @@
       "perspective"
     ],
     "translation": "站在一樓只看得到隔壁的牆。",
+    "soupName": "大碗雞湯",
     "quadrant": "IP"
   },
   {
@@ -696,6 +739,7 @@
       "perspective"
     ],
     "translation": "最深的水，通常是最靜的那一段。",
+    "soupName": "表面普通但很好喝的雞湯",
     "quadrant": "IP"
   },
   {
@@ -712,6 +756,7 @@
       "let-go"
     ],
     "translation": "第一次踩到坑，下次走這條路記得繞開。",
+    "soupName": "漏了點湯的雞湯",
     "quadrant": "IP"
   },
   {
@@ -728,6 +773,7 @@
       "patience"
     ],
     "translation": "存錢筒每天丟一枚硬幣，不急，會滿的。",
+    "soupName": "點滴雞湯",
     "quadrant": "IP"
   },
   {
@@ -743,6 +789,7 @@
       "perspective"
     ],
     "translation": "跑了很遠，回頭看一下當初站在哪裡出發的。",
+    "soupName": "加了核桃的雞湯",
     "quadrant": "IP"
   },
   {
@@ -759,6 +806,7 @@
       "let-go"
     ],
     "translation": "路上有塊石頭，繞過去就好，不用跟它吵架。",
+    "soupName": "沉默的雞湯",
     "quadrant": "SR"
   },
   {
@@ -774,6 +822,7 @@
       "perspective"
     ],
     "translation": "小小的火苗，可以點亮一根蠟燭，也可以燒掉一棟房子。",
+    "soupName": "小碗雞湯",
     "quadrant": "IP"
   },
   {
@@ -790,6 +839,7 @@
       "let-go"
     ],
     "translation": "晚宴只喝開水，回家的路上不用怕路檢。",
+    "soupName": "透明的雞湯",
     "quadrant": "SR"
   },
   {
@@ -806,6 +856,7 @@
       "perspective"
     ],
     "translation": "獎盃是放在架子上的，不是掛在嘴上的。",
+    "soupName": "料很多的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -823,6 +874,7 @@
       "let-go"
     ],
     "translation": "把那件事折好，放進抽屜最深處。沒有扔，只是不放在桌上了。",
+    "soupName": "不需再糾結的雞湯",
     "quadrant": "IR"
   },
   {
@@ -838,6 +890,7 @@
       "perspective"
     ],
     "translation": "別人說的那個人，跟你見到的是同一個嗎？",
+    "soupName": "透徹的雞湯",
     "quadrant": "SR"
   },
   {
@@ -853,6 +906,7 @@
       "let-go"
     ],
     "translation": "抓著不放的東西，手會越來越痠。",
+    "soupName": "糾結在一起的雞湯",
     "quadrant": "IR"
   },
   {
@@ -869,6 +923,7 @@
       "let-go"
     ],
     "translation": "收音機播什麼你決定不了，但你可以換台。",
+    "soupName": "心平氣和的雞湯",
     "quadrant": "SR"
   },
   {
@@ -885,6 +940,7 @@
       "perspective"
     ],
     "translation": "前面施工，有人等，有人找別條路，有人直接穿過去。",
+    "soupName": "#103",
     "quadrant": "IP"
   },
   {
@@ -901,6 +957,7 @@
       "perspective"
     ],
     "translation": "背包上貼滿了貼紙，有些是自己貼的，有些是別人貼的。",
+    "soupName": "有標籤的雞湯",
     "quadrant": "IR"
   },
   {
@@ -916,6 +973,7 @@
       "let-go"
     ],
     "translation": "一碗熱湯，一張電影票，帳單上的數字不大，但夠了。",
+    "soupName": "便宜大碗又好喝的雞湯",
     "quadrant": "IR"
   },
   {
@@ -932,6 +990,7 @@
       "patience"
     ],
     "translation": "第一次見面就把家裡的鑰匙給對方，有點太快了。",
+    "soupName": "中規中矩的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -948,6 +1007,7 @@
       "perspective"
     ],
     "translation": "以為爬到頂了，抬頭一看，還有更高的地方。",
+    "soupName": "有點東西的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -965,6 +1025,7 @@
       "patience"
     ],
     "translation": "第一百次跟第一次，握筆的手感不一樣了。",
+    "soupName": "第N次熬煮的雞湯",
     "quadrant": "IP"
   },
   {
@@ -980,6 +1041,7 @@
       "perspective"
     ],
     "translation": "他記得你說過不喜歡香菜，點餐的時候特別說了一聲。",
+    "soupName": "煮給某個人的雞湯",
     "quadrant": "SP"
   },
   {
@@ -996,6 +1058,7 @@
       "let-go"
     ],
     "translation": "同一場雨，有人淋濕了很狼狽，有人站在屋簷下說：有那麼嚴重嗎？",
+    "soupName": "難以理解的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "IR"
   },
@@ -1012,6 +1075,7 @@
       "courage"
     ],
     "translation": "那封信寫好了，但放了三個月還沒寄出去。",
+    "soupName": "剛煮好的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1028,6 +1092,7 @@
       "patience"
     ],
     "translation": "龜兔賽跑，贏的不是跑最快的那個。",
+    "soupName": "穩扎穩打的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "IP"
   },
@@ -1045,6 +1110,7 @@
       "perspective"
     ],
     "translation": "同樣的木頭，有人用手鋸了三個小時，有人找來電鋸，十分鐘就好了。",
+    "soupName": "喝了會變聰明的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1061,6 +1127,7 @@
       "perspective"
     ],
     "translation": "每個人桌上的考卷題目都不一樣。",
+    "soupName": "充滿課題的雞湯",
     "quadrant": "SR"
   },
   {
@@ -1076,6 +1143,7 @@
       "courage"
     ],
     "translation": "食譜看了很多，但從來沒進過廚房。",
+    "soupName": "很會讀書的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1091,6 +1159,7 @@
       "perspective"
     ],
     "translation": "牛頓說得很清楚：你推出去多少力，就會有多少力推回來。",
+    "soupName": "牛頓的雞湯",
     "quadrant": "SP"
   },
   {
@@ -1107,6 +1176,7 @@
       "let-go"
     ],
     "translation": "眼眶紅著，但還是把那碗飯吃完了。",
+    "soupName": "路邊攤的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "IP"
   },
@@ -1124,6 +1194,7 @@
       "courage"
     ],
     "translation": "第一次騎腳踏車跌倒，第十次可以從台北騎到高雄。",
+    "soupName": "新手小白的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1140,6 +1211,7 @@
       "perspective"
     ],
     "translation": "沒有地址，導航要導去哪裡？",
+    "soupName": "富有想像的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -1157,6 +1229,7 @@
       "perspective"
     ],
     "translation": "有人在公司被罵了，回家把門關得很用力。門沒有做錯什麼。",
+    "soupName": "冷靜之後的雞湯",
     "quadrant": "SP"
   },
   {
@@ -1173,6 +1246,7 @@
       "courage"
     ],
     "translation": "耳機戴上，外面的聲音小了一點。",
+    "soupName": "整齊擺盤的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -1190,6 +1264,7 @@
       "let-go"
     ],
     "translation": "一直在為明天澆水，今天的花快枯了。",
+    "soupName": "適合今天喝的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "IP"
   },
@@ -1207,6 +1282,7 @@
       "patience"
     ],
     "translation": "整條麵包一口吃不下，買散裝的，或切開來就好了。",
+    "soupName": "好幾碗雞湯",
     "quadrant": "IP"
   },
   {
@@ -1222,6 +1298,7 @@
       "perspective"
     ],
     "translation": "海綿吸到擰不出水來為止，然後繼續吸。",
+    "soupName": "沒人教就做出來的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1238,6 +1315,7 @@
       "let-go"
     ],
     "translation": "鍋裡的東西燒焦了，早點關火，至少少點臭味。",
+    "soupName": "煮到一半的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "SR"
   },
@@ -1255,6 +1333,7 @@
       "let-go"
     ],
     "translation": "牌是發下來的，怎麼打是自己的事。但偶爾也需要等一張好牌從牌堆裡摸出來。",
+    "soupName": "幸運的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -1272,6 +1351,7 @@
       "courage"
     ],
     "translation": "路燈亮著，不管底下有沒有人走過。",
+    "soupName": "閃亮亮的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1288,6 +1368,7 @@
       "perspective"
     ],
     "translation": "他請客，不是因為想讓人說他大方。",
+    "soupName": "放了比較多薑的雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "SR"
   },
@@ -1304,6 +1385,7 @@
       "let-go"
     ],
     "translation": "想了三個小時，結果跟第一個念頭一樣。",
+    "soupName": "有點粗糙的雞湯",
     "quadrant": "IR"
   },
   {
@@ -1319,6 +1401,7 @@
       "action"
     ],
     "translation": "一個人搬不動的東西，打一通電話就有人來了。",
+    "soupName": "很順利的雞湯",
     "quadrant": "SP",
     "quadrantSecondary": "IP"
   },
@@ -1336,6 +1419,7 @@
       "courage"
     ],
     "translation": "那趟旅行，兩個人說了好幾年要一起去。後來其中一個人先走了。",
+    "soupName": "Nike贊助的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1352,6 +1436,7 @@
       "let-go"
     ],
     "translation": "貓跌下來，舔舔腳，然後走掉了。",
+    "soupName": "加了紅牛的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "IP"
   },
@@ -1369,6 +1454,7 @@
       "perspective"
     ],
     "translation": "花在自己身上的錢，利息最高。",
+    "soupName": "獨自享用的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1385,6 +1471,7 @@
       "courage"
     ],
     "translation": "被踩了一腳，過幾秒又爬起來了，繼續往前走。",
+    "soupName": "有點辣的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1401,6 +1488,7 @@
       "perspective"
     ],
     "translation": "手裡的牌多一點，選擇就多一點。",
+    "soupName": "#176",
     "quadrant": "IP"
   },
   {
@@ -1417,6 +1505,7 @@
       "let-go"
     ],
     "translation": "什麼都有，但沒有力氣享受，有點可惜。",
+    "soupName": "養生雞湯",
     "quadrant": "IP",
     "quadrantSecondary": "IR"
   },
@@ -1434,6 +1523,7 @@
       "patience"
     ],
     "translation": "有的花春天開，有的花要等到夏天才開。",
+    "soupName": "有朵花的雞湯",
     "quadrant": "IR",
     "quadrantSecondary": "SR"
   },
@@ -1451,6 +1541,7 @@
       "perspective"
     ],
     "translation": "沒有人的時候，收銀機多找了一百塊，他還是放回去了。",
+    "soupName": "一目了然的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1466,6 +1557,7 @@
       "patience"
     ],
     "translation": "大家都在等同一班車，但只有他提前查好了時刻表。",
+    "soupName": "熟悉的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1482,6 +1574,7 @@
       "let-go"
     ],
     "translation": "隨手種下的東西，某天回來發現已經長大了。",
+    "soupName": "隨手煮的雞湯",
     "quadrant": "IR"
   },
   {
@@ -1497,6 +1590,7 @@
       "perspective"
     ],
     "translation": "兩棵樹種在一起，根系交纏，反而都長得更好。",
+    "soupName": "兩碗好喝的雞湯",
     "quadrant": "SP"
   },
   {
@@ -1513,6 +1607,7 @@
       "patience"
     ],
     "translation": "錯過了那班車，卻在月台上遇到了一個人。",
+    "soupName": "不知道好不好喝的雞湯",
     "quadrant": "IR"
   },
   {
@@ -1528,6 +1623,7 @@
       "perspective"
     ],
     "translation": "以為失去了什麼，後來發現空出來的位置，裝進了更多東西。",
+    "soupName": "加了花生的雞湯",
     "quadrant": "IR"
   },
   {
@@ -1544,6 +1640,7 @@
       "courage"
     ],
     "translation": "雛鳥看著母鳥怎麼飛，試了幾次，後來飛得比母鳥還遠。",
+    "soupName": "標榜雞湯",
     "quadrant": "IP"
   },
   {
@@ -1560,6 +1657,7 @@
       "let-go"
     ],
     "translation": "有些事情知道了，就再也回不去了。",
+    "soupName": "3G網路的雞湯",
     "quadrant": "IR"
   },
   {
@@ -1576,6 +1674,7 @@
       "patience"
     ],
     "translation": "最黑的時候，是天快亮之前。",
+    "soupName": "#198",
     "quadrant": "IR"
   },
   {
@@ -1591,6 +1690,7 @@
       "perspective"
     ],
     "translation": "聊了兩個小時，一次也沒提到別人的名字。",
+    "soupName": "沒那麽八卦的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "SP"
   }
