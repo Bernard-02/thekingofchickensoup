@@ -155,9 +155,9 @@
         <div class="relative min-h-screen flex flex-col items-center justify-center p-8">
             <!-- 左上角：導航 -->
             <div id="chat-result-actions" class="absolute flex flex-col items-start gap-2" style="display: none; top: clamp(12px, 3vw, 32px); left: clamp(12px, 3vw, 32px);">
-                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="restart()">← Start Over</button>
-                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="retryChatInput()">← Try Again</button>
-                <button class="en hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="goBackToFork()">← Back to Fork</button>
+                <button class="hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="restart()">← 重新開始</button>
+                <button class="hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="retryChatInput()">← 再來一次</button>
+                <button class="hover-underline w-fit" style="background:none;border:none;cursor:pointer;color:#000;font-size:1rem;" onclick="goBackToFork()">← 選擇鍋子</button>
             </div>
 
             <!-- 中央：雞湯文字 -->
@@ -195,8 +195,8 @@
                     </div>
                     <!-- 英文開關：已移除，英文固定顯示 -->
                     <input id="param-en-toggle" type="checkbox" checked style="display: none;">
-                    <!-- 收藏 CTA -->
-                    <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%;">收藏</button>
+                    <!-- 收藏 CTA（暫時隱藏） -->
+                    <button id="chat-save-btn" onclick="saveChatQuote()" style="background:#000; color:#fff; border:none; padding:10px 16px; cursor:pointer; font-size:0.875rem; width:100%; display:none;">收藏</button>
                 </div>
             </div>
         </div>
@@ -261,7 +261,7 @@
             <div class="max-w-3xl mx-auto text-center w-full">
                 <p id="soup-top-label" class="mb-2" style="opacity: 0.6; font-size: 0.95rem;">你得到了一鍋</p>
                 <h2 id="soup-name" class="font-medium text-black mb-8" style="text-wrap: balance; font-size: 2.5rem;"></h2>
-                <img id="soup-image" src="Images/煮好的雞湯.png" alt="" class="mx-auto mb-10" style="width: 240px; height: 240px; object-fit: contain;">
+                <img id="soup-image" src="Images/煮好的雞湯.png" alt="" class="mx-auto mb-10" style="width: 300px; height: 300px; object-fit: contain;">
                 <p id="soup-desc" class="font-normal text-black mb-8" style="text-wrap: balance; font-size: 1.1rem; line-height: 1.7;"></p>
 
                 <!-- 掃描 hold 5 秒進度條（僅在 scan 模式、hold 中時顯示）-->
@@ -294,8 +294,9 @@
                 </div>
 
                 <div id="reveal-buttons" class="flex flex-row items-center justify-center gap-4">
-                    <button class="primary-btn en" onclick="restart()">Start over</button>
-                    <button class="primary-btn btn-solid en" onclick="goToWebsite()">Project Detail</button>
+                    <button class="primary-btn" onclick="restart()">重新開始</button>
+                    <button class="primary-btn" onclick="goToChatFromReveal()">雞湯學徒</button>
+                    <button class="primary-btn btn-solid" onclick="goToWebsite()">查看專案</button>
                 </div>
             </div>
         </div>
@@ -635,10 +636,10 @@
         <span id="ws-status-text">未連線</span>
     </div>
 
-    <!-- 測試面板：用按鈕模擬 NFC 掃描，方便沒實體卡時開發 -->
-    <!-- 預設隱藏；按 Ctrl+Shift+T 或在 console 跑 toggleTestMode() 顯示 -->
+    <!-- 開發模式面板：用按鈕模擬 NFC 掃描，方便沒實體卡時開發 -->
+    <!-- 預設隱藏；按 Ctrl+Shift+D 或在 console 跑 toggleDevMode() 顯示（同時切換右下角 ws-status） -->
     <div id="test-panel" class="test-panel">
-        <div class="test-panel-title">測試 <span class="test-panel-hint">Ctrl+Shift+T 開關</span></div>
+        <div class="test-panel-title">開發模式 <span class="test-panel-hint">Ctrl+Shift+D 開關</span></div>
         <button class="test-btn" onclick="testSimWildcard()">萬用卡</button>
         <button class="test-btn" onclick="testSimAI()">AI 解鎖卡</button>
         <button class="test-btn" onclick="testSimMatchingBottle()">對應瓶子</button>

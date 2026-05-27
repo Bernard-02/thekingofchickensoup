@@ -665,14 +665,14 @@ const STEP1_INGREDIENTS = [
 ];
 
 // Step 2 加水
-const STEP2_FILL_MS        = 3000;   // 0 → 100% 全長按時間（10 張 frame，平均每張 300ms）
+const STEP2_FILL_MS        = 2000;   // 0 → 100% 全長按時間（10 張 frame，平均每張 200ms）
 const STEP2_TARGET_LEVEL   = 0.7;    // perfect 水位（對齊 frame 07 頂部，正好填到那條線）
 const STEP2_PERFECT_TOL    = 0.05;   // perfect 區 [0.65, 0.75]：frame 07 中段 → frame 08 中段
 const STEP2_OKAY_FLOOR     = 0.45;
 const STEP2_OVERFLOW_LEVEL = 0.85;   // 超過 → 溢出來，判定 fail
 // 「適量」虛線在容器裡的視覺 % — 跟 STEP2_TARGET_LEVEL 不一樣，因為鍋身 (object-fit: contain)
 // 只佔 .water-jar 容器底部約 62%，line 要落在 frame 07 水面那條線才對得上
-const STEP2_TARGET_LINE_PCT = 0.47;
+const STEP2_TARGET_LINE_PCT = 0.42;
 
 // Step 3 開火（賽車起跑風格：指針自動往右跑，按空白鍵停下；perfect 區在 bar 中段）
 const STEP3_SWEEP_MS     = 2400;   // 指針從左到右掃完整條的時間
@@ -690,12 +690,13 @@ const STEP4_HIT_RADIUS_PX   = 40;
 const STEP5_POT_IMG = 'Images/差調味料的雞湯.png';
 const STEP5_SEASONINGS = [
     { id: 'salt',   name: '鹽',   count: 4, img: 'Images/鹽巴.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
-    { id: 'wine',   name: '米酒', count: 3, img: 'Images/米酒.png', shakeImg: 'Images/米酒撒.png',   particleImg: 'Images/米酒掉落.png' },
+    { id: 'wine',   name: '米酒', count: 3, img: 'Images/米酒.png', shakeImg: 'Images/米酒撒.png',   particleImg: 'Images/米酒掉落.png', sprinklerSize: '130px' },
     { id: 'pepper', name: '胡椒', count: 5, img: 'Images/胡椒.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
 ];
 
 let cookingStepIndex = 0;
 let cookingAdvancing = false;
+let step2FinalFrameSrc = null;   // step 2 放鍵時最後停留的水位 frame，step 3 用
 
 // 每換一個 step 就整個重置；集中管理 cleanup / timeouts，避免 ticker 殘留
 let cookingState = { cleanups: [], timeouts: [] };
@@ -727,6 +728,7 @@ document.addEventListener('keyup', (e) => {
 window.goToCooking = function() {
     cookingStepIndex = 0;
     cookingAdvancing = false;
+    step2FinalFrameSrc = null;
     clearCookingState();
     buildCookingProgressBoxes();
     showView('cooking-view');
@@ -1057,14 +1059,17 @@ function setupStep2Water() {
         const elapsed = performance.now() - pressStart;
         level = Math.min(1, level + elapsed / STEP2_FILL_MS);
         stopFill();
+        // 記住最後停留的水位 frame，讓 step 3 的鍋子跟著顯示
+        const fi = level <= 0 ? 0 : Math.min(10, Math.ceil(level * 10));
+        step2FinalFrameSrc = fi > 0 ? fillFrames[fi - 1] : fillFrames[0];
         done = true;
 
         let label, lvKind;
-        if (level >= STEP2_OVERFLOW_LEVEL)                                   { label = '太多了';  lvKind = 'fail';    }
-        else if (level > STEP2_TARGET_LEVEL + STEP2_PERFECT_TOL)            { label = '有點多';  lvKind = 'okay';    }
-        else if (Math.abs(level - STEP2_TARGET_LEVEL) <= STEP2_PERFECT_TOL) { label = '剛剛好';  lvKind = 'perfect'; }
-        else if (level >= STEP2_OKAY_FLOOR)                                  { label = '有點少';  lvKind = 'okay';    }
-        else                                                                  { label = '太少了';  lvKind = 'fail';    }
+        if      (level >= STEP2_OVERFLOW_LEVEL) { label = '太多了'; lvKind = 'fail';    }
+        else if (level > 0.75)                  { label = '有點多'; lvKind = 'okay';    }  // frame 08+
+        else if (level > 0.6)                   { label = '剛剛好'; lvKind = 'perfect'; }  // frame 07（起點 0.6）
+        else if (level >= STEP2_OKAY_FLOOR)     { label = '有點少'; lvKind = 'okay';    }  // frame 05–06
+        else                                    { label = '太少了'; lvKind = 'fail';    }
 
         showCookingFeedback(label, lvKind);
         // 不再用 level 更新進度條（會看到 75% 卡一下才滿）
@@ -1078,14 +1083,30 @@ function setupStep2Water() {
 // 停在 perfect 區 = 火力剛好；其他位置就 perfect=否
 function setupStep3Fire() {
     const stage = document.getElementById('cooking-stage');
-    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(460px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0;';
+    stage.style.cssText = 'position: relative; margin: -16px auto 0; width: min(460px, 92vw); display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 0;';
 
-    // 鍋子圖（側視輪廓）
-    const pot = document.createElement('img');
-    pot.src = 'Images/開火鍋子.png';
-    pot.alt = '';
-    pot.style.cssText = 'width: 200px; max-width: 90%; height: auto; object-fit: contain;';
-    stage.appendChild(pot);
+    // 鍋子（step 2 完成則用水位 frame + 描邊疊合，否則 fallback 到靜態輪廓圖）
+    const potWrap = document.createElement('div');
+    potWrap.style.cssText = 'position: relative; width: 320px; max-width: 90%; height: 140px; flex-shrink: 0;';
+    if (step2FinalFrameSrc) {
+        const fillImg = document.createElement('img');
+        fillImg.className = 'water-fill-img';
+        fillImg.src = step2FinalFrameSrc;
+        fillImg.alt = '';
+        potWrap.appendChild(fillImg);
+        const outlineImg = document.createElement('img');
+        outlineImg.className = 'water-pot-img';
+        outlineImg.src = 'Images/鍋子.png';
+        outlineImg.alt = '';
+        potWrap.appendChild(outlineImg);
+    } else {
+        const fallback = document.createElement('img');
+        fallback.src = 'Images/開火鍋子.png';
+        fallback.alt = '';
+        fallback.style.cssText = 'width: 100%; height: 100%; object-fit: contain;';
+        potWrap.appendChild(fallback);
+    }
+    stage.appendChild(potWrap);
 
     // 5 個火圖示（鍋子正下方，預設半透明，結果後從中心向外點亮）
     const fireRow = document.createElement('div');
@@ -1261,7 +1282,7 @@ function setupStep4Skim() {
 // 按空白鍵 → 撒下當前的，數字 - 1，到 0 切換 active 到下一個。
 function setupStep5Season() {
     const stage = document.getElementById('cooking-stage');
-    stage.style.cssText = 'position: relative; margin: 0 auto; width: min(700px, 92vw); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.4rem;';
+    stage.style.cssText = 'position: relative; margin: -24px auto 0; width: min(700px, 92vw); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;';
 
     const totalRequired = STEP5_SEASONINGS.reduce((sum, s) => sum + s.count, 0);
     let totalDone   = 0;
@@ -1334,8 +1355,8 @@ function setupStep5Season() {
             const p = document.createElement('img');
             p.className = 'season-particle';
             p.src = seasoning.particleImg;
-            // 在瓶口下方水平小範圍散開（粒子寬 18px，所以扣 9px 對齊中心）
-            const spreadX = centerX + (Math.random() - 0.5) * zRect.width * 0.25;
+            // 粒子落在瓶子左側（瓶口朝左搖晃，顆粒從左邊出來）
+            const spreadX = centerX - 50 + (Math.random() - 0.5) * 40;
             p.style.left = (spreadX - 9) + 'px';
             // 從瓶身底部開始落（灑落區高 110px，瓶子貼底，所以從 ~65px 處出發）
             p.style.top  = Math.max(0, zRect.height - 50) + 'px';
@@ -1367,6 +1388,10 @@ function setupStep5Season() {
         // 鍋子上方：每次按下都是獨立一次顯示 — 設 src → 淡入 → 搖晃 → 淡出（下方 icon 不動）
         gsap.killTweensOf(sprinklerImg);
         if (s.shakeImg) sprinklerImg.src = s.shakeImg;
+        // 米酒瓶比較高，sprinklerSize 讓動畫圖更大
+        const szOverride = s.sprinklerSize || '72px';
+        sprinklerImg.style.width  = szOverride;
+        sprinklerImg.style.height = szOverride;
         gsap.set(sprinklerImg, { opacity: 1, rotation: -16 });
         gsap.to(sprinklerImg, {
             rotation: 16,
@@ -2152,6 +2177,15 @@ function stopLoadingAnim() {
 window.enterChatView = function() {
     initChatView();
     showView('chat-view');
+};
+
+// reveal 頁面的「雞湯學徒」按鈕：保留前面 8 題的回答，直接跳到學徒對話
+// （等同 Q8 選「想多說」分支，但是發生在抽完雞湯之後）
+window.goToChatFromReveal = function() {
+    if (window.nfcManager) {
+        nfcManager.userAnswers = userAnswers;
+    }
+    showView('chat-intro-view');
 };
 
 // 監看對話累計次數：第 5 則使用者訊息後讓「對話卡住了？」提示 slide up

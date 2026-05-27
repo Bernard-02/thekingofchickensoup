@@ -810,7 +810,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     position: fixed;
     bottom: 16px;
     right: 16px;
-    display: flex; /* 測試階段顯示連線狀態；上線前可改回 none */
+    display: none; /* 預設關閉；由開發模式（Ctrl+Shift+D）統一切換 */
     align-items: center;
     gap: 8px;
     z-index: 100;
@@ -1507,7 +1507,7 @@ button {
     height: 110px;
     display: flex;
     justify-content: center;
-    align-items: flex-end;   /* 瓶子貼著鍋口上緣 */
+    align-items: center;
     pointer-events: none;
 }
 .season-sprinkler-img {
@@ -1533,7 +1533,7 @@ button {
 }
 .season-row {
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     justify-content: center;
     gap: 2.6rem;
 }

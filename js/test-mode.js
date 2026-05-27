@@ -1,24 +1,32 @@
-// 測試模式：用按鈕模擬 NFC 掃描，沒實體卡時開發/排練流程用
-// 開關：Ctrl+Shift+T，或 console 跑 toggleTestMode()
+// 展演 / 開發模式切換
+// 預設 OFF（展演狀態，看不到任何測試 UI）
+// 開關：Ctrl+Shift+D，或 console 跑 toggleDevMode()
+// ON 時同時顯示：測試面板（模擬 NFC）+ 右下角 ws-status「未連線/已連線」
 // 狀態存 localStorage，重新整理會記住
 
 (function () {
-    const KEY = 'chickensoup_test_mode';
+    const KEY = 'chickensoup_dev_mode';
 
     function isOn() {
         return localStorage.getItem(KEY) === '1';
     }
 
     function apply() {
+        const on = isOn();
         const panel = document.getElementById('test-panel');
-        if (panel) panel.classList.toggle('show', isOn());
+        if (panel) panel.classList.toggle('show', on);
+        const ws = document.getElementById('ws-status-container');
+        if (ws) ws.style.display = on ? 'flex' : 'none';
     }
 
-    window.toggleTestMode = function () {
+    window.toggleDevMode = function () {
         localStorage.setItem(KEY, isOn() ? '0' : '1');
         apply();
-        console.log(`[test] 測試模式: ${isOn() ? '開' : '關'}`);
+        console.log(`[dev] 開發模式: ${isOn() ? '開' : '關'}`);
     };
+
+    // 舊名稱保留別名，避免 console 習慣性鍵入 toggleTestMode 失效
+    window.toggleTestMode = window.toggleDevMode;
 
     // 模擬 ESP 透過 WebSocket 送來的訊息：直接呼叫 nfcManager.handleMessage
     // 跟真的 NFC 掃描走完全一樣的處理路徑，行為一致
@@ -74,15 +82,15 @@
         console.warn('[test] 目前不在可掃瓶子的頁面（要在 soup-result scan 模式或 quote panel 打開時用）');
     };
 
-    // Ctrl+Shift+T 開關測試模式
+    // Ctrl+Shift+D 開關開發模式
     document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.shiftKey && e.code === 'KeyT') {
+        if (e.ctrlKey && e.shiftKey && e.code === 'KeyD') {
             e.preventDefault();
-            window.toggleTestMode();
+            window.toggleDevMode();
         }
     });
 
-    // 載入時套用之前的狀態
+    // 載入時套用之前的狀態（預設 OFF）
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', apply);
     } else {
