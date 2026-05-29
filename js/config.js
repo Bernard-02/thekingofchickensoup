@@ -5,7 +5,7 @@ window.CONFIG = {
     websocket: {
         // ⚠ ESP 的 IP — 開機後從 Serial Monitor 或 Windows「行動熱點」看 ESP 拿到的 IP，貼這
         //   只要這行一個地方
-        url: 'ws://192.168.137.218:81',
+        url: 'ws://192.168.137.14:81',
         reconnectMinInterval: 200,
         reconnectMaxInterval: 3000,
         heartbeatInterval: 3000,

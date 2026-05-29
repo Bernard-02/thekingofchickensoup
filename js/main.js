@@ -687,12 +687,15 @@ const STEP4_HIT_RADIUS_PX   = 40;
 
 // Step 5 撒調味料（鹽 → 米酒 → 胡椒，每樣按對應次數空白鍵）
 // img = 平常的小 icon；shakeImg = 按下空白鍵時瓶子/罐子搖晃的姿態；particleImg = 撒下的顆粒/米酒
+// 注：每樣 count 在進入 step 時隨機（1~3），避免每次玩同一組數字
 const STEP5_POT_IMG = 'Images/差調味料的雞湯.png';
 const STEP5_SEASONINGS = [
-    { id: 'salt',   name: '鹽',   count: 4, img: 'Images/鹽巴.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
-    { id: 'wine',   name: '米酒', count: 3, img: 'Images/米酒.png', shakeImg: 'Images/米酒撒.png',   particleImg: 'Images/米酒掉落.png', sprinklerSize: '130px' },
-    { id: 'pepper', name: '胡椒', count: 5, img: 'Images/胡椒.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
+    { id: 'salt',   name: '鹽',   img: 'Images/鹽巴.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
+    { id: 'wine',   name: '米酒', img: 'Images/米酒.png', shakeImg: 'Images/米酒撒.png',   particleImg: 'Images/米酒掉落.png', sprinklerSize: '130px' },
+    { id: 'pepper', name: '胡椒', img: 'Images/胡椒.png', shakeImg: 'Images/鹽胡椒撒.png', particleImg: 'Images/鹽胡椒掉落.png' },
 ];
+const STEP5_COUNT_MIN = 1;
+const STEP5_COUNT_MAX = 3;
 
 let cookingStepIndex = 0;
 let cookingAdvancing = false;
@@ -786,28 +789,37 @@ function showCookingIntro() {
         introImg.style.display = 'block';
     }
 
+    let advanced = false;
+    const advance = () => {
+        if (advanced) return;
+        advanced = true;
+        cookingKey.down = null;
+        // 移除空白鍵示意圖
+        const img = document.getElementById('cooking-intro-img');
+        if (img) img.remove();
+        // 還原 DOM 順序，title 回到 hint(wrap) 前面（讓 step 0 顯示正常的大標→小提示）
+        if (parent && titleEl && hintWrap) parent.insertBefore(titleEl, hintWrap);
+        // 還原 intro 期間蓋掉的 inline 樣式
+        if (titleEl) titleEl.style.marginBottom = '';
+        if (kwEl)    kwEl.style.display = '';
+        // 還原舞台 + 進度條 + 步驟編號（renderCookingStep 會重設文字）
+        if (stage)    stage.style.display    = '';
+        if (progress) progress.style.display = '';
+        if (stepProg) stepProg.style.display = '';
+        renderCookingStep();
+    };
+
     if (ctrls) {
         ctrls.innerHTML = '';
         const btn = document.createElement('button');
         btn.className = 'primary-btn';   // 預設 border 樣式，hover 才填黑
         btn.textContent = '確定';
-        btn.addEventListener('click', () => {
-            // 移除空白鍵示意圖
-            const img = document.getElementById('cooking-intro-img');
-            if (img) img.remove();
-            // 還原 DOM 順序，title 回到 hint(wrap) 前面（讓 step 0 顯示正常的大標→小提示）
-            if (parent && titleEl && hintWrap) parent.insertBefore(titleEl, hintWrap);
-            // 還原 intro 期間蓋掉的 inline 樣式
-            if (titleEl) titleEl.style.marginBottom = '';
-            if (kwEl)    kwEl.style.display = '';
-            // 還原舞台 + 進度條 + 步驟編號（renderCookingStep 會重設文字）
-            if (stage)    stage.style.display    = '';
-            if (progress) progress.style.display = '';
-            if (stepProg) stepProg.style.display = '';
-            renderCookingStep();
-        });
+        btn.addEventListener('click', advance);
         ctrls.appendChild(btn);
     }
+
+    // 空白鍵也能繼續（跟確定按鈕等效，呼應畫面上的鍵盤示意圖）
+    cookingKey.down = advance;
 
     gsap.fromTo([hintEl, titleEl, introImg, ctrls].filter(Boolean),
         { opacity: 0, y: 12 },
@@ -1251,6 +1263,15 @@ function setupStep4Skim() {
         spoon.style.left = (spoonX - MESH_PX) + 'px';
         spoon.style.top  = (spoonY - MESH_PY) + 'px';
         spoon.style.transform = `rotate(${angle * 180 / Math.PI + SPOON_ANGLE_OFFSET}deg)`;
+        // 勺子靠近浮沫時放大 1.1 倍提示「可以按了」；離開回 1.0
+        foams.forEach(f => {
+            if (f.popped) return;
+            const hovered = Math.hypot(f.x - spoonX, f.y - spoonY) <= STEP4_HIT_RADIUS_PX;
+            if (hovered !== f.hovered) {
+                f.hovered = hovered;
+                gsap.to(f.el, { scale: hovered ? 1.1 : 1, duration: 0.18, ease: 'power2.out', overwrite: false });
+            }
+        });
         requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -1284,13 +1305,17 @@ function setupStep5Season() {
     const stage = document.getElementById('cooking-stage');
     stage.style.cssText = 'position: relative; margin: -24px auto 0; width: min(700px, 92vw); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem;';
 
-    const totalRequired = STEP5_SEASONINGS.reduce((sum, s) => sum + s.count, 0);
+    // 每次進場隨機決定每樣調味料要按幾次（1~3），避免每次玩同一組數字
+    const randCount = () => STEP5_COUNT_MIN + Math.floor(Math.random() * (STEP5_COUNT_MAX - STEP5_COUNT_MIN + 1));
+    const seasonings = STEP5_SEASONINGS.map(s => ({ ...s, count: randCount() }));
+
+    const totalRequired = seasonings.reduce((sum, s) => sum + s.count, 0);
     let totalDone   = 0;
     let activeIdx   = 0;
     let isSprinkling = false;
 
     // 預載 shake / particle 圖，避免按下空白鍵時 src 切換閃一下
-    STEP5_SEASONINGS.forEach(s => {
+    seasonings.forEach(s => {
         [s.shakeImg, s.particleImg].forEach(src => {
             if (src) { const i = new Image(); i.src = src; }
         });
@@ -1324,7 +1349,7 @@ function setupStep5Season() {
     row.className = 'season-row';
     stage.appendChild(row);
 
-    const boxes = STEP5_SEASONINGS.map((s, i) => {
+    const boxes = seasonings.map((s, i) => {
         const box = document.createElement('div');
         box.className = 'season-ingredient' + (i === 0 ? ' active' : '');
         const illust = s.img
@@ -1374,10 +1399,10 @@ function setupStep5Season() {
 
     cookingKey.down = () => {
         if (isSprinkling) return;
-        if (activeIdx >= STEP5_SEASONINGS.length) return;
+        if (activeIdx >= seasonings.length) return;
         isSprinkling = true;
 
-        const s        = STEP5_SEASONINGS[activeIdx];
+        const s        = seasonings[activeIdx];
         const box      = boxes[activeIdx];
         const countEl  = box.querySelector('.season-count');
         const remaining = Math.max(0, parseInt(countEl.dataset.remaining, 10) - 1);
@@ -1600,7 +1625,7 @@ function renderSoupView() {
         topEl.style.display = 'none';
         nameEl.textContent = '差最後一步了！';
         nameEl.style.fontSize = '2.5rem';
-        descEl.textContent = `請拿右邊#${q.number}瓶子掃描鍋子以接住萃取後的${soupName}`;
+        descEl.innerHTML = `請拿右邊#${q.number}瓶子掃描裝置以接住萃取後的<strong>${soupName}</strong>`;
         descEl.style.display = '';
         btn.style.display = 'none';
     }
