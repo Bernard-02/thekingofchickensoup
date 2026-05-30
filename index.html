@@ -15,7 +15,8 @@
     <link rel="icon" type="image/png" href="Logo/Website Favicon.png">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <!-- 本機 JS/CSS 都接 ?v=ASSET_VER 防瀏覽器快取，每次發版改一處（下面 ASSET_VER 全找全換） -->
+    <link rel="stylesheet" href="css/style.css?v=20260530a">
 
     <!-- FontAwesome icons (社群圖示用) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -650,9 +651,9 @@
     <!-- ReconnectingWebSocket：自動重連 + 指數 backoff + 連線 timeout，pladaria/reconnecting-websocket v4.4.0 -->
     <!-- 暴露 window.ReconnectingWebSocket，nfc.js 直接拿來用 -->
     <script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket-iife.min.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/context.js"></script>
-    <script src="js/nfc.js"></script>
+    <script src="js/config.js?v=20260530a"></script>
+    <script src="js/context.js?v=20260530a"></script>
+    <script src="js/nfc.js?v=20260530a"></script>
     <!-- 收藏雞湯 Overlay -->
     <div id="save-overlay" style="display:none; position:fixed; inset:0; background:#ffffff; z-index:500; box-sizing:border-box;">
         <div class="flex w-full h-full">
@@ -759,7 +760,7 @@
     };
     </script>
 
-    <script src="js/main.js"></script>
-    <script src="js/test-mode.js"></script>
+    <script src="js/main.js?v=20260530a"></script>
+    <script src="js/test-mode.js?v=20260530a"></script>
 </body>
 </html>
