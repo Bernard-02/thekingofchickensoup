@@ -18,24 +18,26 @@
     <!-- 本機 JS/CSS 都接 ?v=ASSET_VER 防瀏覽器快取，每次發版改一處（下面 ASSET_VER 全找全換） -->
     <link rel="stylesheet" href="css/style.css?v=20260530a">
 
+    <!-- 第三方資源全部本地化（展演離線可用，不依賴 CDN）-->
+
     <!-- FontAwesome icons (社群圖示用) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
 
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="vendor/tailwind.js"></script>
 
     <!-- QR Code 產生器 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="vendor/qrcode.min.js"></script>
 
     <!-- html2canvas 產 PNG -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="vendor/html2canvas.min.js"></script>
 
     <!-- GSAP -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/EasePack.min.js"></script>
+    <script src="vendor/gsap/gsap.min.js"></script>
+    <script src="vendor/gsap/TextPlugin.min.js"></script>
+    <script src="vendor/gsap/Flip.min.js"></script>
+    <script src="vendor/gsap/MotionPathPlugin.min.js"></script>
+    <script src="vendor/gsap/EasePack.min.js"></script>
 </head>
 <body>
     <!-- 首页 -->
@@ -650,7 +652,7 @@
     <!-- JavaScript -->
     <!-- ReconnectingWebSocket：自動重連 + 指數 backoff + 連線 timeout，pladaria/reconnecting-websocket v4.4.0 -->
     <!-- 暴露 window.ReconnectingWebSocket，nfc.js 直接拿來用 -->
-    <script src="https://cdn.jsdelivr.net/npm/reconnecting-websocket@4.4.0/dist/reconnecting-websocket-iife.min.js"></script>
+    <script src="vendor/reconnecting-websocket-iife.min.js"></script>
     <script src="js/config.js?v=20260530a"></script>
     <script src="js/context.js?v=20260530a"></script>
     <script src="js/nfc.js?v=20260530a"></script>
