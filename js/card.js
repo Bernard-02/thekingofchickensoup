@@ -1,6 +1,7 @@
-// card.js — 從 URL hash 解卡片資料，渲染卡片，提供存 PNG
+// card.js — 從 URL hash 解卡片資料，排版成 1080×1920 → 拍成 PNG 當預覽，提供儲存
 // URL 格式： https://.../card.html#d=<base64-url-of-json>
-// JSON 欄位：{ cn, en?, r?, bg?, txt?, bd?, nb? }
+// JSON 欄位：{ n?, cn, en?, r?, bg?, txt?, bd?, nb? }
+//   n : 雞湯編號（可選，AI 雞湯沒有）
 //   cn: 中文語錄（必填）
 //   en: 英文翻譯（可選）
 //   r : reasoning/解讀文字（可選）
@@ -11,6 +12,11 @@
 
 (function () {
     'use strict';
+
+    // iOS 的 <a download> 只會存到「檔案」，要叫出分享選單才有「儲存影像」進相簿
+    const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+        || (/Mac/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+    let imgFile = null;
 
     function decodeBase64Url(b64) {
         // base64url → base64
@@ -36,73 +42,80 @@
     }
 
     function showError(msg) {
+        document.getElementById('loading').style.display = 'none';
         const el = document.getElementById('error-msg');
         el.textContent = msg;
         el.style.display = '';
     }
 
-    function render(data) {
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        el.textContent = text || '';
+        el.style.display = text ? '' : 'none';
+    }
+
+    async function render(data) {
         if (!data || !data.cn) {
             showError('卡片資料壞掉了，再感應一次試試看？');
             return;
         }
 
-        const card = document.getElementById('card');
-        const cnEl = document.getElementById('card-cn');
-        const enEl = document.getElementById('card-en');
-        const rEl = document.getElementById('card-reasoning');
-
-        cnEl.textContent = data.cn;
-
-        if (data.en) {
-            enEl.textContent = data.en;
-            enEl.style.display = '';
-        }
-
-        if (data.r) {
-            rEl.textContent = data.r;
-            rEl.style.display = '';
-        }
+        setText('card-num', data.n ? `#${data.n}` : '');
+        setText('card-cn', data.cn);
+        setText('card-en', data.en);
+        setText('card-reasoning', data.r);
 
         // 樣式
+        const card = document.getElementById('card');
         const bg = data.bg || '#f2f2f2';
-        const txt = data.txt || '#000000';
-        const bd = data.bd || '#000000';
         card.style.background = bg;
-        card.style.color = txt;
+        card.style.color = data.txt || '#000000';
+        card.style.borderColor = data.bd || '#000000';
+        card.classList.toggle('no-border', !!data.nb);
         document.body.style.background = bg;
-        card.style.borderColor = bd;
-        if (data.nb) card.classList.add('no-border');
 
-        document.getElementById('card-wrap').style.display = '';
+        // logo：淺底用黑 logo，深底用白 logo（html2canvas 不支援 filter，只能換檔）
+        const [r, g, b] = [1, 3, 5].map(i => parseInt(bg.slice(i, i + 2), 16));
+        const logo = document.getElementById('card-logo');
+        logo.src = (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6 ? 'Logo/雞湯Logo.png' : 'Logo/雞湯Logo White.png';
+
+        // 字型（unicode-range 分檔，要指定這段字才會載到對的檔）、logo 都到齊才拍
+        await Promise.all([
+            document.fonts.load('500 64px "Noto Sans TC"', data.cn),
+            document.fonts.load('400 48px "Inter"', `#${data.n || ''} ${data.en || ''}`),
+            logo.decode().catch(() => {}),
+        ]);
+        await document.fonts.ready;
+
+        try {
+            const canvas = await html2canvas(card, { scale: 1, backgroundColor: null, logging: false });
+            const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+            imgFile = new File([blob], `chicken-soup-${data.n || 'quote'}.png`, { type: 'image/png' });
+        } catch (e) {
+            console.error('[card] 出圖失敗:', e);
+            showError('卡片做不出來，重新整理再試一次？');
+            return;
+        }
+
+        const img = document.getElementById('card-img');
+        if (img.src) URL.revokeObjectURL(img.src);
+        img.src = URL.createObjectURL(imgFile);
+        img.style.display = '';
+        document.getElementById('loading').style.display = 'none';
         document.getElementById('actions').style.display = '';
-        document.getElementById('hint').style.display = '';
+        if (matchMedia('(pointer: coarse)').matches) document.getElementById('hint').style.display = '';
     }
 
     window.savePNG = async function () {
-        const card = document.getElementById('card');
-        const btn = document.getElementById('save-btn');
-        btn.disabled = true;
-        btn.textContent = '處理中...';
-        try {
-            const canvas = await html2canvas(card, {
-                backgroundColor: null,
-                scale: 2,
-                useCORS: true,
-                logging: false,
-            });
-            // 觸發下載
-            const link = document.createElement('a');
-            link.download = 'chicken-soup-quote.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            btn.textContent = '再存一次';
-        } catch (e) {
-            console.error('[card] 存圖失敗:', e);
-            btn.textContent = '失敗，再試試';
-        } finally {
-            btn.disabled = false;
+        if (!imgFile) return;
+        if (IS_IOS && navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+            try { await navigator.share({ files: [imgFile] }); } catch (e) { /* 使用者關掉分享選單 */ }
+            return;
         }
+        const link = document.createElement('a');
+        link.download = imgFile.name;
+        link.href = document.getElementById('card-img').src;
+        link.click();
     };
 
     // 啟動

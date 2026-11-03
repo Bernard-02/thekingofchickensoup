@@ -44,7 +44,7 @@
       { "value": "ip", "text": "會在乎，但會拿來督促自己",                         "keyword": "自律", "scores": { "IP": 1 } },
       { "value": "ir", "text": "會想，但會提醒自己別太糾結",                       "keyword": "看淡", "scores": { "IR": 1 } },
       { "value": "sp", "text": "對我重要的人的看法才算數",                         "keyword": "親近", "scores": { "SP": 1 } },
-      { "value": "sr", "text": "沒那麽重要，我自己開心才更重要",                   "keyword": "自在", "scores": { "SR": 1 } }
+      { "value": "sr", "text": "沒那麼重要，我自己開心才更重要",                   "keyword": "自在", "scores": { "SR": 1 } }
     ]
   },
   {

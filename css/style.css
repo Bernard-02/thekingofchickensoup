@@ -6,21 +6,6 @@
 @font-face {
     font-family: 'Noto Sans TC';
     font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-sans-tc-300-latin.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Noto Sans TC';
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-sans-tc-300-zh.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Noto Sans TC';
-    font-style: normal;
     font-weight: 400;
     font-display: swap;
     src: url('../vendor/fonts/noto-sans-tc-400-latin.woff2') format('woff2');
@@ -64,76 +49,6 @@
     src: url('../vendor/fonts/noto-sans-tc-700-zh.woff2') format('woff2');
 }
 
-/* Noto Serif TC */
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-300-latin.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 300;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-300-zh.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-400-latin.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-400-zh.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-500-latin.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 500;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-500-zh.woff2') format('woff2');
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-700-latin.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: 'Noto Serif TC';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url('../vendor/fonts/noto-serif-tc-700-zh.woff2') format('woff2');
-}
-
-/* 中文字體切換 */
-.font-noto-sans-tc { font-family: 'Noto Sans TC', sans-serif !important; }
-.font-noto-serif-tc { font-family: 'Noto Serif TC', serif !important; }
-
-/* 英文字體切換（system fonts）*/
-.font-helvetica { font-family: 'Helvetica', 'Arial', sans-serif !important; }
-.font-times-new-roman { font-family: 'Times New Roman', Times, serif !important; }
-
 * {
     margin: 0;
     padding: 0;
@@ -173,8 +88,24 @@
 .no-scrollbar::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 /* 字體規範 */
+/* 中文全站行高統一。放 :root 不放 body：Tailwind preflight 在 style.css 之後注入 body{line-height:inherit}，
+   同權重會蓋掉 body 的設定；:root 權重高於 html，繼承下去才吃得到 */
+:root {
+    line-height: 1.3;
+    /* 中英混排：英文字體排前面，Helvetica/Arial 沒有中文字，中文自動落到 Noto Sans TC → 同一行中英各用各的字體 */
+    --font-mix: 'Helvetica', 'Arial', 'Noto Sans TC', sans-serif;
+    /* 字級四級制：大標題 / 小標題 / 內文 / 提示。全站只認這四個；手機值在 ≤767 區塊覆寫 */
+    --fs-title: 2.5rem;    /* 40 */
+    --fs-subtitle: 1.5rem; /* 24 */
+    --fs-body: 1rem;       /* 16 */
+    --fs-hint: 0.875rem;   /* 14 */
+    /* 版面：畫面四邊留白 + 底部 logo 列。固定在角落的東西（logo、返回、吉祥物、客製化框）都貼 --page-pad 這條線；手機值在 ≤767 區塊覆寫 */
+    --page-pad: 2rem;      /* 32，= Tailwind p-8 */
+    --logo-h: 40px;
+}
+
 body {
-    font-family: 'Noto Sans TC', 'Helvetica', sans-serif;
+    font-family: var(--font-mix);
     background-color: #f2f2f2;
     color: #000000;
     overflow: hidden;
@@ -182,7 +113,7 @@ body {
 
 /* 中文字體 */
 h1, h2, h3, h4, h5, h6, p, button {
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: var(--font-mix);
 }
 
 /* 英文字體（需要時使用 .en 類別） */
@@ -208,30 +139,22 @@ h1, h2, h3, h4, h5, h6, p, button {
    h6  14px  → 標籤、輔助資訊
    p   16px  → 內文（預設）
 ────────────────────────────── */
-h1 { font-size: 4rem !important;    line-height: 1.1; }   /* 64px */
-h2 { font-size: 2.5rem !important;  line-height: 1.2; }   /* 40px */
-h3 { font-size: 1.75rem !important; line-height: 1.3; }   /* 28px */
-h4 { font-size: 1.375rem !important; line-height: 1.4; }  /* 22px */
-h5 { font-size: 1.125rem !important; line-height: 1.4; }  /* 18px */
-h6 { font-size: 0.875rem !important; line-height: 1.5; }  /* 14px */
-p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
+h1 { font-size: 4rem !important; }   /* 首頁 hero，四級制外唯一例外 */
+h2 { font-size: var(--fs-title) !important; }    /* !important：Tailwind preflight 在 style.css 之後把標題 font-size 設回 inherit */
+h3, h4 { font-size: var(--fs-subtitle) !important; }
+h5 { font-size: var(--fs-body) !important; }
+h6 { font-size: var(--fs-hint) !important; }
+p  { font-size: var(--fs-body); }
 
-/* 頁面切換 */
-.page {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-}
+/* 四級制 utility class（取代 Tailwind 的 text-xs / text-base / text-lg） */
+.fs-title { font-size: var(--fs-title); }
+.fs-subtitle { font-size: var(--fs-subtitle); }
+.fs-body { font-size: var(--fs-body); }
+.fs-hint { font-size: var(--fs-hint); }
 
-.page.active {
-    opacity: 1;
-    visibility: visible;
-}
+/* 英文行高（中文一律用 body 的 1.2） */
+#quote-panel-en { line-height: 1.3; }
+#save-card-text-en { line-height: 1.4; }
 
 /* 覆蓋層 */
 .overlay {
@@ -252,15 +175,6 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     visibility: visible;
 }
 
-.overlay-content {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* p5.js 畫布容器 */
 #p5-canvas {
     position: absolute;
@@ -279,46 +193,19 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     background-color: #f2f2f2;
 }
 
-/* 首頁標題大小 */
-#home-view h1 {
-    font-size: 4rem; /* 64px */
-    line-height: 1.1;
-    margin-bottom: 0.5rem;
-}
-
-#home-view h2 {
-    font-size: 2.5rem; /* 40px */
-    line-height: 1.2;
-}
-
-@media (min-width: 768px) {
-    #home-view h1 {
-        font-size: 5rem; /* 80px */
-        line-height: 1.1;
-        margin-bottom: 0.75rem;
-    }
-
-    #home-view h2 {
-        font-size: 3rem; /* 48px */
-        line-height: 1.2;
-    }
-}
+/* 首頁標題：字級走四級制（h1 = hero 例外），這裡只管間距 */
+#home-view h1 { margin-bottom: 0.5rem; }
+@media (min-width: 768px) { #home-view h1 { margin-bottom: 0.75rem; } }
 
 /* Logo - 在所有頁面顯示（除了雞湯頁） */
 #logo {
     position: fixed;
-    bottom: 32px;
+    bottom: var(--page-pad);
     left: 50%;
     transform: translateX(-50%);
-    height: 32px;
+    height: var(--logo-h);
     z-index: 100; /* 確保在所有頁面之上 */
     transition: opacity 0.3s ease; /* 平滑過渡 */
-}
-
-@media (min-width: 768px) {
-    #logo {
-        height: 40px;
-    }
 }
 
 /* 雞湯頁時隱藏 logo */
@@ -375,82 +262,8 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     z-index: 20;
 }
 
-/* 使用提示頁面樣式 */
-#guide-view h2 {
-    font-size: 2rem; /* 32px */
-    margin-bottom: 3rem;
-}
-
-@media (min-width: 768px) {
-    #guide-view h2 {
-        font-size: 2.5rem; /* 40px */
-    }
-}
-
-/* 問題頁面樣式 */
-#question-view h2,
-#waiting-nfc-view h2 {
-    font-size: 2rem; /* 32px */
-    line-height: 1.3;
-}
-
-@media (min-width: 768px) {
-    #question-view h2,
-    #waiting-nfc-view h2 {
-        font-size: 2.5rem; /* 40px */
-    }
-}
-
-/* 步驟卡片容器 */
-.guide-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto 3rem;
-}
-
-@media (min-width: 768px) {
-    .guide-steps {
-        flex-direction: row;
-        justify-content: center;
-        gap: 2rem;
-    }
-}
-
-/* 步驟卡片 */
-.step-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* 對齊頂部 */
-    text-align: center;
-    padding: 2rem 1.5rem;
-    background: transparent;
-    border: 1px solid #000;
-}
-
-@media (min-width: 768px) {
-    .step-card {
-        max-width: 280px;
-    }
-}
-
-/* 步驟數字 */
-.step-number {
-    font-size: 1.5rem; /* 24px */
-    font-weight: 500;
-    margin-bottom: 1rem;
-    color: #000;
-}
-
-/* 步驟文字 */
-.step-text {
-    font-size: 1.125rem; /* 18px */
-    line-height: 1.4;
-}
+/* 使用提示頁面樣式（字級走四級制） */
+#guide-view h2 { margin-bottom: 3rem; }
 
 /* 問題選項容器 */
 #question-options {
@@ -459,29 +272,9 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     gap: 1rem;
 }
 
-/* 雞湯頁面字體大小 */
-#quote-number-text {
-    font-size: 1rem; /* 16px — 小標 */
-    opacity: 0.4;
-}
-
-#quote-zh-text {
-    font-size: 2rem; /* 32px */
-    text-wrap: balance;
-    line-height: 1.3;
-}
-
-#quote-en-text {
-    font-size: 1.25rem; /* 20px */
-    text-wrap: balance;
-    letter-spacing: -0.02em;
-    line-height: 1.4;
-    opacity: 0.5;
-}
-
 /* 資訊頁導航按鈕 */
 .info-nav-btn {
-    font-size: 1.375rem; /* h4 — 22px */
+    font-size: var(--fs-subtitle);
     background: transparent;
     border: none;
     color: rgba(0,0,0,0.5);    /* 預設 50% 黑（沒 active 時） */
@@ -526,7 +319,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
 
 /* Research anchor 連結 */
 .research-anchor-btn {
-    font-size: 1.375rem; /* h4 — 與導航 btn 同 */
+    font-size: var(--fs-subtitle);
     color: rgba(0,0,0,0.5);   /* 預設 50% 黑（沒 active 時） */
     text-decoration: none;
     cursor: pointer;
@@ -598,7 +391,6 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     color: #fff !important;
 }
 
-
 /* Parameter slider */
 .param-slider {
     -webkit-appearance: none;
@@ -656,22 +448,6 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     transform: rotate(45deg);
 }
 
-/* Custom dropdown */
-.custom-select {
-    -webkit-appearance: none;
-    appearance: none;
-    border: 1px solid #000;
-    background: transparent;
-    padding: 4px 24px 4px 8px;
-    height: 32px;
-    font-size: 0.75rem;
-    cursor: pointer;
-    outline: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23000' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-}
-
 /* 收藏面板專用 radio */
 .save-radio {
     appearance: none;
@@ -703,7 +479,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     border: none;
     border-bottom: 1px solid #000;
     padding: 8px 36px 8px 0;
-    font-size: 0.875rem;
+    font-size: var(--fs-hint);
     outline: none;
     width: 100%;
     box-sizing: border-box;
@@ -728,7 +504,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 0.875rem;
+    font-size: var(--fs-hint);
 }
 .save-email-send:disabled {
     opacity: 0.3;
@@ -786,148 +562,8 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     transform: translateX(0);
 }
 
-/* 雞湯頁面提示文字 */
-#quote-actions {
-    opacity: 0;
-    transition: opacity 0.5s ease-in;
-}
-
 #quote-actions.visible {
     opacity: 1;
-}
-
-#quote-actions p {
-    color: rgba(0, 0, 0, 0.5); /* 0.5黑 */
-}
-
-@media (min-width: 768px) {
-    #quote-number-text {
-        font-size: 2.5rem; /* 40px */
-    }
-
-    #quote-zh-text {
-        font-size: 3rem; /* 48px */
-    }
-
-    #quote-en-text {
-        font-size: 2.5rem; /* 40px */
-    }
-}
-
-/* 脈絡媒體覆蓋層 */
-.context-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(255, 255, 255, 0.8); /* 0.8 白色背景 */
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.context-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.context-media-container {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    position: relative;
-    padding: 0 2rem;
-}
-
-#context-media-display {
-    flex: 1;
-    max-width: 900px;
-    max-height: 75vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-#context-media-display img,
-#context-media-display video {
-    max-width: 100%;
-    max-height: 75vh;
-    object-fit: contain;
-    display: block;
-}
-
-/* 輪播控制按鈕 */
-.context-nav-btn {
-    background: transparent;
-    border: 1px solid #000;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    color: #000;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 210;
-}
-
-.context-nav-btn:hover {
-    background: #000;
-    color: #f2f2f2;
-}
-
-.context-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.context-nav-btn:disabled:hover {
-    background: transparent;
-    color: #000;
-}
-
-/* 左右箭頭位置（已透過 flex 排列，不需要額外定位） */
-.context-nav-left {
-    order: -1;
-}
-
-.context-nav-right {
-    order: 1;
-}
-
-/* 指示器（隱藏，但保留功能給 JS 使用） */
-.context-indicators {
-    display: none !important;
-}
-
-.context-indicator {
-    display: none;
-}
-
-/* 脈絡提示文字 */
-.context-hint {
-    position: fixed;
-    bottom: 8vh; /* 距離底部 15vh，更靠近媒體 */
-    left: 50%;
-    transform: translateX(-50%);
-    color: #000; /* 黑色文字 */
-    font-size: 1rem;
-    text-align: center;
-    z-index: 210;
 }
 
 /* WebSocket 狀態指示器 */
@@ -973,7 +609,7 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     background: #fff;
     border: 1.5px solid #000;
     padding: 10px 12px;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: var(--font-mix);
     font-size: 12px;
     display: none;            /* 預設隱藏，class .show 時才顯示 */
     flex-direction: column;
@@ -1009,22 +645,6 @@ p  { font-size: 1rem;    line-height: 1.5; }   /* 16px */
     background: #333;
 }
 
-/* 狀態指示燈 */
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.status-connected {
-    background-color: #10b981;
-}
-
-.status-disconnected {
-    background-color: #ef4444;
-}
-
 /* 按鈕樣式 */
 button {
     cursor: pointer;
@@ -1037,13 +657,13 @@ button {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
-    padding: 5px 10px;
+    padding: 8px 10px; /* 量過：字的墨跡上下會比左右少 ~3px，上下多給 3px 視覺上四邊才一樣 */
     background: transparent;
     border: 1px solid #000;
     border-radius: 0;
     cursor: pointer;
-    font-size: 18px;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--fs-body);
+    font-family: var(--font-mix);
     font-weight: 500;
     color: #000;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -1056,13 +676,13 @@ button {
 }
 
 .primary-btn {
-    padding: 5px 10px;
+    padding: 8px 10px; /* 量過：字的墨跡上下會比左右少 ~3px，上下多給 3px 視覺上四邊才一樣 */
     background: transparent;
     border: 1px solid #000;
     border-radius: 0;
     cursor: pointer;
-    font-size: 18px;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--fs-body);
+    font-family: var(--font-mix);
     font-weight: 500;
     color: #000;
     margin-top: 2rem;
@@ -1095,12 +715,12 @@ button {
 
 .option-btn {
     width: 100%;
-    padding: 5px 10px;
+    padding: 10px;
     background: transparent;
     border: 1px solid #000;
     cursor: pointer;
-    font-size: 16px;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--fs-body);
+    font-family: var(--font-mix);
     font-weight: 400;
     color: #000;
     text-align: left;
@@ -1111,7 +731,7 @@ button {
 /* 選項前的圓圈數字 */
 .option-number {
     margin-right: 0.5rem;
-    font-size: 16px;
+    font-size: var(--fs-body);
 }
 
 .option-btn:hover {
@@ -1145,12 +765,12 @@ button {
     border: 1px solid #000;
     border-radius: 0;
     cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-family: var(--font-mix);
     color: #000;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* 靠上排：圖框固定高，兩張卡的標題、內文才會對齊 */
     gap: 1rem;
     text-align: center;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -1172,15 +792,13 @@ button {
 }
 
 .container-choice-title {
-    font-size: 1.5rem;
+    font-size: var(--fs-subtitle);
     font-weight: 600;
 }
 
 .container-choice-text {
-    font-size: 1rem;
+    font-size: var(--fs-body);
     font-weight: 400;
-    line-height: 1.6;
-    text-wrap: balance;
     line-break: strict;
 }
 
@@ -1213,7 +831,7 @@ button {
 }
 
 .ingredient-name {
-    font-size: 1.1rem;
+    font-size: var(--fs-body);
     font-weight: 600;
     color: #000;
 }
@@ -1221,7 +839,7 @@ button {
 .ingredient-amount {
     font-family: 'Helvetica', 'Arial', sans-serif;
     letter-spacing: -0.02em;
-    font-size: 1rem;
+    font-size: var(--fs-hint);
     color: rgba(0, 0, 0, 0.6);
 }
 
@@ -1260,6 +878,16 @@ button {
     pointer-events: none;
 }
 
+/* 熬製頁固定格位：控制列（確定鈕）和進度條釘在畫面下方固定位置，不隨步驟內容高低移動；
+   上面的標題 / 提示 / 舞台在剩下的空間置中，提示固定留兩行高，一行、兩行都不會推動舞台 */
+#cooking-view { --cook-dock: calc(var(--logo-h) + 114px); --footer-h: var(--cook-dock); } /* 進度條列 42 + 間距 16 + 按鈕列 56 */
+#cooking-view > div { padding-bottom: calc(var(--page-pad) * 2 + var(--cook-dock)); }
+#cooking-hint-wrap { min-height: calc(var(--fs-hint) * 1.2 * 2); }
+#cooking-controls, #cooking-progress-boxes { position: absolute; left: 0; right: 0; margin: 0; }
+#cooking-progress-boxes { bottom: calc(var(--page-pad) * 2 + var(--logo-h)); }
+#cooking-controls { bottom: calc(var(--page-pad) * 2 + var(--logo-h) + 58px); }
+#cooking-controls .primary-btn { margin-top: 0; }
+
 /* 熬製小遊戲：控制區 layout */
 .cooking-controls.row {
     display: flex;
@@ -1271,126 +899,6 @@ button {
 .cooking-controls.single {
     display: flex;
     justify-content: center;
-}
-
-/* Step 1: 食材按鈕 */
-.cook-ingredient-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #000;
-    background: transparent;
-    cursor: pointer;
-    min-width: 96px;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
-    font-family: inherit;
-}
-.cook-ingredient-btn:hover:not(:disabled) {
-    background: #000;
-    color: #fff;
-}
-.cook-ingredient-btn:hover:not(:disabled) .cook-ingredient-btn-img {
-    filter: invert(1);
-}
-.cook-ingredient-btn:disabled {
-    cursor: default;
-}
-.cook-ingredient-btn-img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    transition: filter 0.15s ease;
-}
-.cook-ingredient-btn-kw {
-    font-size: 0.9rem;
-    font-style: italic;
-}
-
-/* Step 2: 加熱按鈕 */
-.cook-hold-btn {
-    padding: 1rem 2.5rem;
-    border: 1px solid #000;
-    background: transparent;
-    color: #000;
-    font-size: 1.05rem;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s ease, color 0.15s ease, transform 0.08s ease;
-    font-family: inherit;
-}
-.cook-hold-btn:hover { background: #000; color: #fff; }
-.cook-hold-btn.pressed {
-    background: #000;
-    color: #fff;
-    transform: translateY(1px);
-}
-
-/* Step 3: 浮沫氣泡（點擊按鈕疊在鍋上） */
-.foam-bubble {
-    position: absolute;
-    width: 34px;
-    height: 34px;
-    border: 1px solid #000;
-    border-radius: 50%;
-    background: #f2f2f2;
-    padding: 0;
-    cursor: pointer;
-    transition: transform 0.15s ease;
-}
-.foam-bubble::before {
-    content: '';
-    position: absolute;
-    top: 6px; left: 8px;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #fff;
-    opacity: 0.8;
-}
-.foam-bubble:hover { transform: scale(1.1); }
-
-/* Step 4: 調味罐按鈕 */
-.cook-shaker-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 2rem;
-    border: 1px solid #000;
-    background: transparent;
-    color: #000;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-    font-family: inherit;
-    font-size: 1rem;
-}
-.cook-shaker-btn:hover { background: #000; color: #fff; }
-.cook-shaker-btn:hover .cook-shaker-img { filter: invert(1); }
-.cook-shaker-img {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
-    transition: filter 0.15s ease;
-}
-
-/* Stage 上的 overlay（蒸氣 / 浮沫 / 調味料點）*/
-.pot-steam {
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.6rem;
-    opacity: 0.4;
-    pointer-events: none;
-}
-.season-dot {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #000;
-    border-radius: 50%;
-    pointer-events: none;
 }
 
 /* ===========================================================
@@ -1537,15 +1045,6 @@ button {
     border: 2px solid #000;
     background: transparent;
     overflow: visible;
-}
-.fire-fill {
-    /* 已不使用，舊版的填滿條保留樣式以防其他地方還在用 */
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 0%;
-    background: rgba(220, 110, 40, 0.5);
 }
 /* 賽車起跑式：自動往返掃的指針 */
 .fire-indicator {
@@ -1770,8 +1269,7 @@ button {
 
 .chat-bubble {
     padding: 8px 14px;
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: var(--fs-body);
     background: transparent;
     text-align: left;
     color: #000;
@@ -1787,7 +1285,7 @@ button {
     background: #555;
     color: #bbb;
     padding: 8px 14px;
-    font-size: 0.85rem;
+    font-size: var(--fs-hint);
     margin-bottom: 0;
     /* 預設藏起來（往下偏 + 透明），加 .show 才滑進來 */
     opacity: 0;
@@ -1805,7 +1303,7 @@ button {
     border: none;
     cursor: pointer;
     color: #bbb;
-    font-size: 0.85rem;
+    font-size: var(--fs-hint);
     padding: 0;
     font-family: inherit;
     transition: color 0.2s ease;
@@ -1829,8 +1327,7 @@ button {
 
 /* thinking：學徒 avatar 旁邊的打字機思考文字（不加泡泡） */
 .chat-thinking-text {
-    font-size: 1rem;
-    line-height: 1.7;
+    font-size: var(--fs-body);
     color: rgba(0, 0, 0, 0.6);
     font-style: italic;
     padding: 12px 0;
@@ -1852,13 +1349,13 @@ button {
 
 /* 確定按鈕 */
 .confirm-btn {
-    padding: 5px 10px;
+    padding: 8px 10px; /* 量過：字的墨跡上下會比左右少 ~3px，上下多給 3px 視覺上四邊才一樣 */
     background: transparent;
     border: 1px solid #000;
     border-radius: 0;
     cursor: pointer;
-    font-size: 18px;
-    font-family: 'Noto Sans TC', sans-serif;
+    font-size: var(--fs-body);
+    font-family: var(--font-mix);
     font-weight: 500;
     color: #000;
     margin-top: 3rem;
@@ -1877,7 +1374,6 @@ button {
     background: #000;
     color: #f2f2f2;
 }
-
 
 /* 日誌容器 */
 #log-container {
@@ -1910,14 +1406,113 @@ button {
         opacity: 0.5;
     }
 }
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* 按鈕模式（沒有 NFC）：藏掉只跟實體書本 / 感應裝置有關的東西 */
+.no-nfc #reveal-mascot-hint,
+.no-nfc #save-nfc-btn,
+.no-nfc #save-nfc-status,
+.no-nfc #reveal-buttons {
+    display: none !important;
 }
 
+/* 揭曉頁按鈕模式：脈絡 / 儲存 + 一行小字連結（NFC 模式用原本三顆按鈕）*/
+/* AI 結果頁右下的客製化框：貼留白線（手機改放 logo 列上面，見 ≤767 區塊）*/
+#chat-customize-dock { bottom: var(--page-pad); right: var(--page-pad); width: min(300px, calc(100vw - 2 * var(--page-pad))); }
+
+#reveal-buttons-web { display: none; margin: 2rem 0 80px; } /* 80px：不壓 logo（原本寫在每顆 .primary-btn 上）*/
+#reveal-buttons-web .primary-btn { margin: 0; }
+.no-nfc #reveal-buttons-web { display: flex; }
+#reveal-links button { background: none; border: none; padding: 0; cursor: pointer; color: #000; font-size: var(--fs-body); }
+#reveal-links span { opacity: 0.4; }
+
 /* 響應式設計 */
-@media (max-width: 768px) {
-    #quote-text {
-        font-size: 1.5rem;
+/* 熬製頁用「按住畫面」代替空白鍵：長按不選字、不跳圖片選單、不雙擊縮放 */
+#cooking-view {
+    overflow: hidden !important;   /* 小遊戲畫面固定不捲：點畫面 / 按住時不會跟著滑動（版面本來就釘在一個畫面內）*/
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+/* ── 手機排版（< 768px）── */
+@media (max-width: 767px) {
+    /* ── 版面框 ──
+       每頁內容 = 畫面扣掉四邊 --page-pad，底部再扣掉 footer 列（--footer-h，預設 = logo）+ 一個 --page-pad 當間距。
+       角落固定的東西都貼 --page-pad，內容就不會撞到它們；內容太長整頁捲，不會被裁掉。 */
+    :root { --page-pad: 1.5rem; --logo-h: 32px; }   /* 1.5rem = Tailwind spacing-6，跟聊天頁的 px-6 一樣 */
+    .view-container { overflow-y: auto; --footer-h: var(--logo-h); }
+    #question-view { --footer-h: 112px; }           /* 角落吉祥物 64 + 頭上自我介紹兩行 */
+    .view-container > .p-8, #home-view > div {
+        min-height: 100%;
+        padding: var(--page-pad) var(--page-pad) calc(var(--page-pad) * 2 + var(--footer-h));
     }
+    .primary-btn, .confirm-btn { margin-bottom: 0; } /* 原本 80px 是各自躲 logo，改由上面的底部留白統一處理 */
+    #chat-view > div { height: 100%; }               /* h-screen(100vh) 在 iOS 比可見高度高，會多出捲動 */
+    /* 鍵盤彈出（html.kb-open，main.js 依輸入框 focus 切）：logo 藏掉、底部留白縮到一個 --page-pad，輸入框才貼得到鍵盤 */
+    html.kb-open #chat-view > div { padding-bottom: var(--page-pad) !important; } /* inline 110px 要 !important 才蓋得掉 */
+    html.kb-open #logo { display: none; }
+
+    /* AI 結果頁：左上三顆返回、下方客製化框都佔位，內容上下讓開；客製化框放在 logo 列上面、整排寬 */
+    #chat-result-view { --footer-h: calc(var(--logo-h) + var(--page-pad) + 50px); }
+    #chat-result-view > .p-8 { padding-top: calc(var(--page-pad) * 2 + 4.5rem); }
+    #chat-customize-dock { bottom: calc(var(--page-pad) * 2 + var(--logo-h)); left: var(--page-pad); width: auto; }
+
+    /* 字級四級制的手機值：大標題 / 小標題縮，內文 / 提示不變；h1 是首頁 hero 例外 */
+    :root { --fs-title: 1.5rem; --fs-subtitle: 1.125rem; --fs-body: 0.875rem; --fs-hint: 0.75rem; }   /* 24 / 18 / 14 / 12 */
+    h1 { font-size: 2.5rem !important; }
+
+    #home-view > div { text-align: center; }
+    /* 導覽圖縮小、貼齊框底（object-position: bottom）靠近文案；框高固定，兩步換圖不跳版 */
+    #guide-image { max-width: 240px !important; height: 100px !important; object-position: center bottom; margin-bottom: 1rem; }
+
+    /* 問題：keep-all 會讓整句中文不能斷行而被切掉 */
+    #question-text { word-break: normal !important; }
+
+    /* 問題頁吉祥物：縮到角落，不壓選項跟 logo；自我介紹從旁邊改到頭上 */
+    #question-mascot-wrap { right: var(--page-pad) !important; bottom: var(--page-pad) !important; flex-direction: column; align-items: flex-end !important; gap: 8px !important; }
+    #question-mascot-wrap-left { left: var(--page-pad) !important; bottom: var(--page-pad) !important; flex-direction: column-reverse; align-items: flex-start !important; gap: 8px !important; }
+    #question-mascot, #question-mascot-left { width: 64px !important; }
+    #question-mascot-hint, #question-mascot-hint-left { max-width: calc(50vw - var(--page-pad)) !important; }   /* 從留白線到畫面中線 */
+
+    /* 選鍋子（Q8）：兩欄維持，但縮內距 / 圖 / 字 */
+    #question-options.container-choice-layout { gap: 0.75rem; }
+    .container-choice-box { min-height: 0; padding: 1.25rem 0.75rem; gap: 0.5rem; }
+    .container-choice-image { width: 80px; height: 80px; }
+
+    /* 熬製：各步驟舞台在 JS 寫死 360px 寬（加水的水位標籤還會再往右凸），手機整個等比縮小 */
+    #cooking-stage { zoom: 0.8; }
+    #cooking-stage:has(.water-jar) { zoom: 0.7; }   /* 加水的「適量」標籤凸在鍋子右邊，再縮一點才進得了留白 */
+    /* 熬製提示：手機上不放提示文字左邊的小雞湯王（JS 會寫 inline display，所以要 !important）*/
+    #cooking-hint-icon { display: none !important; }
+    /* 剁食材：一次只出現一個（JS 切 .current）；1.25 × 舞台 0.8 = 桌面原尺寸，菜刀、標籤一起縮放 */
+    .chop-ingredient:not(.current) { display: none; }
+    .chop-ingredient { zoom: 1.25; }
+
+    /* iOS Safari 的 100vh 會算進網址列底下，底部 logo / 按鈕被擋；支援 dvh 就用可見高度 */
+    .view-container, #info-website-view > div { height: 100dvh; }
+
+    /* 資訊網站頁：左右各半 → 上面導航、下面內容（內容區照舊自己捲，research 錨點 / 進場動畫都靠它）*/
+    #info-website-view > div { flex-direction: column; }
+    #info-left-panel { position: relative; width: 100%; height: auto; flex-shrink: 0; padding: var(--page-pad); gap: 16px; }
+    #info-left-panel > .absolute { top: var(--page-pad); right: var(--page-pad); bottom: auto; left: auto; }
+    #info-left-panel > .absolute img { width: 4.5rem; }
+    #info-nav { flex-direction: row; flex-wrap: wrap; column-gap: 1.5rem; }
+    #research-anchors { flex-direction: row; flex-basis: 100%; gap: 1rem; margin-top: 0; margin-left: 0; }
+    .research-anchor-btn { margin-left: 0; font-size: var(--fs-body); }
+    #info-right-panel { width: 100%; flex: 1; min-height: 0; padding-inline: var(--page-pad); border-top: 2px solid #000; }
+    #info-right-panel .info-pane { padding-top: 1.5rem !important; padding-right: 0 !important; }
+    #info-right-panel .info-pane h4.pt-24 { padding-top: 0; }
+    #info-right-panel [style*="max-width"] { max-width: none !important; }
+    #info-right-panel .gap-24 { gap: 3rem; }
+
+    /* 雞湯 panel：半螢幕 → 全螢幕 */
+    .quote-slide-panel { width: 100%; height: 100dvh; border-left: none; }
+    .quote-slide-panel > button { top: var(--page-pad); right: var(--page-pad); }
+    #quote-panel-content { padding-inline: var(--page-pad); }
+}
+
+/* 觸控裝置沒有真正的 hover，點過的列會一直卡在黑底 */
+@media (hover: none) {
+    #quotes-list > div:hover { background-color: transparent !important; }
+    #quotes-list > div:hover span { color: inherit !important; }
 }

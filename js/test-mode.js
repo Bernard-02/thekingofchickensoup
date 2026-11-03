@@ -17,6 +17,8 @@
         if (panel) panel.classList.toggle('show', on);
         const ws = document.getElementById('ws-status-container');
         if (ws) ws.style.display = on ? 'flex' : 'none';
+        const modeBtn = document.getElementById('mode-toggle-btn');
+        if (modeBtn) modeBtn.textContent = CONFIG.useNFC ? '展覽模式 → 切線上' : '線上模式 → 切展覽';
     }
 
     window.toggleDevMode = function () {

@@ -81,7 +81,7 @@
       "patience"
     ],
     "translation": "放了很久的東西，你還記得它在哪嗎？",
-    "soupName": "#5",
+    "soupName": "熬了很久的雞湯",
     "quadrant": "SP"
   },
   {
@@ -325,7 +325,7 @@
     "id": "029",
     "number": 29,
     "category": "人生哲理",
-    "textCN": "沒有什麽東西是永恆不變的，唯一不變的東西就是改變本身。",
+    "textCN": "沒有什麼東西是永恆不變的，唯一不變的東西就是改變本身。",
     "textEN": "Nothing is truly permanent — the only thing that never changes is change itself.",
     "nfcUID": "04:AE:D5:22:BF:2A:81",
     "contextId": "029",
@@ -376,7 +376,7 @@
     "id": "033",
     "number": 33,
     "category": "人際關係",
-    "textCN": "處在不適合的群體，不是想著要怎麽變成像他們一樣，而是去尋找下一個更合適的群體。",
+    "textCN": "處在不適合的群體，不是想著要怎麼變成像他們一樣，而是去尋找下一個更合適的群體。",
     "textEN": "When you're in a group that doesn't suit you, don't think about becoming like them — instead, look for a group that fits you better.",
     "nfcUID": "04:B8:D5:22:BF:2A:81",
     "contextId": "033",
@@ -595,7 +595,7 @@
     "id": "054",
     "number": 54,
     "category": "人生哲理",
-    "textCN": "强者從不抱怨環境，是金子總會發光，你其實沒那麽多藉口。",
+    "textCN": "强者從不抱怨環境，是金子總會發光，你其實沒那麼多藉口。",
     "textEN": "The strong never complain about their environment — if you're gold, you will shine. You actually don't have that many excuses.",
     "nfcUID": "04:CF:D5:22:BF:2A:81",
     "contextId": "054",
@@ -664,7 +664,7 @@
     "id": "062",
     "number": 62,
     "category": "人際關係",
-    "textCN": "愛要及時，因為你無法預測你愛的人什麽時候會離開你。",
+    "textCN": "愛要及時，因為你無法預測你愛的人什麼時候會離開你。",
     "textEN": "Love needs to be timely, because you never know when the person you love might leave you.",
     "nfcUID": "04:D8:D5:22:BF:2A:81",
     "contextId": "062",
@@ -913,7 +913,7 @@
     "id": "100",
     "number": 100,
     "category": "處世態度",
-    "textCN": "別人的嘴巴長在他們身上，我們沒辦法決定他人要說什麽，但我們可以決定自己要聽什麽。",
+    "textCN": "別人的嘴巴長在他們身上，我們沒辦法決定他人要說什麼，但我們可以決定自己要聽什麼。",
     "textEN": "You can't control what others say, but you can choose what to listen to.",
     "nfcUID": "04:46:6F:97:CC:2A:81",
     "contextId": "100",
@@ -940,7 +940,7 @@
       "perspective"
     ],
     "translation": "前面施工，有人等，有人找別條路，有人直接穿過去。",
-    "soupName": "#103",
+    "soupName": "意外發現的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1150,7 +1150,7 @@
     "id": "141",
     "number": 141,
     "category": "人際關係",
-    "textCN": "將心比心，你怎麽對待別人，別人就怎麽對待你。",
+    "textCN": "將心比心，你怎麼對待別人，別人就怎麼對待你。",
     "textEN": "Treat others the way you want to be treated; people usually reflect what you give.",
     "nfcUID": "04:9E:68:97:CC:2A:81",
     "contextId": "141",
@@ -1166,7 +1166,7 @@
     "id": "142",
     "number": 142,
     "category": "人生哲理",
-    "textCN": "無論再怎麽難過，肚子餓了還是要吃，感覺累了還是要睡——生活還是要過。",
+    "textCN": "無論再怎麼難過，肚子餓了還是要吃，感覺累了還是要睡——生活還是要過。",
     "textEN": "No matter how sad you are, you still need to eat when you're hungry and sleep when you're tired—life goes on.",
     "nfcUID": "04:25:6F:97:CC:2A:81",
     "contextId": "142",
@@ -1376,7 +1376,7 @@
     "id": "165",
     "number": 165,
     "category": "處世態度",
-    "textCN": "別想太多，有的時候心思不那麽細膩也行。",
+    "textCN": "別想太多，有的時候心思不那麼細膩也行。",
     "textEN": "Don't overthink everything. It's okay if your mind isn't always so delicate and precise.",
     "nfcUID": "04:FC:6E:97:CC:2A:81",
     "contextId": "165",
@@ -1488,7 +1488,7 @@
       "perspective"
     ],
     "translation": "手裡的牌多一點，選擇就多一點。",
-    "soupName": "#176",
+    "soupName": "配料豐富的雞湯",
     "quadrant": "IP"
   },
   {
@@ -1674,14 +1674,14 @@
       "patience"
     ],
     "translation": "最黑的時候，是天快亮之前。",
-    "soupName": "#198",
+    "soupName": "喝到底才回甘的雞湯",
     "quadrant": "IR"
   },
   {
     "id": "199",
     "number": 199,
     "category": "處世態度",
-    "textCN": "兩個人之間有那麽多話題可以聊，我們沒有必要說他人的是非。",
+    "textCN": "兩個人之間有那麼多話題可以聊，我們沒有必要說他人的是非。",
     "textEN": "There are so many things two people can talk about—there's no need to gossip about others.",
     "nfcUID": "04:D7:6E:97:CC:2A:81",
     "contextId": "199",
@@ -1690,7 +1690,7 @@
       "perspective"
     ],
     "translation": "聊了兩個小時，一次也沒提到別人的名字。",
-    "soupName": "沒那麽八卦的雞湯",
+    "soupName": "沒那麼八卦的雞湯",
     "quadrant": "SR",
     "quadrantSecondary": "SP"
   }

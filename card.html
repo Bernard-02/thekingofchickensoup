@@ -8,135 +8,85 @@
 
     <title>你的雞湯 — The King of Chicken Soup</title>
     <link rel="icon" type="image/png" href="Logo/Website Favicon.png">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20261103i">
     <script src="vendor/tailwind.js"></script>
     <script src="vendor/html2canvas.min.js"></script>
 
     <style>
-        html, body {
-            background: #f2f2f2;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            font-family: 'Noto Sans TC', sans-serif;
+        /* 卡片英文用 Inter（Google Fonts 的 Helvetica 替身，打包在 vendor/ 三平台出圖才一致）；只有這頁用，裝置端維持 Helvetica */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('vendor/fonts/inter-400-latin.woff2') format('woff2');
         }
+        html, body { background: #f2f2f2; min-height: 100%; overflow: auto; }
         .page {
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 24px;
-            padding: 24px 16px;
-            box-sizing: border-box;
+            padding: var(--page-pad);
         }
-        #card-wrap {
-            width: min(92vw, 420px);
-            aspect-ratio: 3 / 4;
-            position: relative;
-        }
+        /* 預覽 = 實際存下來的 PNG，手機可以直接長按存相簿 */
+        #card-img { height: min(calc(100dvh - 2 * var(--page-pad) - 140px), 760px); aspect-ratio: 9 / 16; }
+
+        /* 出圖用：1080×1920 原尺寸排版，放在畫面外，html2canvas 拍完轉成上面的 #card-img
+           字級以中文 64 為基準：編號 / 英文 48（中文的 3/4，拉近中英落差）、logo 高 112*/
         #card {
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            left: -10000px;
+            top: 0;
+            width: 1080px;
+            height: 1920px;
+            padding: 0 120px;
             background: #f2f2f2;
             color: #000;
-            border: 1px solid #000;
-            box-sizing: border-box;
-            padding: 32px 28px;
+            border: 3px solid #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            gap: 18px;
         }
         #card.no-border { border: none; }
-        #card-cn {
-            font-size: clamp(1.2rem, 5vw, 1.6rem);
-            line-height: 1.6;
-            font-weight: 500;
-            text-wrap: balance;
-            word-break: keep-all;
-            line-break: strict;
-        }
-        #card-en {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: clamp(0.9rem, 3.5vw, 1.05rem);
-            line-height: 1.5;
-            font-weight: 400;
-            opacity: 0.85;
-            text-wrap: balance;
-        }
-        #card-reasoning {
-            font-size: clamp(0.8rem, 3vw, 0.9rem);
-            line-height: 1.7;
-            opacity: 0.65;
-            margin-top: 8px;
-            text-wrap: balance;
-        }
-        .actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .actions button {
-            background: #000;
-            color: #f2f2f2;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .actions button.secondary {
-            background: transparent;
-            color: #000;
-            border: 1px solid #000;
-        }
-        .hint {
-            font-size: 0.875rem;
-            color: #000;
-            opacity: 0.6;
-            text-align: center;
-            max-width: 320px;
-            line-height: 1.6;
-        }
-        .brand {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 0.75rem;
-            opacity: 0.5;
-            letter-spacing: 0.08em;
-        }
-        .error {
-            font-size: 0.95rem;
-            color: #c00;
-            text-align: center;
-            max-width: 320px;
-        }
+        #card .en { font-family: 'Inter', 'Helvetica', 'Arial', sans-serif; }
+        #card-num { font-size: 48px; margin-bottom: 26px; }
+        #card-cn { font-size: 64px; font-weight: 500; margin-bottom: 38px; text-wrap: balance; line-break: strict; }
+        #card-en { font-size: 48px; text-wrap: balance; }
+        #card-reasoning { font-size: 30px; line-height: 1.6; opacity: 0.65; margin-top: 48px; text-wrap: balance; }
+        /* IG 限動底部 ~250px 會被回覆列蓋住，logo 放在它上面 */
+        #card-logo { position: absolute; left: 0; right: 0; bottom: 260px; margin: 0 auto; height: 112px; }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        .actions .primary-btn { margin: 0; }
+        .hint { font-size: var(--fs-hint); opacity: 0.6; text-align: center; }
+        .error { color: #c00; text-align: center; max-width: 320px; }
     </style>
 </head>
 <body>
     <div class="page">
-        <div id="error-msg" class="error" style="display:none;"></div>
-
-        <div id="card-wrap" style="display:none;">
-            <div id="card">
-                <p id="card-cn"></p>
-                <p id="card-en" style="display:none;"></p>
-                <p id="card-reasoning" style="display:none;"></p>
-                <span class="brand">The King of Chicken Soup</span>
-            </div>
-        </div>
-
+        <p id="error-msg" class="error" style="display:none;"></p>
+        <p id="loading" class="hint">卡片製作中…</p>
+        <img id="card-img" alt="你的雞湯卡片" style="display:none;">
         <div id="actions" class="actions" style="display:none;">
-            <button id="save-btn" onclick="savePNG()">存成圖片</button>
-            <button class="secondary" onclick="location.href='/'">回首頁</button>
+            <button id="save-btn" class="primary-btn btn-solid" onclick="savePNG()">儲存圖片</button>
+            <button class="primary-btn" onclick="location.href='/'">回首頁</button>
         </div>
-
-        <p id="hint" class="hint" style="display:none;">長按圖片可以直接存到相簿</p>
+        <p id="hint" class="hint" style="display:none;">也可以長按圖片存到相簿</p>
     </div>
 
-    <script src="js/card.js"></script>
+    <div id="card">
+        <p id="card-num" class="en" style="display:none;"></p>
+        <p id="card-cn"></p>
+        <p id="card-en" class="en" style="display:none;"></p>
+        <p id="card-reasoning" style="display:none;"></p>
+        <img id="card-logo" src="Logo/雞湯Logo.png" alt="">
+    </div>
+
+    <script src="js/card.js?v=20261103i"></script>
 </body>
 </html>

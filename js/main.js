@@ -46,8 +46,8 @@ window.showView = function(viewId) {
         window.cancelRevealHold();
     }
 
-    // 控制全域 Logo 顯示/隱藏 (因為資訊頁面自己有專屬左下角Logo，所以全域的要藏起來)
-    if (viewId === 'info-website-view') {
+    // 控制全域 Logo 顯示/隱藏 (因為資訊頁面自己有專屬左下角Logo，所以全域的要藏起來；書本脈絡是長文，logo 會壓字)
+    if (viewId === 'info-website-view' || viewId === 'book-context-view') {
         logo.classList.add('hidden');
     } else {
         logo.classList.remove('hidden');
@@ -365,7 +365,8 @@ function renderQuestion(index) {
 
     // 問題文字（fade in）
     const questionEl = document.getElementById('question-text');
-    questionEl.textContent = q.text;
+    // ponytail: 「…」內不斷行，不會從引號中間切（questions.json 是作者自己寫的，直接 innerHTML）
+    questionEl.innerHTML = q.text.replace(/「[^」]*」/g, m => `<span style="white-space:nowrap">${m}</span>`);
     gsap.fromTo(questionEl, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' });
 
     // 英文題目（已隱藏，保留元素避免版面位移）
@@ -622,29 +623,6 @@ function computeIngredientsFromQuote(quote) {
     });
 }
 
-function showIngredientView() {
-    if (!finalQuizResult) return;
-    const list = computeIngredientsFromQuote(finalQuizResult.quote);
-
-    const container = document.getElementById('ingredient-list');
-    container.innerHTML = '';
-    list.forEach((ing, i) => {
-        const card = document.createElement('div');
-        card.className = 'ingredient-card';
-        card.innerHTML = `
-            <img class="ingredient-icon" src="${ing.img}" alt="${ing.name}">
-            <div class="ingredient-name">${ing.name}</div>
-            <div class="ingredient-amount en">${ing.amount}</div>
-        `;
-        container.appendChild(card);
-
-        gsap.set(card, { opacity: 0, y: 20 });
-        gsap.to(card, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 + i * 0.25 });
-    });
-
-    showView('ingredient-view');
-}
-
 // ========== 熬製五步驟（純鍵盤互動：空白鍵；幾何圖形佔位） ==========
 // 之後實際出圖時，把 setup 函式內的 div / 邊框換成圖檔即可，邏輯都不需要動
 const COOKING_STEPS = [
@@ -712,21 +690,46 @@ function isCookingViewActive() {
     return !!(v && v.classList.contains('active'));
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.code !== 'Space' || e.repeat) return;
-    if (!isCookingViewActive()) return;
-    e.preventDefault();
-    if (cookingKey.isDown) return;
+function cookingPress() {
+    if (!isCookingViewActive() || cookingKey.isDown) return;
     cookingKey.isDown = true;
     if (cookingKey.down) cookingKey.down();
-});
-document.addEventListener('keyup', (e) => {
-    if (e.code !== 'Space') return;
+}
+function cookingRelease() {
     if (!isCookingViewActive()) return;
-    e.preventDefault();
     cookingKey.isDown = false;
     if (cookingKey.up) cookingKey.up();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || e.repeat || !isCookingViewActive()) return;
+    e.preventDefault();
+    cookingPress();
 });
+document.addEventListener('keyup', (e) => {
+    if (e.code !== 'Space' || !isCookingViewActive()) return;
+    e.preventDefault();
+    cookingRelease();
+});
+
+// 觸控（手機沒有空白鍵）：按住熬製頁任何地方 = 按住空白鍵；按鈕除外，「確定」照常點
+// 桌機滑鼠一律略過：展場只認空白鍵，也避免按著空白鍵時點滑鼠把長按提早放掉
+const cookingViewEl = document.getElementById('cooking-view');
+const isTouchPointer = (e) => e.pointerType !== 'mouse';
+cookingViewEl.addEventListener('pointerdown', (e) => { if (isTouchPointer(e) && !e.target.closest('button')) cookingPress(); });
+cookingViewEl.addEventListener('pointerup', (e) => { if (isTouchPointer(e)) cookingRelease(); });
+cookingViewEl.addEventListener('pointercancel', (e) => { if (isTouchPointer(e)) cookingRelease(); });
+cookingViewEl.addEventListener('contextmenu', (e) => e.preventDefault()); // 長按不跳系統選單
+
+// 觸控裝置的提示文字：把「空白鍵」換成「畫面」
+const IS_TOUCH = matchMedia('(pointer: coarse)').matches;
+function keyHint(text) {
+    if (!IS_TOUCH) return text;
+    return text.replace('長按空白鍵', '長按畫面')
+               .replace('按一下空白鍵', '點一下畫面')
+               .replace('按空白鍵', '點畫面')
+               .replace('用空白鍵', '點按畫面');
+}
 
 window.goToCooking = function() {
     cookingStepIndex = 0;
@@ -770,15 +773,15 @@ function showCookingIntro() {
 
     if (hintEl)  hintEl.textContent  = '接下來';
     if (titleEl) {
-        titleEl.textContent = '請用空白鍵進行互動';
+        titleEl.textContent = keyHint('請用空白鍵進行互動');
         titleEl.style.marginBottom = '72px'; // intro 的標題到鍵盤圖之間留比較多空間
     }
     // intro 不需要 keyword 區塊，整個收掉避免留白
     if (kwEl)    { kwEl.textContent = ''; kwEl.style.opacity = 0; kwEl.style.display = 'none'; }
 
-    // 空白鍵示意圖（只在 intro 顯示，按確定後移除）
+    // 空白鍵示意圖（只在 intro 顯示，按確定後移除；觸控裝置沒有鍵盤就不放）
     let introImg = document.getElementById('cooking-intro-img');
-    if (!introImg && ctrls && ctrls.parentNode) {
+    if (!IS_TOUCH && !introImg && ctrls && ctrls.parentNode) {
         introImg = document.createElement('img');
         introImg.id = 'cooking-intro-img';
         introImg.src = 'Images/空白鍵.png';
@@ -880,7 +883,7 @@ function renderCookingStep() {
     const progressEl = document.getElementById('cooking-step-progress');
 
     titleEl.textContent = step.title;
-    if (hintEl) hintEl.textContent = step.hint;
+    if (hintEl) hintEl.textContent = keyHint(step.hint);
     // 步驟頁顯示左邊小雞湯王 icon（intro 提示頁會藏起來）
     if (hintIconEl) hintIconEl.style.display = '';
     if (progressEl) {
@@ -944,10 +947,13 @@ function setupStep1Chop() {
     const stage = document.getElementById('cooking-stage');
     stage.style.cssText = 'position: relative; margin: 0 auto; width: min(800px, 92vw); height: 240px; display: flex; align-items: center; justify-content: center; gap: 1.8rem;';
 
+    // 手機一次只放一個食材（.current，CSS 藏其他的），切完停一下看成品再換下一個；桌面 .current 沒有樣式
+    const ONE_AT_A_TIME = matchMedia('(max-width: 767px)').matches;
+
     const boxes = [];
     STEP1_INGREDIENTS.forEach((ing, i) => {
         const box = document.createElement('div');
-        box.className = 'chop-ingredient' + (i === 0 ? ' active' : '');
+        box.className = 'chop-ingredient' + (i === 0 ? ' active current' : '');
         box.innerHTML = `
             <img class="chop-shape${ing.sizeClass ? ' ' + ing.sizeClass : ''}" src="${ing.raw}" data-chopped="${ing.chopped}" alt="${ing.label}">
             <div class="chop-label">${ing.label}</div>
@@ -990,7 +996,14 @@ function setupStep1Chop() {
                   gsap.to(knife, { y: -130, opacity: 0, duration: 0.2, ease: 'power2.out',
                       onComplete: () => {
                           knife.remove();
-                          isChopping = false;
+                          gsap.delayedCall(ONE_AT_A_TIME ? 0.35 : 0, () => {
+                              if (ONE_AT_A_TIME && next) {
+                                  box.classList.remove('current');
+                                  next.classList.add('current');
+                                  gsap.fromTo(next, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' });
+                              }
+                              isChopping = false;
+                          });
                       }
                   });
                   gsap.fromTo(box, { x: -3 }, { x: 3, duration: 0.05, repeat: 3, yoyo: true, clearProps: 'x' });
@@ -1609,7 +1622,6 @@ function renderSoupView() {
         topEl.textContent = '你得到了一鍋';
         topEl.style.display = '';
         nameEl.textContent = soupName;
-        nameEl.style.fontSize = '2.5rem';
         if (q.soupDesc) {
             descEl.textContent = q.soupDesc;
             descEl.style.display = '';
@@ -1619,12 +1631,12 @@ function renderSoupView() {
         }
         btn.textContent = '下一步';
         btn.style.display = '';
+        btn.disabled = false;
     } else {
         // scan 模式：差最後一步（沒按鈕，等觀眾實體掃描對應編號 NFC）
         topEl.textContent = '';
         topEl.style.display = 'none';
         nameEl.textContent = '差最後一步了！';
-        nameEl.style.fontSize = '2.5rem';
         descEl.innerHTML = `請拿右邊#${q.number}瓶子掃描裝置以接住萃取後的<strong>${soupName}</strong>`;
         descEl.style.display = '';
         btn.style.display = 'none';
@@ -1633,6 +1645,12 @@ function renderSoupView() {
 
 // 成品頁按鈕動作：第一次點 → 切成掃描提示（同頁替換）；第二次點 → 揭曉原句
 window.advanceFromSoup = function() {
+    // 按鈕模式：沒有瓶子可掃，跳過「差最後一步」直接揭曉原句（disabled 防連點重播）
+    if (!CONFIG.useNFC) {
+        document.getElementById('soup-btn').disabled = true;
+        revealQuote();
+        return;
+    }
     if (soupViewMode === 'soup') {
         // 替換內容：fade out → 切模式 → fade in
         const nodes = ['soup-top-label', 'soup-name', 'soup-desc', 'soup-btn']
@@ -1728,21 +1746,6 @@ async function buildQuotesList(highlightNumber) {
 // Canvas particle 系統（支援多元素）
 let particleCanvases = [];
 let particleAnimFrame = null;
-
-// 用 Range 取得實際文字的 bounding rect（相對於 el）
-function getTextBounds(el) {
-    const elRect = el.getBoundingClientRect();
-    const range = document.createRange();
-    range.selectNodeContents(el);
-    const rects = Array.from(range.getClientRects());
-    if (rects.length === 0) return { left: 0, top: 0, width: elRect.width, height: elRect.height };
-
-    const left   = Math.min(...rects.map(r => r.left))   - elRect.left;
-    const top    = Math.min(...rects.map(r => r.top))    - elRect.top;
-    const right  = Math.max(...rects.map(r => r.right))  - elRect.left;
-    const bottom = Math.max(...rects.map(r => r.bottom)) - elRect.top;
-    return { left, top, width: right - left, height: bottom - top };
-}
 
 const FADE_ZONE = 30; // 邊緣淡出範圍（px）
 
@@ -1869,7 +1872,13 @@ function openQuotePanel(quote) {
     // 立刻隱藏文字（避免閃爍），重置 hint
     zhEl.style.color = '#f2f2f2';
     enEl.style.color = '#f2f2f2';
-    document.getElementById('quote-panel-hint').textContent = '雞湯的香味出來啦！';
+    const hint = document.getElementById('quote-panel-hint');
+    if (CONFIG.useNFC) {
+        hint.textContent = '雞湯的香味出來啦！';
+    } else {
+        hint.style.opacity = '1';
+        hint.innerHTML = '<button class="primary-btn" onclick="this.disabled=true; revealQuoteInPanel()">打開這句雞湯</button>';
+    }
 
     // 開啟 panel
     panel.classList.add('open');
@@ -2009,7 +2018,7 @@ window.revealQuote = function() {
     const numEl = document.getElementById('reveal-number');
     const zhEl = document.getElementById('reveal-zh');
     const enEl = document.getElementById('reveal-en');
-    const buttons = document.querySelectorAll('#quote-reveal-view .primary-btn');
+    const buttons = document.querySelectorAll('#quote-reveal-view .primary-btn, #reveal-links');
 
     numEl.textContent = `#${q.number}`;
     zhEl.textContent = q.textCN || '';
@@ -2055,6 +2064,40 @@ window.revealQuote = function() {
         }, 1000);
     }, 400);
 };
+
+// 書本脈絡（按鈕模式沒有實體書）：data/book.json，key = 雞湯編號，值 = 段落陣列；第一次點才載
+let bookData = null;
+window.showBookContext = async function() {
+    const q = finalQuizResult && finalQuizResult.quote;
+    if (!q) return;
+    if (!bookData) bookData = await fetch('data/book.json').then(r => r.json()).catch(() => null);
+    const paras = (bookData && bookData[q.number]) || ['這句的脈絡暫時讀不到，晚點再試試。'];
+
+    document.getElementById('book-number').textContent = `#${q.number}`;
+    document.getElementById('book-quote').textContent = q.textCN || '';
+    document.getElementById('book-en').textContent = q.textEN || '';
+    document.getElementById('book-body').replaceChildren(...paras.map(text => {
+        const p = document.createElement('p');
+        p.textContent = text;
+        return p;
+    }));
+    document.getElementById('book-scroll').scrollTop = 0;
+    showView('book-context-view');
+};
+
+// 儲存雞湯：開新分頁到 card.html（存成圖片 / 長按存相簿），原本這頁留著可以回來
+window.saveQuoteCard = function() {
+    const q = finalQuizResult && finalQuizResult.quote;
+    if (!q) return;
+    window.open(`card.html#d=${toBase64Url(JSON.stringify({ n: q.number, cn: q.textCN, en: q.textEN }))}`, '_blank');
+};
+
+// UTF-8 字串 → base64url（card.html 的 #d= 參數）
+function toBase64Url(str) {
+    let binary = '';
+    for (const b of new TextEncoder().encode(str)) binary += String.fromCharCode(b);
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
 // 進入網站瀏覽（Explore 按鈕）
 window.goToWebsite = function() {
@@ -2103,9 +2146,8 @@ let lastChatMessage = ''; // 儲存最後一次輸入的文字
 // 把 slider 0-100 值對應到 5 個等級 index 0..4
 function snapToneIdx(v) { return Math.round(Number(v ?? 50) / 25); }
 
-// API 端點：Vercel 上用相對路徑，本地用完整網址
-const IS_LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const API_URL = IS_LOCAL ? 'https://chicken-soup-quote.vercel.app/api/chat' : '/api/chat';
+// API 端點：Vercel 上用相對路徑；本機、區網 IP（手機連電腦測）沒有 API，打線上那份
+const API_URL = location.hostname.endsWith('.vercel.app') ? '/api/chat' : 'https://chicken-soup-quote.vercel.app/api/chat';
 
 // 顯示結果頁面
 function showChatResult() {
@@ -2125,8 +2167,13 @@ function showChatResult() {
     // 脈絡、客製化 dock 預設藏起來（NFC reveal 後才出現）
     if (ctxEl)  { ctxEl.textContent = ''; ctxEl.style.display = 'none'; }
 
-    hintEl.style.opacity = '0.5';
-    hintEl.textContent = '掃描裝置以解讀這句雞湯';
+    if (CONFIG.useNFC) {
+        hintEl.style.opacity = '0.5';
+        hintEl.textContent = '掃描裝置以解讀這句雞湯';
+    } else {
+        hintEl.style.opacity = '1';
+        hintEl.innerHTML = '<button class="primary-btn" onclick="this.disabled=true; revealChatQuote()">解讀這句雞湯</button>';
+    }
     hintEl.style.display = '';
 
     document.getElementById('chat-result-actions').style.display = 'none';
@@ -2831,11 +2878,7 @@ window.shareCardViaNFC = function () {
         nb: document.getElementById('save-no-border')?.checked ? 1 : 0,
     };
 
-    // UTF-8 → base64url
-    const utf8 = new TextEncoder().encode(JSON.stringify(payload));
-    let binary = '';
-    for (const b of utf8) binary += String.fromCharCode(b);
-    const b64 = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const b64 = toBase64Url(JSON.stringify(payload));
 
     const origin = location.origin.includes('http') ? location.origin : 'https://chicken-soup-quote.vercel.app';
     const url = `${origin}/card.html#d=${b64}`;
@@ -3198,28 +3241,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const lengthSlider = document.getElementById('param-length');
     if (lengthSlider) lengthSlider.addEventListener('change', onParamChange);
 
-    // 中文字體切換
-    const fontZhSelect = document.getElementById('param-font-zh');
-    if (fontZhSelect) {
-        fontZhSelect.addEventListener('change', () => {
-            const textEl = document.getElementById('chat-translation-text');
-            if (!textEl) return;
-            textEl.classList.remove('font-noto-sans-tc', 'font-noto-serif-tc');
-            textEl.classList.add(`font-${fontZhSelect.value}`);
-        });
-    }
-
-    // 英文字體切換
-    const fontEnSelect = document.getElementById('param-font-en');
-    if (fontEnSelect) {
-        fontEnSelect.addEventListener('change', () => {
-            const enEl = document.getElementById('chat-en-text');
-            if (!enEl) return;
-            enEl.classList.remove('font-helvetica', 'font-times-new-roman');
-            enEl.classList.add(`font-${fontEnSelect.value}`);
-        });
-    }
-
 
     // 聊天輸入框邏輯
     const chatInput = document.getElementById('chat-input');
@@ -3264,13 +3285,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (chatInput.value.trim().length > 0) submitChat();
             }
         });
+
+        // 手機鍵盤：照各家 AI chat 的做法，輸入框貼著鍵盤、訊息往上推
+        // iOS / 新版 Android 鍵盤都只縮 visualViewport、不縮 100dvh，所以把聊天頁高度手動設成可見高度
+        // ponytail: 靠 focus 判斷鍵盤開關；外接鍵盤的平板會誤判成開（只是 logo 藏掉），要精準就改看 kb > 80
+        if (IS_TOUCH) {
+            const chatView = document.getElementById('chat-view');
+            const chatBox = chatView.querySelector(':scope > div');
+            const scroller = document.getElementById('chat-messages');
+            const fit = () => {
+                const vv = window.visualViewport;
+                const open = document.activeElement === chatInput;
+                document.documentElement.classList.toggle('kb-open', open);
+                const kb = vv ? window.innerHeight - vv.height : 0; // layout 高 − 可見高 ≈ 鍵盤高
+                chatBox.style.height = (open && kb > 80) ? vv.height + 'px' : '';
+                if (!open) return;
+                window.scrollTo(0, 0);          // iOS 會把頁面往上推去露出輸入框，推回來
+                chatView.scrollTop = 0;
+                requestAnimationFrame(() => { scroller.scrollTop = scroller.scrollHeight; });
+            };
+            chatInput.addEventListener('focus', fit);
+            chatInput.addEventListener('blur', fit);
+            window.addEventListener('resize', fit);
+            window.visualViewport?.addEventListener('resize', fit);
+            window.visualViewport?.addEventListener('scroll', fit);
+        }
     }
 
     // 初始化 WebSocket
     console.log('檢查 nfcManager:', window.nfcManager);
     console.log('檢查 CONFIG:', window.CONFIG);
 
-    if (window.nfcManager) {
+    if (!CONFIG.useNFC) {
+        console.log('按鈕模式：不連 NFC 裝置');
+    } else if (window.nfcManager) {
         console.log('準備連接 WebSocket...');
         // WS 連線後推一次 idle 狀態給 ESP（ESP 剛開機不知道 app 在哪個階段）
         nfcManager.onConnect(() => {

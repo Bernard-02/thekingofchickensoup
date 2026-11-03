@@ -15,17 +15,12 @@ class NFCManager {
     constructor() {
         this.ws = null;
         this.isConnected = false;
-        this.heartbeatTimer = null;
-        this.heartbeatWatchdog = null;
-        this.lastMessageTime = 0;
         this.currentQuoteNumber = -1; // 當前顯示的雞湯編號
 
         // 事件回調
-        this.onReadCallback = null;
         this.onWriteCallback = null;
         this.onConnectCallback = null;
         this.onDisconnectCallback = null;
-        this.onRemoveCallback = null;
     }
 
     // 連線到 ESP8266 — 最樸素的 vanilla WebSocket
@@ -85,32 +80,9 @@ class NFCManager {
                     // AI 解鎖卡：只在 chat-result-view 揭曉 AI 原句
                     this.handleAIReveal();
                     break;
-                case 'category_selected':
-                    // 處理分類選擇（保留向下相容）
-                    this.handleCategorySelected(message);
-                    break;
                 case 'show_context':
                     // 處理顯示脈絡（舊版，保留相容性）
                     this.handleShowContext(message);
-                    break;
-                case 'toggle_context':
-                    // 處理切換脈絡顯示
-                    this.handleToggleContext(message);
-                    break;
-                case 'save_quote':
-                    // 處理儲存雞湯
-                    this.handleSaveQuote(message);
-                    break;
-                case 'page_change':
-                    // 舊版頁面切換（保留向下相容）
-                    this.handlePageChange(message);
-                    break;
-                case 'nfc_read':
-                    this.handleNFCRead(message.data);
-                    break;
-                case 'nfc_removed':
-                    // 不再處理 NFC 移除事件，改用切換邏輯
-                    log('收到 NFC 移除訊息（已忽略）', 'info');
                     break;
                 case 'nfc_write_success':
                     this.handleNFCWriteSuccess(message.data);
@@ -266,47 +238,6 @@ class NFCManager {
         log('不在 chat-result-view，AI 卡掃描忽略（這張卡只能用來解鎖 AI 雞湯）', 'info');
     }
 
-    // 處理分類選擇（保留向下相容）
-    async handleCategorySelected(message) {
-        const { uid, category } = message;
-        log(`分類選擇! UID: ${uid}, 分類: ${category}`, 'info');
-
-        try {
-            // 載入雞湯資料
-            const response = await fetch(CONFIG.dataFiles.quotes);
-            const quotes = await response.json();
-
-            // 篩選該分類的雞湯
-            const categoryQuotes = quotes.filter(q => q.category === category);
-
-            if (categoryQuotes.length === 0) {
-                log(`分類 ${category} 沒有雞湯文`, 'warn');
-                return;
-            }
-
-            // 隨機選擇一句
-            const randomQuote = categoryQuotes[Math.floor(Math.random() * categoryQuotes.length)];
-            log(`隨機選中: #${randomQuote.number} - ${randomQuote.textCN}`, 'info');
-
-            // 儲存到 localStorage，供 quote.html 使用
-            localStorage.setItem('currentQuote', JSON.stringify(randomQuote));
-            localStorage.setItem('selectedCategory', category);
-
-            // 跳轉到 quote.html（會顯示過渡動畫）
-            window.location.href = 'quote.html';
-
-        } catch (error) {
-            log(`載入雞湯失敗: ${error}`, 'error');
-        }
-    }
-
-    // 處理切換脈絡顯示（新版）
-    // 新版：掃 NFC → 開 quote panel 並 reveal 原句
-    // （舊版的 contextManager 滿版脈絡已廢棄）
-    async handleToggleContext(message) {
-        return this.handleShowContext(message);
-    }
-
     async handleShowContext(message) {
         const { uid } = message;
         log(`掃描到 NFC UID: "${uid}"`, 'info');
@@ -369,22 +300,6 @@ class NFCManager {
         }
     }
 
-    // 處理儲存雞湯（此函數現在由 ESP8266 主動觸發寫入，這裡保留用於 UI 回饋）
-    handleSaveQuote(message) {
-        log('儲存雞湯功能觸發', 'info');
-
-        // 取得當前雞湯
-        const currentQuote = localStorage.getItem('currentQuote');
-
-        if (currentQuote) {
-            const quote = JSON.parse(currentQuote);
-            log(`準備儲存雞湯 #${quote.number} 到 NFC`, 'info');
-            // 注意：實際寫入是由 ESP8266 處理，這裡只是顯示提示
-        } else {
-            log('沒有雞湯可以儲存', 'warn');
-        }
-    }
-
     // 發送當前顯示的雞湯編號給 ESP8266
     updateCurrentQuote(quoteNumber) {
         // 無論是否連線，都先儲存到本地
@@ -407,81 +322,6 @@ class NFCManager {
         } catch (error) {
             log(`發送雞湯編號失敗: ${error}`, 'error');
             return false;
-        }
-    }
-
-    // 處理頁面切換 (舊版，保留向下相容)
-    handlePageChange(message) {
-        const { uid, page } = message;
-        log(`NFC 偵測到! UID: ${uid}, 切換到頁面: ${page}`, 'info');
-
-        // 根據頁面名稱切換到對應的 HTML 頁面
-        const pageMap = {
-            'quote': 'quote.html',
-            'context': 'context.html',
-            'home': 'index.html'
-        };
-
-        const targetPage = pageMap[page];
-        if (targetPage) {
-            log(`正在跳轉到: ${targetPage}`, 'info');
-            window.location.href = targetPage;
-        } else {
-            log(`未知的頁面: ${page}`, 'warn');
-        }
-
-        // 觸發回調
-        if (this.onReadCallback) {
-            this.onReadCallback({ uid, page });
-        }
-    }
-
-    // 處理 NFC 讀取
-    handleNFCRead(data) {
-        log(`NFC 讀取: UID=${data.uid}`, 'info');
-
-        // 更新 UI
-        const resultDiv = document.getElementById('nfc-read-result');
-        if (resultDiv) {
-            resultDiv.innerHTML = `
-                <p class="font-semibold">偵測到 NFC 標籤！</p>
-                <p class="mt-2">UID: ${data.uid}</p>
-                ${data.page ? `<p class="mt-2">頁面: ${data.page}</p>` : ''}
-                ${data.content ? `<p class="mt-2">內容: ${data.content}</p>` : ''}
-            `;
-        }
-
-        // 如果有頁面資訊,自動切換頁面
-        if (data.page && window.app) {
-            const pageId = data.page + '-page';
-            log(`自動切換到頁面: ${pageId}`, 'info');
-            window.app.showPage(pageId);
-        }
-
-        // 觸發回調
-        if (this.onReadCallback) {
-            this.onReadCallback(data);
-        }
-    }
-
-    // 處理 NFC 移除
-    handleNFCRemoved(data) {
-        log(`NFC 標籤移除: UID=${data.uid}`, 'info');
-
-        // 隱藏脈絡媒體覆蓋層
-        if (window.contextManager) {
-            window.contextManager.hide();
-        }
-
-        // 更新 UI
-        const resultDiv = document.getElementById('nfc-read-result');
-        if (resultDiv) {
-            resultDiv.innerHTML = '<p>等待 NFC 標籤...</p>';
-        }
-
-        // 觸發回調
-        if (this.onRemoveCallback) {
-            this.onRemoveCallback(data);
         }
     }
 
@@ -649,60 +489,6 @@ class NFCManager {
         }, 2500);
     }
 
-    // 舊版：滿版警告（保留但不再使用）
-    showWrongBottleWarning(correctNumber, scannedNumber) {
-        const overlay = document.createElement('div');
-        overlay.id = 'wrong-bottle-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 300;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
-
-        overlay.innerHTML = `
-            <div style="
-                position: fixed;
-                bottom: 8vh;
-                left: 50%;
-                transform: translateX(-50%);
-                text-align: center;
-                color: #000;
-                width: 100%;
-                padding: 0 2rem;
-            ">
-                <p style="font-size: 1rem; font-weight: 500;">好像有點不對，請掃描對應編號的瓶子。</p>
-            </div>
-        `;
-
-        document.body.appendChild(overlay);
-
-        // 淡入
-        setTimeout(() => {
-            overlay.style.opacity = '1';
-        }, 10);
-
-        // 2秒後淡出並移除
-        setTimeout(() => {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        }, 2000);
-
-        // 點擊關閉
-        overlay.addEventListener('click', () => {
-            overlay.style.opacity = '0';
-            setTimeout(() => overlay.remove(), 300);
-        });
-    }
-
     // 發送訊息
     send(type, data = {}) {
         if (!this.isConnected || !this.ws) {
@@ -776,15 +562,6 @@ class NFCManager {
             this.ws.close();
         }
         this.stopHeartbeat();
-    }
-
-    // 設定事件監聽器
-    onRead(callback) {
-        this.onReadCallback = callback;
-    }
-
-    onRemove(callback) {
-        this.onRemoveCallback = callback;
     }
 
     onWrite(callback) {

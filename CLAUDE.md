@@ -15,13 +15,12 @@
 ├── js/
 │   ├── config.js           # 全域設定（WebSocket URL、資料路徑）
 │   ├── main.js             # 頁面邏輯、問題渲染、流程控制
-│   ├── nfc.js              # NFC WebSocket 通訊（連接 ESP8266）
-│   └── context.js          # 脈絡媒體覆蓋層
+│   └── nfc.js              # NFC WebSocket 通訊（連接 ESP8266）
 ├── data/
 │   ├── quotes.json         # 完整 200 句語錄（備份用，勿直接使用）
 │   ├── quotes-selected.json # 篩選後的 100 句（裝置使用的資料來源）
 │   ├── questions.json      # 8 題問答資料（動態渲染）
-│   └── contexts.json       # 每句話的脈絡媒體資料
+│   └── book.json           # 書中每句雞湯的文字脈絡（200 句，key = 編號，值 = 段落陣列）
 └── src/main.cpp            # ESP8266 韌體（PlatformIO）
 ```
 
@@ -31,8 +30,10 @@
 
 - **前端**：原生 HTML / CSS / JavaScript
 - **樣式**：Tailwind CSS（CDN）、自訂 `style.css`
-- **動畫**：GSAP 3.12.5（CDN，含 TextPlugin / Flip / MotionPathPlugin / EasePack）
-- **字體**：Noto Sans TC（中文）、Helvetica（英文，用 `.en` class 套用）
+- **動畫**：GSAP 3.12.5（vendor/ 本地，只載 core + TextPlugin）
+- **字體**：Noto Sans TC（中文）、Helvetica（英文，用 `.en` class 套用）。一般文字用 `var(--font-mix)`（Helvetica → Arial → Noto Sans TC），同一行中英混排時英文、數字自動用英文字體；行高 `:root` 統一 1.3
+- **字級**：四級制，只認 `css/style.css` `:root` 的 `--fs-title` / `--fs-subtitle` / `--fs-body` / `--fs-hint`（桌機 40/24/16/14，手機 24/18/14/12，在 ≤767 區塊覆寫）。新元素用 `var(--fs-*)` 或 `.fs-*` class，不寫死 px/rem；例外只有首頁 h1（hero）、熬製小遊戲內部標籤、分享卡片（固定像素出圖）
+- **版面**：`:root` 的 `--page-pad`（畫面四邊留白，桌機 32 / 手機 24）、`--logo-h`（底部 logo，40 / 32）。角落固定的東西（logo、返回、吉祥物、客製化框）一律貼 `var(--page-pad)`，不寫死 px。手機（≤767）每頁內容 = 畫面扣四邊留白、底部再扣 `--footer-h`（預設 = logo；問題頁、AI 結果頁另外加大）+ 一個留白，內容太長整頁捲；新頁面外層用 `p-8` 容器就會自動套用
 - **硬體通訊**：WebSocket 連接 ESP8266 NFC 讀取裝置
 - **硬體**：ESP8266 + PN532 NFC 模組
 
@@ -63,6 +64,13 @@ Q8 分叉：
                 掃 QR code 帶走（數位卡片）
 ```
 
+### 展覽模式 / 線上模式（按鈕模式，無 NFC）
+`CONFIG.useNFC`（`js/config.js`）：本機（localhost / file）且畫面 >767 → 展覽（NFC）；Vercel、手機、DevTools 手機模擬 → 線上（按鈕）。手動切換：開發模式面板（Ctrl+Shift+D）的「切換模式」按鈕（記在該瀏覽器的 localStorage，切回跟自動一樣時自動清掉），或網址加 `?nfc=0` / `?nfc=1`（最優先）。線上模式不連 WebSocket，`<html>` 帶 `no-nfc` class：
+- 雞湯成品頁「下一步」→ 直接揭曉原句（跳過「差最後一步」掃瓶子）
+- 原句揭曉頁按鈕換成「查看脈絡」（`book-context-view`，讀 `book.json`）/「儲存雞湯」（開新分頁到 `card.html`：排 1080×1920 → html2canvas 拍成 PNG 當預覽，可長按存相簿；按鈕在 iOS 叫分享選單、其他直接下載），重新開始 / 雞湯學徒 / 查看專案縮成一行小字
+- AI 結果頁、雞湯列表 panel 的「掃描」提示換成按鈕
+- 藏掉翻書提示、「感應手機帶走」
+
 ---
 
 ## 語錄資料說明
@@ -87,6 +95,9 @@ Q8 分叉：
 - `人生哲理` — 對生命、自我的觀察
 - `人際關係` — 對他人、關係的觀察
 - `處世態度` — 面對事情的方式
+
+### 書本脈絡（book.json）
+從作者 Notion「語錄大全 1-100 / 101-200」每頁內文的中文部分匯出（英文翻譯不收）。編號 = Notion 的「序」= `quotes.json` / `quotes-selected.json` 的 `number`，用 `book[q.number]` 取段落陣列。上線後不再讀 Notion；書的內容有改時重新匯出覆蓋此檔。
 
 ### 轉譯（translation）
 每句語錄有一個「轉譯」版本，像籤文一樣——用客觀描述一個場景或意象，不直接說出道理，讓觀眾自行解讀。裝置顯示的是轉譯，掃 NFC 後才看到原句。
